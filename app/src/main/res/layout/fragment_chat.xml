@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ChatFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/content_search"
+            android:layout_width="325dp"
+            android:layout_height="47dp"
+            android:background="@drawable/btn_search"
+            android:ems="10"
+            android:hint="모집방 검색"
+            android:textSize="15sp"
+            android:lines="1"
+            android:drawableStart="@drawable/magnifier"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/notosans_semibold"
+            android:textColorHint="#737373"
+            android:paddingLeft="15dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/send_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/bell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:paddingVertical="10dp"
+            android:text="참여 중인 모집방"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:fontFamily="@font/notosans_bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/join_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</LinearLayout>
