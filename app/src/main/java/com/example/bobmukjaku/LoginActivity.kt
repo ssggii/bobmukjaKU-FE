@@ -1,14 +1,17 @@
 package com.example.bobmukjaku
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.bobmukjaku.databinding.ActivityLoginBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
-//    private lateinit var auth: FirebaseAuth
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -21,25 +24,25 @@ class LoginActivity : AppCompatActivity() {
     private fun initLayout() {
         binding.apply {
             loginBtn.setOnClickListener {
-                val id = loginId.text.toString()
+                val email = loginId.text.toString()
                 val passwd = loginPasswd.text.toString()
 
-//                auth = Firebase.auth
-//                auth.signInWithEmailAndPassword(email, passwd)
-//                    .addOnCompleteListener(this@LoginActivity) { task ->
-//                        if (task.isSuccessful) {
+                auth = Firebase.auth
+                auth.signInWithEmailAndPassword(email, passwd)
+                    .addOnCompleteListener(this@LoginActivity) { task ->
+                        if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
-                            //Toast.makeText(this@LoginActivity, "login 성공", Toast.LENGTH_LONG).show()
+
                             //데이터베이스에 user정보를 넣어줘야함
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            //updateUI(null)
-//                            Toast.makeText(this@LoginActivity, "login 실패", Toast.LENGTH_LONG).show()
-//                        }
-//                    }
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            //updateUI(null)
+                            Toast.makeText(this@LoginActivity, "login 실패", Toast.LENGTH_LONG).show()
+                        }
+                    }
             }
 
             joinBtn.setOnClickListener {

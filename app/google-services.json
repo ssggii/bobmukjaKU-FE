@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "685215740456",
+    "project_id": "bobmukjaku",
+    "storage_bucket": "bobmukjaku.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685215740456:android:06cfc85e46c10bf1957b1d",
+        "android_client_info": {
+          "package_name": "com.example.bobmukjaku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO3ol6sa2yNFeoCEgsw3c8b_M6qPAAsgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

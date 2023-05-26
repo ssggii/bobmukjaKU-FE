@@ -20,6 +20,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<ChatAdap
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.binding.name.text = items[position].senderName
         holder.binding.chat.text = items[position].message
     }
 }

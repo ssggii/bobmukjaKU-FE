@@ -2,13 +2,17 @@ package com.example.bobmukjaku
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.UserItem
 import com.example.bobmukjaku.databinding.FragmentChatBinding
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -48,27 +52,29 @@ class ChatFragment : Fragment() {
     }
 
     private fun getChatRoomList() {
-//        val db = Firebase.database.getReference("users")
-//        db.get().addOnSuccessListener { dataSnapshot: DataSnapshot ->
-//            for (user in dataSnapshot.children) {
-//                val name = user.child("username").value.toString()
-//                val uid = user.child("uid").value.toString()
-//                chatlist.add(UserItem(name, "message", uid))
-//            }
-//
-//                binding.joinRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-//                adapter = ChatRoomListAdapter(chatlist)
-//                adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
-//                    override fun onItemClick(pos: Int) {
-//                        val intent = Intent(requireActivity(), ChatActivity::class.java)
-//                        intent.putExtra("name", chatlist[pos].name)
-//                        intent.putExtra("uid", chatlist[pos].uid)
-//                        startActivity(intent)
-//                    }
-//
-//                }
-//                binding.joinRecyclerView.adapter = adapter
-//            }
+        val db = Firebase.database.getReference("users")
+        db.get().addOnSuccessListener { dataSnapshot: DataSnapshot ->
+            for (user in dataSnapshot.children) {
+                val name = user.child("username").value.toString()
+                val uid = user.child("uid").value.toString()
+                Log.i("user", name.plus(uid))
+                chatlist.add(UserItem(name, "message", uid))
+            }
+
+
+                binding.joinRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                adapter = ChatRoomListAdapter(chatlist)
+                adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
+                    override fun onItemClick(pos: Int) {
+                        val intent = Intent(requireActivity(), ChatActivity::class.java)
+                        intent.putExtra("name", chatlist[pos].name)
+                        intent.putExtra("uid", chatlist[pos].uid)
+                        startActivity(intent)
+                    }
+
+                }
+                binding.joinRecyclerView.adapter = adapter
+            }
     }
 
     companion object {
