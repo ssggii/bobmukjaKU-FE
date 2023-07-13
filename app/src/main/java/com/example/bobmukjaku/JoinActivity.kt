@@ -156,8 +156,8 @@ class JoinActivity : AppCompatActivity() {
                                     Toast.makeText(this@JoinActivity, "객체넣기 실패", Toast.LENGTH_LONG).show()
                                 }
 
-                            //채팅방목록화면으로 전환
-                            val intent = Intent(this@JoinActivity, MainActivity::class.java)
+                            //재학생 인증 화면으로 전환
+                            val intent = Intent(this@JoinActivity, Join2Activity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)
                         } else {
