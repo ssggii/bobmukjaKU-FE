@@ -11,6 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BobmukjaKU"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="rvufpqa0vm" />
+
         <activity
             android:name=".Join2Activity"
             android:exported="false" />
