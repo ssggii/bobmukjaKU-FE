@@ -1,3 +1,11 @@
 package com.example.bobmukjaku.Model
 
-data class ChatModel(val myUid:String, val yourUid:String, val message:String, val time:Long, val who:String, val senderName:String)
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class ChatModel(
+    @JsonProperty val message:String,
+    @JsonProperty val senderUid:String,
+    @JsonProperty val senderName:String,
+    @JsonProperty val time:Long,
+    @JsonProperty val isShareMessage:Boolean,
+    @JsonProperty val chatRoomId:String)
