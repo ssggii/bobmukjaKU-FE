@@ -5,10 +5,209 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/modifyBtn"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="25dp"
+        android:layout_marginRight="30dp"
+        android:fontFamily="@font/notosans_medium"
+        android:background="@drawable/btn_circle_gray"
+        android:text="정보수정"
+        android:textSize="14sp"
+        android:textColor="#787878" />
 
+    <ImageButton
+        android:id="@+id/profileBG"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/ku_bg" />
+
+    <ImageButton
+        android:id="@+id/profileImg"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/ku_3" />
+
+    <ImageButton
+        android:id="@+id/profileBtn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="145dp"
+        android:layout_marginLeft="125dp"
+        android:background="@drawable/btn_edit_background" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="180dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="left"
+            android:text="닉네임"
+            android:textColor="@color/black"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/notosans_bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_gravity="left"
+                android:text="Lv "
+                android:textColor="@color/main"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold" />
+
+            <TextView
+                android:id="@+id/level"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_gravity="left"
+                android:text="3"
+                android:textColor="@color/main"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_gravity="left"
+                android:text="."
+                android:textColor="@color/main"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="재학생 인증: "
+                android:textColor="#787878"
+                android:textSize="14sp"
+                android:fontFamily="@font/notosans_light" />
+
+            <TextView
+                android:id="@+id/student_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="2023.07.20"
+                android:textColor="#787878"
+                android:textSize="14sp"
+                android:fontFamily="@font/notosans_light" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:letterSpacing="-0.05"
+            android:text="Until Next Level"
+            android:textColor="#737373"
+            android:textSize="15sp"
+            android:fontFamily="@font/notosans_semibold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:letterSpacing="-0.05"
+            android:text="Max"
+            android:textColor="#C8C8C8"
+            android:textSize="15sp"
+            android:fontFamily="@font/notosans_semibold" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:layout_marginTop="230dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:src="@drawable/level_gray" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="230dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:src="@drawable/level_green" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="270dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:src="@drawable/line_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="290dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="시간표"
+            android:textColor="@color/black"
+            android:textSize="22dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/notosans_bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/edit_timetable" />
+
+    </LinearLayout>
 </FrameLayout>
