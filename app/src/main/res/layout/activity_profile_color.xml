@@ -184,7 +184,7 @@
         android:orientation="vertical" >
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/join_button"
+            android:id="@+id/change_button"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_marginLeft="35dp"
