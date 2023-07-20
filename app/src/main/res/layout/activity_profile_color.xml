@@ -28,7 +28,7 @@
         android:layout_marginTop="250dp"
         android:layout_marginRight="70dp"
         android:layout_gravity="center|top"
-        android:background="@drawable/bg1" />
+        android:background="@drawable/btn_bg1" />
 
     <ImageButton
         android:id="@+id/bg2"
