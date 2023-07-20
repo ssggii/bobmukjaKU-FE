@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.bobmukjaku.databinding.ActivityMainBinding
@@ -7,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+    private val PROFILE_COLOR_REQUEST_CODE = 100 // Request code to identify the ProfileColorActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
@@ -50,7 +52,19 @@ class MainActivity : AppCompatActivity() {
                 }
                 true
             }
-            selectedItemId = R.id.first
+        }
+        // 초기화
+        val initialSelectedItem = intent.getIntExtra("selectedItemId", R.id.first)
+        mainBnv.selectedItemId = initialSelectedItem
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PROFILE_COLOR_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Get the selectedItemId from the data and set it as the selected item on BottomNavigationView
+            val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
+            val mainBnv = findViewById<BottomNavigationView>(R.id.main_bnv)
+            mainBnv.selectedItemId = selectedItemId ?: R.id.forth
         }
     }
 }
