@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.example.bobmukjaku.databinding.ActivityProfileColorBinding
 
 class ProfileColorActivity : AppCompatActivity() {
@@ -54,8 +56,19 @@ class ProfileColorActivity : AppCompatActivity() {
     private fun setSelectedBackground(selectedId: Int) {
         val button = findViewById<ImageButton>(selectedId)
         val resourceName = "btn_bg" + resources.getResourceEntryName(selectedId).removePrefix("bg").toInt()
+        val colorResName = "bg" + resources.getResourceEntryName(selectedId).removePrefix("bg").toInt()
         val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
         button.setBackgroundResource(resourceId)
+
+        val colorAttrId = resources.getIdentifier(colorResName, "color", packageName)
+        val color = ContextCompat.getColor(this, colorAttrId)
+        val drawable = ContextCompat.getDrawable(this, R.drawable.ku_bg)
+
+        drawable?.mutate()?.let {
+            val wrappedDrawable = DrawableCompat.wrap(it)
+            DrawableCompat.setTint(wrappedDrawable, color)
+            binding.profileBG2.background = wrappedDrawable
+        }
     }
 
     private fun init() {
