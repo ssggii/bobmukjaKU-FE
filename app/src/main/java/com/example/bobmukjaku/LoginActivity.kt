@@ -42,7 +42,8 @@ class LoginActivity : AppCompatActivity() {
                                 // Sign in success, update UI with the signed-in user's information
 
                                 //데이터베이스에 user정보를 넣어줘야함
-                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                //val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                             } else {

@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -29,9 +30,15 @@ class ChatFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    lateinit var mContext: Context
     lateinit var binding: FragmentChatBinding
     lateinit var adapter: ChatRoomListAdapter
     var chatlist = arrayListOf<UserItem>()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +69,7 @@ class ChatFragment : Fragment() {
             }
 
 
-                binding.joinRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                binding.joinRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
                 adapter = ChatRoomListAdapter(chatlist)
                 adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
                     override fun onItemClick(pos: Int) {

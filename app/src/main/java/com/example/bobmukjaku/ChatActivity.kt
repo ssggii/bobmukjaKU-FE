@@ -128,15 +128,6 @@ class ChatActivity : AppCompatActivity() {
 
         binding.apply {
             sendMsg.setOnClickListener {
-                /*val message = this.message.text.toString()
-                this.message.setText("")
-
-                val rf = Firebase.database.getReference("message")
-                val chatSend = ChatModel(myUid, yourUid, message, System.currentTimeMillis(), "me", myName)
-                rf.child(myUid).child(yourUid).push().setValue(chatSend)
-
-                val chatGet = ChatModel(myUid, yourUid, message, System.currentTimeMillis(), "you", myName)
-                rf.child(yourUid).child(myUid).push().setValue(chatGet)*/
 
                 //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화
                 menuDrawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)

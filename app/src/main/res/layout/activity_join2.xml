@@ -59,83 +59,102 @@
                 android:textColor="@color/white" />
 
         <LinearLayout
+            android:id="@+id/layout_input_authcode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:gravity="center"
+            android:paddingHorizontal="30dp"
             android:orientation="horizontal" >
 
-            <TextView
+            <EditText
                 android:id="@+id/num1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number" />
 
-            <TextView
+            <EditText
                 android:id="@+id/num2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number"/>
 
-            <TextView
+            <EditText
                 android:id="@+id/num3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number"/>
 
-            <TextView
+            <EditText
                 android:id="@+id/num4"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number"/>
 
-            <TextView
+            <EditText
                 android:id="@+id/num5"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number"/>
 
-            <TextView
+            <EditText
                 android:id="@+id/num6"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:padding="10dp"
                 android:layout_gravity="center"
                 android:background="@drawable/edittext"
                 android:textAlignment="center"
-                android:text="3"
-                android:textSize="30dp" />
+                android:text=""
+                android:textSize="30dp"
+                android:maxLength="1"
+                android:inputType="number"/>
         </LinearLayout>
 
             <TextView
