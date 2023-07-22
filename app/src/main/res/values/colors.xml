@@ -9,4 +9,24 @@
     <color name="red">#FFFF0000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- 프로필 배경색 리스트 -->
+    <color name="bg1">#FFFFF16F</color>
+    <color name="bg2">#FFFF8A8A</color>
+    <color name="bg3">#FFFFBC97</color>
+    <color name="bg4">#FF9FF092</color>
+    <color name="bg5">#FF89FFE3</color>
+    <color name="bg6">#FFC0F0FF</color>
+    <color name="bg7">#FFA9D1FF</color>
+    <color name="bg8">#FFC2C0FF</color>
+    <color name="bg9">#FFF2C0FF</color>
+    <color name="bg10">#FF998282</color>
+    <color name="bg11">#FF829984</color>
+    <color name="bg12">#FF829199</color>
+    <color name="bg13">#FF7D9AFF</color>
+    <color name="bg14">#FFD3D4D4</color>
+    <color name="bg15">#FFFDF6B9</color>
+    <color name="bg16">#FFFF8718</color>
+    <color name="bg17">#FFB76FFF</color>
+    <color name="bg18">#FFFD3BB0</color>
 </resources>
