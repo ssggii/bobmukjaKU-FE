@@ -218,6 +218,7 @@
         android:layout_weight="1">
 
         <TableLayout
+            android:id="@+id/timetableView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="45dp"
@@ -230,8 +231,8 @@
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="20dp"
+                    android:layout_height="25dp"
                     android:layout_marginRight="0.8dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
@@ -241,8 +242,8 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="15dp"
+                    android:layout_height="25dp"
                     android:layout_marginRight="0.8dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
@@ -253,8 +254,8 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="15dp"
+                    android:layout_height="25dp"
                     android:layout_marginRight="0.8dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
@@ -266,7 +267,7 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:layout_marginRight="0.8dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
@@ -277,8 +278,8 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="15dp"
+                    android:layout_height="25dp"
                     android:layout_marginRight="0.8dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
@@ -289,8 +290,8 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="15dp"
+                    android:layout_height="25dp"
                     android:layout_marginBottom="0.8dp"
                     android:background="#F4F4F4"
                     android:fontFamily="@font/notosans_semibold"
