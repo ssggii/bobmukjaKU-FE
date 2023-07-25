@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#B9B8B8" />
+    <corners android:radius="10dp" /> <!-- 이 값을 조정하여 둥글기 정도를 조절할 수 있습니다. -->
+    <padding android:left="0.7dp"
+        android:top="0.7dp"
+        android:right="0.7dp"
+        android:bottom="0.7dp" />
+</shape>
