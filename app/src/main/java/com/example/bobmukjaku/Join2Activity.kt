@@ -29,7 +29,7 @@ class Join2Activity : AppCompatActivity() {
     var hashedAuthCodeFromServer:String = ""
     val sha256 = Sha256()
 
-    //테스트 깃
+
     private val BASE_URL = "http://192.168.219.106:8080/"
     lateinit var retrofit: Retrofit
 
