@@ -48,6 +48,8 @@ class Join2Activity : AppCompatActivity() {
 
     }
 
+    //한번더 테스트
+
     private fun initLayout() {
         binding.sendBtn.setOnClickListener {
             //서버에게 이메일인증을 요청
