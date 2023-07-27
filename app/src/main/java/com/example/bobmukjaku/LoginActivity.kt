@@ -56,7 +56,9 @@ class LoginActivity : AppCompatActivity() {
             }
 
             joinBtn.setOnClickListener {
-                val intent = Intent(this@LoginActivity, JoinActivity::class.java)
+                /*val intent = Intent(this@LoginActivity, JoinActivity::class.java)
+                startActivity(intent)*/
+                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
                 startActivity(intent)
             }
         }
