@@ -7,6 +7,7 @@ data class Member(
 
     @JsonProperty("uid")var uid: Long?,
     @JsonProperty("memberEmail")var memberEmail: String?,
+    @JsonProperty("memberPassword")var memberPassword: String?,
     @JsonProperty("memberNickName")var memberNickName: String?,
     @JsonProperty("certificatedAt")var certificatedAt: String?,
     @JsonProperty("rate")var rate: Int?,
@@ -20,6 +21,10 @@ fun Member.getUid(): Long? {
 
 fun Member.getMemberEmail(): String? {
     return this.memberEmail
+}
+
+fun Member.getMemberPassword(): String? {
+    return this.memberPassword
 }
 
 fun Member.getMemberNickName(): String? {
