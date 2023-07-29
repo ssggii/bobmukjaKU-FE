@@ -136,10 +136,16 @@ class Join2Activity : AppCompatActivity() {
                 when{
                     (hashedAuthCodeFromUser == hashedAuthCodeFromServer)->{
                         //Log.i("kim", "일치합니다.")
-                        //메인화면으로 전환하는 코드...
-                        val intent = Intent(this@Join2Activity, JoinActivity::class.java)
-                        intent.putExtra("email", email)
-                        startActivity(intent)
+                        //로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
+                        //회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
+                        if(intent.getBooleanExtra("alreadyJoin", false)) {
+                            val intent = Intent(this@Join2Activity, MainActivity::class.java)
+                            startActivity(intent)
+                        }else{
+                            val intent = Intent(this@Join2Activity, JoinActivity::class.java)
+                            intent.putExtra("email", email)
+                            startActivity(intent)
+                        }
                     }
                     else->{
                         //Log.i("kim", "불일치합니다.")
