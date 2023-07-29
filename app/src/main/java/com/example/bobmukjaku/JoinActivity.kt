@@ -11,14 +11,12 @@ import androidx.core.widget.addTextChangedListener
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.databinding.ActivityJoinBinding
-import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class JoinActivity : AppCompatActivity() {
     lateinit var binding: ActivityJoinBinding
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
