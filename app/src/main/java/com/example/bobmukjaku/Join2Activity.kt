@@ -1,11 +1,14 @@
 package com.example.bobmukjaku
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Hash.Sha256
 import com.example.bobmukjaku.Model.HashedAuthCode
 import com.example.bobmukjaku.databinding.ActivityJoin2Binding
@@ -26,12 +29,20 @@ class Join2Activity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
+    lateinit var email: String
     var hashedAuthCodeFromServer:String = ""
     val sha256 = Sha256()
 
+    private var toast1: Toast? = null
+    private var toast2: Toast? = null
+    private var toast3: Toast? = null
+    private var toast4: Toast? = null
 
-    private val BASE_URL = "http://192.168.219.106:8080/"
+
+    private val BASE_URL = "http://192.168.219.107:8080/"
     lateinit var retrofit: Retrofit
+
+    val TAG = "kim"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,24 +59,49 @@ class Join2Activity : AppCompatActivity() {
 
     }
 
+
     private fun initLayout() {
         binding.sendBtn.setOnClickListener {
-            //서버에게 이메일인증을 요청
+            /*서버에게 이메일인증을 요청*/
 
+
+            //건국대학교 메일주소만 입력받도록 필터링
+            email = binding.inputEmail.text.toString()
+            val regex = """^[a-zA-Z0-9]+@konkuk\.ac\.kr$""".toRegex()
+            if(!regex.matches(email)) {
+                //Log.i("kim", "학교이메일아님")
+                toast2?.cancel()
+                toast2 = Toast.makeText(this@Join2Activity, "건국대학교 이메일이 아닙니다.", Toast.LENGTH_SHORT)
+                toast2?.show()
+                return@setOnClickListener
+            }
+
+            //1. 서버에 이메일인증 요청
+            //2. 응답값에서 인증코드 해시값을 꺼내와서 hashedAuthCodeFromServer변수에 저장
             val service = retrofit.create(MailAuthApi::class.java)
-            val repos = service.RequestMailAuth("kimdm4638@naver.com")
+            val repos = service.RequestMailAuth(email)
             CoroutineScope(Dispatchers.IO).launch {
-                repos.enqueue(object : Callback<HashedAuthCode>{
+                repos.enqueue(object : Callback<HashedAuthCode> {
                     override fun onResponse(
                         call: Call<HashedAuthCode>,
                         response: Response<HashedAuthCode>
                     ) {
                         Log.i("kim", response.body()!!.hashedAuthCode)
                         hashedAuthCodeFromServer = response.body()!!.hashedAuthCode
+
+                        binding.layoutInputAuthcode.visibility = View.VISIBLE
+                        binding.join2Button.visibility = View.VISIBLE
+                        binding.sendBtn.text = "이메일 재전송"
+                        binding.emailSend.text = "6자리 인증코드를 입력해주세요.\n혹시 이메일이 오지 않았다면 이메일 재전송 버튼을 눌러주세요."
                     }
 
                     override fun onFailure(call: Call<HashedAuthCode>, t: Throwable) {
-                        TODO("Not yet implemented")
+                        toast3?.cancel()
+                        toast3 = Toast
+                            .makeText(this@Join2Activity
+                                , "이메일 인증 요청을 실패하였습니다.\n 다시 재학생 인증 버튼을 눌러주세요."
+                                , Toast.LENGTH_SHORT)
+                        toast3?.show()
                     }
                 })
             }
@@ -88,7 +124,9 @@ class Join2Activity : AppCompatActivity() {
             Log.i("kim", authCodeFromUser)
 
             if(authCodeFromUser.length != 6){
-                Toast.makeText(this, "6자리의 인증코드를 제대로 입력하세요", Toast.LENGTH_SHORT).show()
+                toast1?.cancel()
+                toast1 = Toast.makeText(this, "6자리의 인증코드를 제대로 입력하세요", Toast.LENGTH_SHORT)
+                toast1?.show()
                 return@setOnClickListener
             }
 
@@ -97,11 +135,23 @@ class Join2Activity : AppCompatActivity() {
             if(hashedAuthCodeFromServer != ""){
                 when{
                     (hashedAuthCodeFromUser == hashedAuthCodeFromServer)->{
-                        Log.i("kim", "일치합니다.")
-                        //메인화면으로 전환하는 코드...
+                        //Log.i("kim", "일치합니다.")
+                        //로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
+                        //회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
+                        if(intent.getBooleanExtra("alreadyJoin", false)) {
+                            val intent = Intent(this@Join2Activity, MainActivity::class.java)
+                            startActivity(intent)
+                        }else{
+                            val intent = Intent(this@Join2Activity, JoinActivity::class.java)
+                            intent.putExtra("email", email)
+                            startActivity(intent)
+                        }
                     }
                     else->{
-                        Log.i("kim", "불일치합니다.")
+                        //Log.i("kim", "불일치합니다.")
+                        toast4?.cancel()
+                        toast4 = Toast.makeText(this@Join2Activity, "인증코드가 일치하지 않습니다.", Toast.LENGTH_SHORT)
+                        toast4?.show()
                     }
                 }
             }
@@ -113,7 +163,7 @@ class Join2Activity : AppCompatActivity() {
                 binding.num1.setText("")
             }
         }
-        binding.num1.addTextChangedListener(object : TextWatcher{
+        binding.num1.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -208,11 +258,33 @@ class Join2Activity : AppCompatActivity() {
                 binding.num5.setText("")
             }
         }
+        binding.num6.addTextChangedListener(object: TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                when(binding.num6.text.toString().length){
+                    0->binding.join2Button.background= ContextCompat
+                        .getDrawable(this@Join2Activity,
+                            R.drawable.btn_green_off)
+
+                    1->binding.join2Button.background= ContextCompat
+                        .getDrawable(this@Join2Activity,
+                            R.drawable.btn_green)
+                }
+            }
+
+        })
         binding.num6.setOnFocusChangeListener { v, hasFocus ->
             if(hasFocus){
                 binding.num6.setText("")
             }
         }
+
+
     }
 
     //Retrofit사용을 위한 초기화
