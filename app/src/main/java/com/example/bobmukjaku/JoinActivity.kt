@@ -107,16 +107,6 @@ class JoinActivity : AppCompatActivity() {
                 //입력이 끝났을 때
                 // 비밀번호 일치하는지 확인
                 override fun afterTextChanged(p0: Editable?) {
-//                    if(passwdArea.text.toString().equals(passwdAreaCheck.text.toString())){
-//                        pwConfirm.text = "비밀번호가 일치합니다."
-//
-//                        // 가입하기 버튼 활성화
-//                        joinButton.isEnabled=true
-//                    }
-//                    else{
-//                        pwConfirm.text = "비밀번호가 일치하지 않습니다."
-//                        pwConfirm.setTextColor(ContextCompat.getColor(applicationContext!!, R.color.red))
-//                    }
                 }
                 //입력하기 전
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
