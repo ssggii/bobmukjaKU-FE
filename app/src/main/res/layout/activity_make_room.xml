@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    tools:context=".MakeRoomActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:padding="10dp"
+        android:background="@drawable/line_gray"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancelBtn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/btn_cancel" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="35dp"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:text="모집방 개설"
+            android:textColor="@color/black"
+            android:textSize="22dp"
+            android:fontFamily="@font/notosans_bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="35dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginBottom="30dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="모집방 이름"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold"/>
+
+            <EditText
+                android:id="@+id/name_area"
+                android:layout_width="match_parent"
+                android:layout_height="47dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/line_gray"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="시간"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold"/>
+
+            <EditText
+                android:id="@+id/time_area"
+                android:layout_width="match_parent"
+                android:layout_height="47dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/line_gray"
+                android:text="현재 시간"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="음식 종류"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/KoreaF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="한식"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/JapanF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="일식"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/ForeignF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="양식"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/ChinaF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="중식"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/ectF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="기타"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="인원"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                android:fontFamily="@font/notosans_bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/P2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="2명"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/P3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="3명"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/P4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="4명"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="40dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/P5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="5명"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/P6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:text="6명"
+                    android:fontFamily="@font/notosans_bold"
+                    android:backgroundTint="#F5F5F5"
+                    android:background="@drawable/btn_circle_gray" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical" >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/finishBtn"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginLeft="35dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_green"
+            android:text="완료"
+            android:textSize="15dp"
+            android:textColor="@color/white" />
+    </LinearLayout>
+</LinearLayout>
