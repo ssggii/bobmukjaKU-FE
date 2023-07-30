@@ -66,8 +66,8 @@ class MakeRoomActivity : AppCompatActivity() {
         val currentHour = currentTime.get(Calendar.HOUR_OF_DAY)
         val currentMinute = currentTime.get(Calendar.MINUTE)
 
-        // 분을 10분 단위로 설정
-        val adjustedMinute = (currentMinute / 10) * 10
+        // 분을 무조건 0으로 초기화
+        val adjustedMinute = 0
 
         // startTimeArea에 현재 시간 + 1시간 설정
         val startTime = String.format("%02d:%02d", (currentHour + 1) % 24, adjustedMinute)
