@@ -17,7 +17,7 @@
 
         <EditText
             android:id="@+id/content_search"
-            android:layout_width="325dp"
+            android:layout_width="320dp"
             android:layout_height="47dp"
             android:background="@drawable/btn_search"
             android:ems="10"
@@ -34,9 +34,8 @@
             android:id="@+id/send_btn"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/bell" />
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/alarm" />
     </LinearLayout>
 
     <LinearLayout
