@@ -111,8 +111,8 @@
                     android:layout_height="30dp"
                     android:text="한식"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:textColor="@color/white"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/JapanF"
@@ -121,8 +121,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="일식"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ForeignF"
@@ -131,8 +131,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="양식"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
             </LinearLayout>
 
             <LinearLayout
@@ -147,8 +147,8 @@
                     android:layout_height="30dp"
                     android:text="중식"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ectF"
@@ -157,8 +157,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="기타"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
             </LinearLayout>
 
             <TextView
@@ -182,8 +182,8 @@
                     android:layout_height="30dp"
                     android:text="2명"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:textColor="@color/white"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/P3"
@@ -192,8 +192,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="3명"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/P4"
@@ -202,8 +202,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="4명"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
             </LinearLayout>
 
             <LinearLayout
@@ -219,8 +219,8 @@
                     android:layout_height="30dp"
                     android:text="5명"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/P6"
@@ -229,8 +229,8 @@
                     android:layout_marginLeft="15dp"
                     android:text="6명"
                     android:fontFamily="@font/notosans_bold"
-                    android:backgroundTint="#F5F5F5"
-                    android:background="@drawable/btn_circle_gray" />
+                    android:backgroundTint="@color/gray"
+                    android:background="@drawable/btn_circle_green" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
