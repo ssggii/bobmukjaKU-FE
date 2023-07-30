@@ -47,6 +47,9 @@ class ProfileFragment : Fragment() {
 
             if (currentColorFilter == null) {
                 // 수정 가능한 상태
+                // 안내 문구 변경
+                binding.timetableInfo.text = "불가능한 모든 시간 선택 후 다시 아이콘을 클릭해주세요."
+
                 val color = ContextCompat.getColor(requireContext(), R.color.main)
                 binding.editTimetable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
 
@@ -105,6 +108,8 @@ class ProfileFragment : Fragment() {
                 }
             } else {
                 // 수정 불가능한 상태
+                // 안내 문구 변경
+                binding.timetableInfo.text = "시간표 수정을 원하시면 시간표 옆 아이콘을 클릭하세요."
                 binding.editTimetable.clearColorFilter()
             }
         }

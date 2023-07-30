@@ -187,20 +187,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="290dp"
+        android:layout_marginTop="280dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="left"
+            android:fontFamily="@font/notosans_bold"
             android:text="시간표"
             android:textColor="@color/black"
             android:textSize="22dp"
-            android:textStyle="bold"
-            android:fontFamily="@font/notosans_bold" />
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/editTimetable"
@@ -211,10 +211,21 @@
             android:src="@drawable/edit_timetable" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/timetableInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="320dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:text="시간표 수정을 원하시면 시간표 옆 아이콘을 클릭하세요."
+        android:textSize="12dp"
+        android:textColor="@color/black"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="340dp"
         android:layout_weight="1">
 
         <TableLayout
