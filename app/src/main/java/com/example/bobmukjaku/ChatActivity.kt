@@ -129,13 +129,13 @@ class ChatActivity : AppCompatActivity() {
         binding.apply {
             sendMsg.setOnClickListener {
 
-                //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화
-                menuDrawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
-
-                //오른쪽 상단 메뉴버튼 눌렀을 때
-                chatroomMenu.setOnClickListener {
-                    menuDrawer.openDrawer(Gravity.RIGHT)
-                }
+//                //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화
+//                menuDrawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
+//
+//                //오른쪽 상단 메뉴버튼 눌렀을 때
+//                chatroomMenu.setOnClickListener {
+//                    menuDrawer.openDrawer(Gravity.RIGHT)
+//                }
 
                 //message전송
                 sendMsg.setOnClickListener {
