@@ -32,4 +32,11 @@
     <color name="bg16">#FFFF8718</color>
     <color name="bg17">#FFB76FFF</color>
     <color name="bg18">#FFFD3BB0</color>
+
+    <!-- 음식종류 배경색 리스트 -->
+    <color name="kor">#FFF28C6B</color>
+    <color name="jap">#FFEE9A38</color>
+    <color name="frg">#FF6EB279</color>
+    <color name="chi">#FFF34848</color>
+    <color name="ect">#FF594F45</color>
 </resources>
