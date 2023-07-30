@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.Dto.LoginResponseDto
 import com.example.bobmukjaku.Model.Member
+import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -20,12 +21,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -33,10 +28,7 @@ class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
 
-    private val BASE_URL = "http://192.168.219.107:8080/"
-    lateinit var retrofit: Retrofit
-    lateinit var service: LoginApi
-    private var sharedPreference: SharedPreferences? = null
+    lateinit var sharedPreference: SharedPreferences
 
     private var toast: Toast? = null
     private var toast2: Toast? = null
@@ -50,8 +42,7 @@ class LoginActivity : AppCompatActivity() {
 
 
         initSharedPreference()
-        //sharedPreference!!.edit().remove("accessToken").remove("access token").apply()
-        initRetroFit()
+        //sharedPreference.edit().remove("accessToken").apply()
         initLayout()
         autoLogin()
 
@@ -74,7 +65,8 @@ class LoginActivity : AppCompatActivity() {
     private fun certificatedAtCheck() {
         //서버에서 인증날짜를 비교해서 재학생인증이 만료됐는지 체크
 
-        val request = service.certificatedAtCheck(sharedPreference?.getString("accessToken", "")!!)
+        //val request = service.certificatedAtCheck(sharedPreference?.getString("accessToken", "")!!)
+        val request = RetrofitClient.memberService.certificatedAtCheck(sharedPreference.getString("accessToken", "")?:"")
         CoroutineScope(Dispatchers.IO).launch {
             request.enqueue(object: Callback<Member>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -89,8 +81,8 @@ class LoginActivity : AppCompatActivity() {
                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                         val certificatedAtFromServer =
                             LocalDate.parse(certificatedAtFromServerString, formatter)
-                        Log.i("kim", certificatedAtFromServer.toString())
-                        Log.i("kim", LocalDate.now().toString())
+                        //Log.i("kim", certificatedAtFromServer.toString())
+                        //Log.i("kim", LocalDate.now().toString())
 
                         val daysUntilCertificatedAt = certificatedAtFromServer.toEpochDay()
                         val daysUntilNow = LocalDate.now().toEpochDay()
@@ -101,11 +93,7 @@ class LoginActivity : AppCompatActivity() {
                             intent.putExtra("alreadyJoin", true)
                             startActivity(intent)
                         }
-
-
                     }
-
-
                 }
 
                 override fun onFailure(call: Call<Member>, t: Throwable) {
@@ -120,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initSharedPreference(){
         sharedPreference = applicationContext
-            ?.getSharedPreferences(
+            .getSharedPreferences(
                 getString(R.string.preference_file_key)
                 , Context.MODE_PRIVATE)
     }
@@ -146,7 +134,8 @@ class LoginActivity : AppCompatActivity() {
                     //로그인 실패 시 ?
 
 
-                    val request = service.login(LoginDto(id, passwd))
+                    //val request = service.login(LoginDto(id, passwd))
+                    val request = RetrofitClient.memberService.login(LoginDto(id,passwd))
                     CoroutineScope(Dispatchers.IO).launch {
                         request.enqueue(object: Callback<LoginResponseDto> {
                             override fun onResponse(
@@ -162,7 +151,8 @@ class LoginActivity : AppCompatActivity() {
                                 when{
                                     (accessToken != null && member != null)->{
                                         //로그인 성공, shared preference에 access token을 저장한다.
-                                        sharedPreference?.edit()?.putString("accessToken", accessToken)?.apply()
+                                        Log.i("kim", accessToken)
+                                        sharedPreference.edit().putString("accessToken", accessToken).apply()
 
                                         //인증날짜 만료 체크
                                         certificatedAtCheck()
@@ -207,27 +197,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    private fun initRetroFit() {
-        retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build()
-
-        service = retrofit.create(LoginApi::class.java)
-    }
-
-    interface LoginApi{
-        @POST("login")
-        fun login(@Body loginDto: LoginDto): Call<LoginResponseDto>
-
-        @GET("certificatedAtCheck")
-        fun certificatedAtCheck(@Header("accessToken") accessToken: String): Call<Member>
-    }
-
-
-
     //파이어베이스로 로그인을 구현한 파트
     /*private fun initLayout() {
         binding.apply {
