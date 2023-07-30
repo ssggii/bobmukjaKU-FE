@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Hash.Sha256
 import com.example.bobmukjaku.Model.HashedAuthCode
+import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +21,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
 
 class Join2Activity : AppCompatActivity() {
     lateinit var binding: ActivityJoin2Binding
@@ -54,7 +52,7 @@ class Join2Activity : AppCompatActivity() {
         setupAuthStateListener()*/
 
 
-        initRetroFit()
+        //initRetroFit()
         initLayout()
 
     }
@@ -78,10 +76,9 @@ class Join2Activity : AppCompatActivity() {
 
             //1. 서버에 이메일인증 요청
             //2. 응답값에서 인증코드 해시값을 꺼내와서 hashedAuthCodeFromServer변수에 저장
-            val service = retrofit.create(MailAuthApi::class.java)
-            val repos = service.RequestMailAuth(email)
+            val request = RetrofitClient.memberService.RequestMailAuth(email)
             CoroutineScope(Dispatchers.IO).launch {
-                repos.enqueue(object : Callback<HashedAuthCode> {
+                request.enqueue(object : Callback<HashedAuthCode> {
                     override fun onResponse(
                         call: Call<HashedAuthCode>,
                         response: Response<HashedAuthCode>
@@ -157,7 +154,7 @@ class Join2Activity : AppCompatActivity() {
             }
         }
 
-        //인증코드 입력폼 관련 리스너 초기화 -> 숫자입력하면 자동으로 다음 EditText로 포커스가 가도록
+        //인증코드 입력할 때 자동으로 다음 EditText로 넘어가도록
         binding.num1.setOnFocusChangeListener { v, hasFocus ->
             if(hasFocus){
                 binding.num1.setText("")
@@ -288,18 +285,18 @@ class Join2Activity : AppCompatActivity() {
     }
 
     //Retrofit사용을 위한 초기화
-    private fun initRetroFit() {
+    /*private fun initRetroFit() {
         retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
             .build()
-    }
+    }*/
 
     //Retrofit에서 요청을 위한 함수를 정의하는 인터페이스
-    interface MailAuthApi{
+    /*interface MailAuthApi{
         @GET("mailAuth")
         fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
-    }
+    }*/
 
 
     //지흔님 파트 - firebase로 이메일 인증 구현
