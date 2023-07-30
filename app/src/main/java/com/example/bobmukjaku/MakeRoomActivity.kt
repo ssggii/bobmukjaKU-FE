@@ -1,11 +1,15 @@
 package com.example.bobmukjaku
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.DatePicker
+import android.widget.TextView
+import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
@@ -55,6 +59,94 @@ class MakeRoomActivity : AppCompatActivity() {
         // date_area 클릭 이벤트 처리
         binding.dateArea.setOnClickListener {
             showDatePicker()
+        }
+
+        // 현재 시간 정보 가져오기
+        val currentTime = Calendar.getInstance()
+        val currentHour = currentTime.get(Calendar.HOUR_OF_DAY)
+        val currentMinute = currentTime.get(Calendar.MINUTE)
+
+        // 분을 10분 단위로 설정
+        val adjustedMinute = (currentMinute / 10) * 10
+
+        // startTimeArea에 현재 시간 + 1시간 설정
+        val startTime = String.format("%02d:%02d", (currentHour + 1) % 24, adjustedMinute)
+        binding.startTimeArea.text = startTime
+
+        // endTimeArea에 startTimeArea의 시간 + 2시간 설정
+        val endTime = String.format("%02d:%02d", (currentHour + 3) % 24, adjustedMinute)
+        binding.endTimeArea.text = endTime
+
+        // time_area 클릭 이벤트 처리
+        binding.startTimeArea.setOnClickListener {
+            showStartTimePickerDialog()
+        }
+        binding.endTimeArea.setOnClickListener {
+            showEndTimePickerDialog()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showStartTimePickerDialog() {
+        showTimePickerDialog { hour, minute ->
+            val selectedTime = String.format("%02d:%02d", hour, minute)
+            binding.startTimeArea.text = selectedTime
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showEndTimePickerDialog() {
+        showTimePickerDialog { hour, minute ->
+            val selectedTime = String.format("%02d:%02d", hour, minute)
+            binding.endTimeArea.text = selectedTime
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showTimePickerDialog(onTimeSet: (hour: Int, minute: Int) -> Unit) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.timepicker_alert_dialog, null)
+        val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker_alert_two)
+        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
+
+        // 현재 시간 정보 가져오기
+        val currentHour = timePicker.hour
+        val currentMinute = timePicker.minute
+
+        // 분을 10분 단위로 설정
+        val adjustedMinute = (currentMinute / 10) * 10
+
+        // 시간과 분 설정
+        timePicker.hour = currentHour
+        timePicker.minute = adjustedMinute
+
+        // 분을 10분 단위로 변경하기 위한 리스너 설정
+        timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
+            val adjustedMinute = (minute / 10) * 10
+            timePicker.minute = adjustedMinute
+        }
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        // 확인 버튼 클릭 이벤트 처리
+        yesButton.setOnClickListener {
+            val hour = timePicker.hour
+            val minute = timePicker.minute
+
+            // 선택한 시간 정보를 콜백 함수를 통해 전달합니다.
+            onTimeSet(hour, minute)
+
+            alertDialog.dismiss()
+        }
+
+        // 취소 버튼 클릭 이벤트 처리
+        noButton.setOnClickListener {
+            alertDialog.dismiss()
         }
     }
 

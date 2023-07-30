@@ -16,4 +16,9 @@
     <style name="BottomNavigationView">
         <item name="fontFamily">@font/notosans_regular</item>
     </style>
+
+    <style name="InfoNumberPickerTheme">
+        <item name="android:textSize">17sp</item>
+        <item name="fontFamily">@font/notosans_regular</item>
+    </style>
 </resources>
