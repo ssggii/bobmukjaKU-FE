@@ -6,7 +6,6 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
@@ -18,6 +17,7 @@ class MakeRoomActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMakeRoomBinding
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMakeRoomBinding.inflate(layoutInflater)
@@ -26,6 +26,7 @@ class MakeRoomActivity : AppCompatActivity() {
         initLayout()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
         // 음식종류 각 버튼에 클릭 이벤트 설정
         binding.KoreaF.setOnClickListener { selectFoodType(binding.KoreaF) }
