@@ -147,6 +147,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:text="전체 모집방"
+                android:textColor="@color/black"
+                android:textSize="20dp"
+                android:fontFamily="@font/notosans_bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/openRoomBtn"
+                android:layout_width="110dp"
+                android:layout_height="30dp"
+                android:text="모집방 개설"
+                android:fontFamily="@font/notosans_bold"
+                android:background="@drawable/btn_circle_gray" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/all_recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </ScrollView>
     </LinearLayout>
 
 </LinearLayout>
