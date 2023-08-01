@@ -14,27 +14,3 @@ data class Member(
     @JsonProperty("profileColor")var profileColor: String?,
     //var role: Role,
 )
-
-fun Member.getUid(): Long? {
-    return this.uid
-}
-
-fun Member.getMemberEmail(): String? {
-    return this.memberEmail
-}
-
-fun Member.getMemberPassword(): String? {
-    return this.memberPassword
-}
-
-fun Member.getMemberNickName(): String? {
-    return this.memberNickName
-}
-
-fun Member.getRate(): Int? {
-    return this.rate
-}
-
-fun Member.getProfileColor(): String? {
-    return this.profileColor
-}
