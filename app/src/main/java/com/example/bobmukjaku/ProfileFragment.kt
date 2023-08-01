@@ -117,16 +117,29 @@ class ProfileFragment : Fragment() {
                 binding.editTimetable.clearColorFilter()
             }
         }
+
+        // 정보 수정 버튼 이벤트
+        modifyInfo()
+    }
+
+    private fun modifyInfo() {
+        binding.modifyBtn.setOnClickListener {
+            val intent = Intent(requireContext(), ModifyInfoActivity::class.java)
+            startActivityForResult(intent, PROFILE_MODIFY_REQUEST_CODE)
+        }
     }
 
     companion object {
         private const val PROFILE_COLOR_REQUEST_CODE = 100
+        private const val PROFILE_MODIFY_REQUEST_CODE = 101
     }
 
-    // Override onActivityResult to set the result when returning from ProfileColorActivity.kt
+    // 프로필 정보 수정 후 다시 프로필 화면으로 돌아감
+    // 프로필 배경 변경 후 다시 프로필 화면으로 돌아감
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PROFILE_COLOR_REQUEST_CODE && resultCode == RESULT_OK) {
+        if ((requestCode == PROFILE_COLOR_REQUEST_CODE && resultCode == RESULT_OK) or
+            (requestCode == PROFILE_MODIFY_REQUEST_CODE && resultCode == RESULT_OK)) {
             val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
             activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
         }
