@@ -1,8 +1,6 @@
 package com.example.bobmukjaku
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +11,7 @@ import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.Dto.LoginResponseDto
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +27,6 @@ class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
 
-    lateinit var sharedPreference: SharedPreferences
 
     private var toast: Toast? = null
     private var toast2: Toast? = null
@@ -40,9 +38,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
-        initSharedPreference()
-        //sharedPreference.edit().remove("accessToken").apply()
+        SharedPreferences.initSharedPreferences(applicationContext)
+        SharedPreferences.remove("accessToken")
         initLayout()
         autoLogin()
 
@@ -51,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun autoLogin() {
         //shared preference에서 accessToken을 꺼내와서 값이 있으면 자동로그인
-        if(sharedPreference!!.contains("accessToken")){
+        if(SharedPreferences.contains("accessToken")){
 
             //자동로그인하기 전 재학생 인증 만료 체크
             certificatedAtCheck()
@@ -66,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
         //서버에서 인증날짜를 비교해서 재학생인증이 만료됐는지 체크
 
         //val request = service.certificatedAtCheck(sharedPreference?.getString("accessToken", "")!!)
-        val request = RetrofitClient.memberService.certificatedAtCheck(sharedPreference.getString("accessToken", "")?:"")
+        val request = RetrofitClient.memberService.certificatedAtCheck(SharedPreferences.getString("accessToken", "")?:"")
         CoroutineScope(Dispatchers.IO).launch {
             request.enqueue(object: Callback<Member>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -106,12 +103,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
-    private fun initSharedPreference(){
+    /*private fun initSharedPreference(){
         sharedPreference = applicationContext
             .getSharedPreferences(
                 getString(R.string.preference_file_key)
                 , Context.MODE_PRIVATE)
-    }
+    }*/
 
     private fun initLayout() {
         binding.apply {
@@ -152,7 +149,8 @@ class LoginActivity : AppCompatActivity() {
                                     (accessToken != null && member != null)->{
                                         //로그인 성공, shared preference에 access token을 저장한다.
                                         Log.i("kim", accessToken)
-                                        sharedPreference.edit().putString("accessToken", accessToken).apply()
+                                        //sharedPreference.edit().putString("accessToken", accessToken).apply()
+                                        SharedPreferences.putString("accessToken", accessToken)
 
                                         //인증날짜 만료 체크
                                         certificatedAtCheck()

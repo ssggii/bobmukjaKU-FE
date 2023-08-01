@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Hash.Sha256
 import com.example.bobmukjaku.Model.HashedAuthCode
 import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -51,7 +52,7 @@ class Join2Activity : AppCompatActivity() {
         initLayout()
         setupAuthStateListener()*/
 
-
+        Log.i("kim3", SharedPreferences.getString("accessToken", "")?:"")
         //initRetroFit()
         initLayout()
 
