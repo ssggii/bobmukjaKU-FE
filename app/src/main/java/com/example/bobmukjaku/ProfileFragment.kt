@@ -26,6 +26,10 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 사용자 닉네임 전달 받아서 화면에 출력
+//        val nickname = arguments?.getString("nickname")
+//        binding.nickname.text = nickname
+
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
