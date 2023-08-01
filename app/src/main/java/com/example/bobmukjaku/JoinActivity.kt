@@ -172,8 +172,14 @@ class JoinActivity : AppCompatActivity() {
                             // 네트워크 요청을 비동기적으로 실행하도록 호출
                             call.enqueue(object : Callback<Void> {
                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                    // 데이터 삽입 실패
-                                    if (response.code() == 400) {
+                                    if (response.isSuccessful) {
+                                        // 데이터 삽입 성공
+                                        Toast.makeText(this@JoinActivity, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                                        val intent = Intent(this@JoinActivity, LoginActivity::class.java)
+                                        intent.putExtra("email", email)
+                                        startActivity(intent)
+                                    } else if (response.code() == 400) { // 데이터 삽입 실패
                                         // 400 error code (Bad Request)
                                         Toast.makeText(this@JoinActivity, "회원가입에 실패했습니다. 잘못된 요청입니다.", Toast.LENGTH_SHORT).show()
                                     } else {
