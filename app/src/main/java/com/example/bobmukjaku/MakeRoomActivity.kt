@@ -20,6 +20,9 @@ import java.util.*
 class MakeRoomActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMakeRoomBinding
+    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
+    val selectFoodType = "KoreaF"
+    val selectPersonType = "P2"
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +57,7 @@ class MakeRoomActivity : AppCompatActivity() {
 
         // date_area에 현재 날짜 정보 설정
         val currentDate = getCurrentDate()
-        binding.dateArea.setText(currentDate)
+        binding.dateArea.text = currentDate
 
         // date_area 클릭 이벤트 처리
         binding.dateArea.setOnClickListener {
@@ -83,6 +86,11 @@ class MakeRoomActivity : AppCompatActivity() {
         }
         binding.endTimeArea.setOnClickListener {
             showEndTimePickerDialog()
+        }
+
+        // 완료 버튼 클릭 이벤트 처리
+        binding.finishBtn.setOnClickListener {
+            // 추후 추가
         }
     }
 
