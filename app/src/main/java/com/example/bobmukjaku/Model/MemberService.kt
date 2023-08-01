@@ -3,7 +3,6 @@ package com.example.bobmukjaku.Model
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.bobmukjaku.Dto.LoginDto
-import com.example.bobmukjaku.Dto.LoginResponseDto
 import com.example.bobmukjaku.R
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -34,7 +33,7 @@ interface MemberService {
 
     //로그인
     @POST("login")
-    fun login(@Body loginDto: LoginDto): Call<LoginResponseDto>
+    fun login(@Body loginDto: LoginDto): Call<ResponseBody>
 
     //인증날짜만료 체크
     @GET("certificatedAtCheck")
@@ -63,6 +62,8 @@ object RetrofitClient {
     }
 }
 
+//앱이 종료되도 데이터(accessToken, refreshToken등)가 저장되도록
+//SharedPreference클래스를 싱글통으로 정의
 object SharedPreferences{
     private lateinit var sharedPreferences: SharedPreferences
 
