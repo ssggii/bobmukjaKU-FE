@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.R
+import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -12,8 +14,8 @@ import retrofit2.http.*
 
 interface MemberService {
     // 사용자 추가
-    @POST("insert")
-    fun insertMember(@Body member: Member): Call<Void>
+    @POST("/signUp")
+    fun insertMember(@Body member: SignUpRequest): Call<Void>
 
     // 사용자 조회 (단일 사용자)
     @GET("select/{uid}")
@@ -32,8 +34,8 @@ interface MemberService {
     fun deleteMember(@Path("uid") uid: Long): Call<ResponseBody>
 
     //로그인
-    @POST("login")
-    fun login(@Body loginDto: LoginDto): Call<ResponseBody>
+    @POST("/login")
+    fun login(@Body loginDto: LoginDto): Call<Void>
 
     //인증날짜만료 체크
     @GET("certificatedAtCheck")
@@ -48,12 +50,25 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "http://your-maria-db-server-url/api/" // 여기에 MariaDB 서버의 URL 넣기
-    private const val BASE_URL = "http://192.168.219.108:8080/api/" // 여기에 MariaDB 서버의 URL 넣기
+    private const val BASE_URL = "http://192.168.0.179:8081/" // 여기에 MariaDB 서버의 URL 넣기
+
+    private val clientBuilder = OkHttpClient.Builder()
+    private val loggingInterceptor = HttpLoggingInterceptor()
+
+    //var clientBuilder = OkHttpClient.Builder()
+    //var loggingInterceptor = HttpLoggingInterceptor()
+    //loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+    //clientBuilder.addInterceptor(loggingInterceptor)
 
     private val retrofit: Retrofit by lazy {
+
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        clientBuilder.addInterceptor(loggingInterceptor)
+
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
+            .client(clientBuilder.build())
             .build()
     }
 

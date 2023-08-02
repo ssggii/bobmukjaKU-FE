@@ -15,12 +15,12 @@ import com.example.bobmukjaku.databinding.ActivityLoginBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
@@ -106,6 +106,7 @@ class LoginActivity : AppCompatActivity() {
 
 
     private fun initLayout() {
+
         binding.apply {
 
             //최근 로그인한 이메일 자동입력
@@ -131,15 +132,18 @@ class LoginActivity : AppCompatActivity() {
 
 
                     val request = RetrofitClient.memberService.login(LoginDto(id,passwd))
-                    CoroutineScope(Dispatchers.IO).launch {
-                        request.enqueue(object: Callback<ResponseBody> {
+                    //CoroutineScope(Dispatchers.IO).launch {
+                        request.enqueue(object: Callback<Void> {
                             override fun onResponse(
-                                call: Call<ResponseBody>,
-                                response: Response<ResponseBody>
+                                call: Call<Void>,
+                                response: Response<Void>
                             ) {
+                                Log.i("success", response.raw().toString())
+
                                 //응답상태코드를 보고 로그인에 성공했으면
                                 //헤더에서 accessToken, refreshToken을 꺼내온다.
                                 if(response.isSuccessful){
+
                                     when(response.code()){
                                         200->{
                                             /*로그인에 성공
@@ -181,9 +185,10 @@ class LoginActivity : AppCompatActivity() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
 
-                                Log.i("kim", t.message!!)
+                                Log.i("error", "error")
+                                Log.i("kim1", t.message!!)
 
                                 toast2?.cancel()
                                 toast = Toast.makeText(this@LoginActivity,
@@ -193,7 +198,7 @@ class LoginActivity : AppCompatActivity() {
                             }
 
                         })
-                    }
+                    //}
                 }
             }
 
@@ -201,7 +206,7 @@ class LoginActivity : AppCompatActivity() {
             joinBtn.setOnClickListener {
                 /*val intent = Intent(this@LoginActivity, JoinActivity::class.java)
                 startActivity(intent)*/
-                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
+                val intent = Intent(this@LoginActivity, JoinActivity::class.java)
                 startActivity(intent)
             }
         }
