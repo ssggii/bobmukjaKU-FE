@@ -10,8 +10,8 @@ import retrofit2.http.*
 
 interface MemberService {
     // 사용자 추가
-    @POST("insert")
-    fun insertMember(@Body member: Member): Call<Void>
+    @POST("/signUp")
+    fun insertMember(@Body request: SignUpRequest): Call<Void>
 
     // 사용자 조회 (단일 사용자)
     @GET("select/{uid}")
@@ -30,7 +30,7 @@ interface MemberService {
     fun deleteMember(@Path("uid") uid: Long): Call<ResponseBody>
 
     //로그인
-    @POST("login")
+    @POST("/login")
     fun login(@Body loginDto: LoginDto): Call<LoginResponseDto>
 
     //인증날짜만료 체크
@@ -46,7 +46,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "http://your-maria-db-server-url/api/" // 여기에 MariaDB 서버의 URL 넣기
-    private const val BASE_URL = "http://192.168.219.108:8080/api/" // 여기에 MariaDB 서버의 URL 넣기
+    private const val BASE_URL = "http://192.168.219.103:8081/" // 여기에 MariaDB 서버의 URL 넣기
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SignUpRequest
 import com.example.bobmukjaku.databinding.ActivityJoinBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -62,8 +63,9 @@ class JoinActivity : AppCompatActivity() {
             joinButton.isEnabled=false
 
             // 받아온 이메일 넣기
-            emailArea.setText(email)
-            emailArea.isEnabled = false
+//            emailArea.setText(email)
+//            emailArea.isEnabled = false
+            emailArea.setText("example@konkuk.ac.kr") // test
 
             // 닉네임 중복확인 버튼
             binding.nickcheckbtn.setOnClickListener {
@@ -160,14 +162,19 @@ class JoinActivity : AppCompatActivity() {
                     if (pwInfo.text == "해당 비밀번호는 사용 가능합니다.") {
                         if (pwConfirm.text == "비밀번호가 일치합니다.") {
                             //입력한 닉네임, passwd를 가져와서 변수에 저장
+                            val email = emailArea.text.toString()
                             val nickname = username.text.toString()
                             val passwd = passwdArea.text.toString()
 
-                            // 사용자 정보를 담는 Member 객체 생성
-                            val member = Member(memberEmail = email, memberNickName = nickname, memberPassword = passwd, certificatedAt = "", profileColor = "bg1", rate = 45, uid=0)
+                            val signUpRequest = SignUpRequest(memberEmail = email, password = passwd, nickname = nickname)
 
-                            // MemberService의 insertMember 메서드를 호출하여 사용자 정보를 DB에 저장
-                            val call = RetrofitClient.memberService.insertMember(member)
+                            val call = RetrofitClient.memberService.insertMember(signUpRequest)
+
+//                            // 사용자 정보를 담는 Member 객체 생성
+//                            val member = Member(memberEmail = email, memberNickName = nickname, memberPassword = passwd, certificatedAt = "", profileColor = "bg1", rate = 45, uid=0)
+//
+//                            // MemberService의 insertMember 메서드를 호출하여 사용자 정보를 DB에 저장
+//                            val call = RetrofitClient.memberService.insertMember(member)
 
                             // 네트워크 요청을 비동기적으로 실행하도록 호출
                             call.enqueue(object : Callback<Void> {
