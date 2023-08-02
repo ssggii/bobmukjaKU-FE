@@ -20,7 +20,7 @@ import java.util.*
 class MakeRoomActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMakeRoomBinding
-    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
+//    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
     val selectFoodType = "KoreaF"
     val selectPersonType = "P2"
 
