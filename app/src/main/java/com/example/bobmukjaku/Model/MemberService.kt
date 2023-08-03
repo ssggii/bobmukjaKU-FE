@@ -2,11 +2,11 @@ package com.example.bobmukjaku.Model
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -50,25 +50,24 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "http://your-maria-db-server-url/api/" // 여기에 MariaDB 서버의 URL 넣기
-    private const val BASE_URL = "http://192.168.0.179:8081/" // 여기에 MariaDB 서버의 URL 넣기
+    private const val BASE_URL = "http://192.168.219.110:8081/" // 여기에 MariaDB 서버의 URL 넣기
 
-    private val clientBuilder = OkHttpClient.Builder()
-    private val loggingInterceptor = HttpLoggingInterceptor()
+    private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
+            = OkHttpClient.Builder().run {
+        addInterceptor(interceptor)
+        build()
+    }
 
-    //var clientBuilder = OkHttpClient.Builder()
-    //var loggingInterceptor = HttpLoggingInterceptor()
-    //loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-    //clientBuilder.addInterceptor(loggingInterceptor)
 
     private val retrofit: Retrofit by lazy {
 
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        clientBuilder.addInterceptor(loggingInterceptor)
+
+
 
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
-            .client(clientBuilder.build())
+            .client(provideOkHttpClient(ContentTypeInterceptor()))
             .build()
     }
 
