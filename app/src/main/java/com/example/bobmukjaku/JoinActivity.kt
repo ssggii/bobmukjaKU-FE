@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -179,6 +180,7 @@ class JoinActivity : AppCompatActivity() {
                             // 네트워크 요청을 비동기적으로 실행하도록 호출
                             call.enqueue(object : Callback<Void> {
                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                    Log.i("success", response.raw().toString())
                                     if (response.isSuccessful) {
                                         // 데이터 삽입 성공
                                         Toast.makeText(this@JoinActivity, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
