@@ -131,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
                     //로그인 실패(그외) 시 "로그인 실패"메시지 출력
 
 
-                    val request = RetrofitClient.memberService.login(LoginDto(id,passwd))
+                    val request = RetrofitClient.memberService.login(LoginDto(passwd,id))
                     //CoroutineScope(Dispatchers.IO).launch {
                         request.enqueue(object: Callback<Void> {
                             override fun onResponse(
@@ -163,10 +163,11 @@ class LoginActivity : AppCompatActivity() {
                                             //여기서 SharedPreferences에 로그인한 이메일을 저장
                                             SharedPreferences.putString("recentLoginId", id)
 
-//                                            val a = SharedPreferences.getString("accessToken","null") ?: "null"
-//                                            val r = SharedPreferences.getString("refreshToken","null") ?: "null"
-//                                            Log.i("kim", a?:"null-accessToken")
-//                                            Log.i("kim", r?:"null-refreshToken")
+                                            val a = SharedPreferences.getString("accessToken","null") ?: "null"
+                                            val r = SharedPreferences.getString("refreshToken","null") ?: "null"
+                                            Log.i("kim", "teset")
+                                            Log.i("kim", a?:"null-accessToken")
+                                            Log.i("kim", r?:"null-refreshToken")
 
                                             //인증날짜 만료되었는지 체크 후
                                             certificatedAtCheck()
