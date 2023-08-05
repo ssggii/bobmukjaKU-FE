@@ -48,48 +48,60 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         // 지도 디폴트 위치 고정
         naverMap.moveCamera(com.naver.maps.map.CameraUpdate.scrollTo(LatLng(37.54130009, 127.0701751)).animate(com.naver.maps.map.CameraAnimation.Easing))
         val restaurantList = readRestaurantDataFromTextFile()
+        val markerList = mutableListOf<Marker>()
 
-//        // 네이버 맵의 가시 영역에 해당하는 좌표 값 계산
-//        val visibleRegion = naverMap.projection.toScreenLocation(naverMap.cameraPosition.target)
-//        val leftTop = naverMap.projection.fromScreenLocation(
-//            PointF(visibleRegion.x - mapView.width / 2, visibleRegion.y - mapView.height / 2)
-//        )
-//        val rightBottom = naverMap.projection.fromScreenLocation(
-//            PointF(visibleRegion.x + mapView.width / 2, visibleRegion.y + mapView.height / 2)
-//        )
-//
-//        // 가시 영역 좌표 값 출력
-//        val minx = leftTop.longitude // 서쪽 경도
-//        val miny = rightBottom.latitude // 남쪽 위도
-//        val maxx = rightBottom.longitude // 동쪽 경도
-//        val maxy = leftTop.latitude // 북쪽 위도
-//
-//        Log.d("MapListFragment", "minx: $minx, miny: $miny, maxx: $maxx, maxy: $maxy")
+        val onCameraIdleListener = NaverMap.OnCameraIdleListener {
+            // 네이버 맵의 가시 영역에 해당하는 좌표 값 계산
+            val visibleRegion = naverMap.projection.toScreenLocation(naverMap.cameraPosition.target)
+            val leftTop = naverMap.projection.fromScreenLocation(
+                PointF(visibleRegion.x - mapView.width / 2, visibleRegion.y - mapView.height / 2)
+            )
+            val rightBottom = naverMap.projection.fromScreenLocation(
+                PointF(visibleRegion.x + mapView.width / 2, visibleRegion.y + mapView.height / 2)
+            )
 
-        for (restaurant in restaurantList) {
-//            if (restaurant.latitude in miny..maxy && restaurant.longitude in minx..maxx) {
-                val marker = Marker() // 마커 추가
-                marker.position = LatLng(restaurant.latitude, restaurant.longitude)
-                marker.map = naverMap
+            // 가시 영역 좌표 값 출력
+            val minx = leftTop.longitude // 서쪽 경도
+            val miny = rightBottom.latitude // 남쪽 위도
+            val maxx = rightBottom.longitude // 동쪽 경도
+            val maxy = leftTop.latitude // 북쪽 위도
 
-                val infoWindow = InfoWindow() // 정보창 추가
-                infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
-                    override fun getText(infoWindow: InfoWindow): CharSequence {
-                        return "${restaurant.name}\n${restaurant.category}"
+            Log.d("MapListFragment", "minx: $minx, miny: $miny, maxx: $maxx, maxy: $maxy")
+
+            // 이전에 표시된 마커들 삭제
+            markerList.forEach { it.map = null }
+            markerList.clear()
+
+            for (restaurant in restaurantList) {
+                if (restaurant.latitude in miny..maxy && restaurant.longitude in minx..maxx) {
+                    val marker = Marker() // 마커 추가
+                    marker.position = LatLng(restaurant.latitude, restaurant.longitude)
+                    marker.map = naverMap
+
+                    val infoWindow = InfoWindow() // 정보창 추가
+                    infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
+                        override fun getText(infoWindow: InfoWindow): CharSequence {
+                            return "${restaurant.name}\n${restaurant.category}"
+                        }
                     }
-                }
 
-                marker.setOnClickListener {
-                    if (infoWindow.map == null) {
-                        infoWindow.open(marker)
-                    } else {
-                        infoWindow.close()
+                    marker.setOnClickListener {
+                        if (infoWindow.map == null) {
+                            infoWindow.open(marker)
+                        } else {
+                            infoWindow.close()
+                        }
+                        true
                     }
-                    true
+
+                    markerList.add(marker)
                 }
             }
-//        }
+        }
+
+        naverMap.addOnCameraIdleListener(onCameraIdleListener)
     }
+
 
 
 
