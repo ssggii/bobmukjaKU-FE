@@ -4,12 +4,20 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.example.bobmukjaku.Model.Member
+import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.FragmentProfileBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ProfileFragment : Fragment() {
 
@@ -26,9 +34,8 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 사용자 닉네임 전달 받아서 화면에 출력
-//        val nickname = arguments?.getString("nickname")
-//        binding.nickname.text = nickname
+        // 사용자 닉네임 정보 가져와서 화면에 설정
+        displayNickname()
 
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
@@ -120,6 +127,45 @@ class ProfileFragment : Fragment() {
 
         // 정보 수정 버튼 이벤트
         modifyInfo()
+    }
+
+    private fun displayNickname() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
+        call?.enqueue(object : Callback<Member> {
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if (response.isSuccessful) {
+                    val member = response.body()
+                    val nickname = member?.memberNickName
+                    binding.nickname.text = nickname
+                } else {
+                    val errorCode = response.code()
+                    if (errorCode == 400) {
+                        // 400 error code (Bad Request)
+                        Toast.makeText(
+                            requireContext(),
+                            "닉네임을 가져오는데 실패했습니다. 잘못된 요청입니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "닉네임을 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                // 네트워크 오류 처리
+                Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun modifyInfo() {
