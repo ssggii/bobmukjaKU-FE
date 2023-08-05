@@ -1,47 +1,34 @@
 package com.example.bobmukjaku
 
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.ChatModel
+import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.databinding.ActivityChatBinding
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.PUT
+import retrofit2.Callback
+import retrofit2.Response
 
 class ChatActivity : AppCompatActivity() {
     lateinit var binding: ActivityChatBinding
-    lateinit var auth:FirebaseAuth
     lateinit var adapter:ChatAdapter
 
-    lateinit var myUid:String
     lateinit var myName:String
-    lateinit var yourUid:String
     lateinit var yourName:String
 
 
-    lateinit var chatItem:ArrayList<ChatModel>
+    var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()
 
 
     val chatRoomId = "testChatRoomId"
 
-    private val BASE_URL = "http://172.30.1.100:8080/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,38 +41,36 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        auth = FirebaseAuth.getInstance()
-        myUid = auth.uid!!
-        yourUid = intent.getStringExtra("uid")!!
-        yourName = intent.getStringExtra("name")!!
-        chatItem = arrayListOf<ChatModel>()
+        myName = "kim"//
+        //yourName = intent.getStringExtra("name")!!
 
 
 
-        Firebase.database.getReference("users/$myUid/username")
-            .get()
-            .addOnSuccessListener {
-                myName = it.value.toString()
-            }
+//        Firebase.database.getReference("users/$myUid/username")
+//            .get()
+//            .addOnSuccessListener {
+//                myName = it.value.toString()
+//            }
 
 
+        //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
         Firebase.database.getReference("message/$chatRoomId")
             .get()
             .addOnSuccessListener{
                 chatItem.clear()
                 for (chat in it.children) {
                     val message = chat.child("message").value.toString()
-                    val senderUid = chat.child("senderUid").value.toString()
                     val senderName = chat.child("senderName").value.toString()
                     val time = chat.child("time").value.toString().toLong()
-                    val isShareMessage = chat.child("isShareMessage").value.toString()
+                    val isShareMessage = chat.child("isShareMessage").value.toString().toBoolean()
                     val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString()
-                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage = false, chatRoomIdFromMessage))
+                    chatItem.add(ChatModel(message, senderName, time, isShareMessage, chatRoomIdFromMessage))
                 }
                 adapter.notifyDataSetChanged()
 
             }
 
+        //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
         val rf = Firebase.database.getReference("message/$chatRoomId")
         val childEventListener = object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -96,7 +81,7 @@ class ChatActivity : AppCompatActivity() {
                 val time = snapshot.child("time").value.toString().toLong()
                 val isShareMessage = snapshot.child("isShareMessage").value.toString()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString()
-                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage = false, chatRoomIdFromMessage))
+                chatItem.add(ChatModel(message, senderName, time, isShareMessage = false, chatRoomIdFromMessage))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
 
@@ -144,41 +129,45 @@ class ChatActivity : AppCompatActivity() {
                     val message = this.message.text.toString()
                     this.message.setText("")
 
-                    val retrofit = Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addConverterFactory(JacksonConverterFactory.create())
-                        .build()
+                    //val service = retrofit.create(UserApi::class.java)
+                    val request = RetrofitClient.memberService.sendMessage(
+                        ChatModel(message,
+                            myName,
+                            System.currentTimeMillis(),
+                            false,
+                            chatRoomId)
+                    )
 
-                    val service = retrofit.create(UserApi::class.java)
-                    val repos = service.sendMessage(ChatModel(message, myUid, myName, System.currentTimeMillis(), false, chatRoomId))
-
-                    CoroutineScope(Dispatchers.IO).launch {
-                        repos.execute()
-                    }
-
-
-                    FirebaseMessaging.getInstance().subscribeToTopic("111111")
-                        .addOnCompleteListener {task->
-                            var msg = "Subscribed"
-                            if(!task.isSuccessful){
-                                msg = "Subscribed failed"
-                            }
-                            Log.i("kim", msg)
-                            Toast.makeText(this@ChatActivity, msg, Toast.LENGTH_SHORT).show()
+                    request.enqueue(object: Callback<Unit>{
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            Toast.makeText(this@ChatActivity, "메시지 전송 성공", Toast.LENGTH_SHORT).show()
                         }
-                        .addOnCanceledListener {
-                            Log.i("kim", "canceled")
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            Toast.makeText(this@ChatActivity, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
                         }
+
+                    })
+
+
+//                    FirebaseMessaging.getInstance().subscribeToTopic("111111")
+//                        .addOnCompleteListener {task->
+//                            var msg = "Subscribed"
+//                            if(!task.isSuccessful){
+//                                msg = "Subscribed failed"
+//                            }
+//                            Log.i("kim", msg)
+//                            Toast.makeText(this@ChatActivity, msg, Toast.LENGTH_SHORT).show()
+//                        }
+//                        .addOnCanceledListener {
+//                            Log.i("kim", "canceled")
+//                        }
                 }
 
             }
         }
     }
 
-    interface UserApi{
-        @PUT("message")
-        fun sendMessage(@Body message: ChatModel) : Call<Unit>
-    }
 
     private fun initRecyclerView() {
 

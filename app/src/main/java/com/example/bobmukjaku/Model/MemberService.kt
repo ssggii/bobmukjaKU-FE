@@ -42,15 +42,19 @@ interface MemberService {
     fun certificatedAtCheck(@Header("accessToken") accessToken: String): Call<Member>
 
     //재학생 인증
-    @GET("mailAuth")
+    @GET("/mailAuth")
     fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
+
+    //메시지 전송
+    @PUT("message")
+    fun sendMessage(@Body message: ChatModel) : Call<Unit>
 
     // 필요한 다른 API 구현
 }
 
 object RetrofitClient {
     //private const val BASE_URL = "http://your-maria-db-server-url/api/" // 여기에 MariaDB 서버의 URL 넣기
-    private const val BASE_URL = "http://192.168.219.110:8081/" // 여기에 MariaDB 서버의 URL 넣기
+    private const val BASE_URL = "http://172.30.1.97:8081/" // 여기에 MariaDB 서버의 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
