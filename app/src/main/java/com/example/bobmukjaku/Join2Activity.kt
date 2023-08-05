@@ -1,17 +1,20 @@
 package com.example.bobmukjaku
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Hash.Sha256
 import com.example.bobmukjaku.Model.HashedAuthCode
 import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +24,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import java.time.LocalDate
 
 class Join2Activity : AppCompatActivity() {
     lateinit var binding: ActivityJoin2Binding
@@ -42,6 +46,7 @@ class Join2Activity : AppCompatActivity() {
 
     val TAG = "kim"
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityJoin2Binding.inflate(layoutInflater)
@@ -57,6 +62,7 @@ class Join2Activity : AppCompatActivity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
         binding.sendBtn.setOnClickListener {
             /*서버에게 이메일인증을 요청*/
@@ -138,6 +144,9 @@ class Join2Activity : AppCompatActivity() {
                         }else{//회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
                             val intent = Intent(this@Join2Activity, JoinActivity::class.java)
                             intent.putExtra("email", email)
+
+                            // db에 현재 날짜 정보 넘겨주기
+                            updateCertificatedAt()
                             startActivity(intent)
                         }
                     }
@@ -281,80 +290,39 @@ class Join2Activity : AppCompatActivity() {
 
     }
 
-    //Retrofit사용을 위한 초기화
-    /*private fun initRetroFit() {
-        retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build()
-    }*/
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateCertificatedAt() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
 
-    //Retrofit에서 요청을 위한 함수를 정의하는 인터페이스
-    /*interface MailAuthApi{
-        @GET("mailAuth")
-        fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
-    }*/
+        val authorizationHeader = "Bearer $accessToken"
 
+        val updatedCertificatedAt = LocalDate.now().toString() // 현재 날짜를 가져옴
 
-    //지흔님 파트 - firebase로 이메일 인증 구현
-    /*private fun initLayout() {
-        val user = Firebase.auth.currentUser
-
-        binding.sendBtn.setOnClickListener {
-            if (binding.emailSend.text.contains("인증 메일이 발송되었습니다")) {
-                // 인증 완료 여부 확인
-                val isEmailVerified = user?.isEmailVerified
-
-                if (isEmailVerified == true) {
-                    binding.emailSend.text = "인증이 완료되었습니다"
+        val call = accessToken?.let { memberService.updateCertificatedAt(authorizationHeader, updatedCertificatedAt) }
+        call?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // 성공적으로 업데이트됨
+                    Toast.makeText(
+                        this@Join2Activity,
+                        "현재 날짜가 업데이트되었습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    binding.emailSend.text = "인증이 완료되지 않았습니다\n추후 추가"
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        this@Join2Activity,
+                        "현재 날짜 업데이트 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            } else {
-                user!!.sendEmailVerification()
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Email 전송")
-                            binding.emailSend.text =
-                                "인증 메일이 발송되었습니다\n메일함을 확인해 재학생 인증을 완료하고 다시 버튼을 눌러주세요"
-                        }
-                    }
             }
-        }
-    }
 
-    private fun setupAuthStateListener() {
-        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            val user = firebaseAuth.currentUser
-
-            // 인증 완료 여부 확인
-            val isEmailVerified = user?.isEmailVerified
-
-            if (isEmailVerified == true) {
-                binding.emailSend.text = "인증이 완료되었습니다"
-            } else {
-                binding.emailSend.text = "인증이 완료되지 않았습니다\n추후 추가"
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // 네트워크 오류 처리
+                Toast.makeText(this@Join2Activity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             }
-        }
+        })
     }
-
-    override fun onStart() {
-        super.onStart()
-        auth.addAuthStateListener(authStateListener)
-
-        // 인증 완료 여부 초기 확인
-        val user = auth.currentUser
-        val isEmailVerified = user?.isEmailVerified
-
-        if (isEmailVerified == true) {
-            binding.emailSend.text = "인증이 완료되었습니다"
-        } else {
-            binding.emailSend.text = "인증이 완료되지 않았습니다\n추후 추가"
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        auth.removeAuthStateListener(authStateListener)
-    }*/
 }
