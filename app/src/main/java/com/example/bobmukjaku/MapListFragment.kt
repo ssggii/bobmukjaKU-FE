@@ -47,13 +47,6 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
     }
 
-    fun removeMarkerInfoDialog(dialog: DialogFragment) {
-        val markerToRemove = markerInfoWindowMap.entries.find { it.value == dialog }?.key
-        markerToRemove?.let {
-            markerInfoWindowMap.remove(it)
-        }
-    }
-
     override fun onMapReady(naverMap: NaverMap) {
         // 지도 디폴트 위치 고정
 //        naverMap.moveCamera(com.naver.maps.map.CameraUpdate.scrollTo(LatLng(37.54130009, 127.0701751)).animate(com.naver.maps.map.CameraAnimation.Easing))
