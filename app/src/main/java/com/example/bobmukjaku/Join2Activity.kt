@@ -52,7 +52,6 @@ class Join2Activity : AppCompatActivity() {
         setupAuthStateListener()*/
 
 
-        //initRetroFit()
         initLayout()
 
     }
@@ -133,12 +132,10 @@ class Join2Activity : AppCompatActivity() {
                 when{
                     (hashedAuthCodeFromUser == hashedAuthCodeFromServer)->{
                         //Log.i("kim", "일치합니다.")
-                        //로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
-                        //회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
-                        if(intent.getBooleanExtra("alreadyJoin", false)) {
+                        if(intent.getBooleanExtra("alreadyJoin", false)) {//로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
                             val intent = Intent(this@Join2Activity, MainActivity::class.java)
                             startActivity(intent)
-                        }else{
+                        }else{//회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
                             val intent = Intent(this@Join2Activity, JoinActivity::class.java)
                             intent.putExtra("email", email)
                             startActivity(intent)
