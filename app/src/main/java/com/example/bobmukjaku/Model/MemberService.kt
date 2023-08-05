@@ -11,6 +11,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.*
+import java.time.LocalDate
 
 interface MemberService {
     // 사용자 추가
@@ -18,16 +19,29 @@ interface MemberService {
     fun insertMember(@Body member: SignUpRequest): Call<Void>
 
     // 사용자 조회 (단일 사용자)
-    @GET("select/{uid}")
-    fun selectOne(@Path("uid") uid: Long): Call<Member>
+    @GET("/member/info")
+    fun selectOne(@Header("Authorization") authorization: String): Call<Member>
 
     // 사용자 조회 (모든 사용자)
-    @GET("select")
+    @GET("/members/info")
     fun selectAll(): Call<List<Member>>
 
     // 사용자 수정
-    @PUT("update/{uid}")
-    fun updateMember(@Path("uid") uid: Long, @Body member: Member): Call<Void>
+    @PUT("/member/info")
+    @FormUrlEncoded
+    fun updateCertificatedAt(
+        @Header("Authorization") authorization: String,
+        @Field("certificatedAt") certificatedAt: String?
+    ): Call<Void>
+
+
+    @PUT("/member/info")
+    @FormUrlEncoded
+    fun updateNickName(
+        @Header("Authorization") authorization: String,
+        @Field("memberNickName") memberNickName: String?
+    ): Call<Void>
+
 
     // 사용자 삭제
     @DELETE("delete/{uid}")
@@ -49,8 +63,7 @@ interface MemberService {
 }
 
 object RetrofitClient {
-    //private const val BASE_URL = "http://your-maria-db-server-url/api/" // 여기에 MariaDB 서버의 URL 넣기
-    private const val BASE_URL = "http://192.168.219.110:8081/" // 여기에 MariaDB 서버의 URL 넣기
+    private const val BASE_URL = "http://172.30.1.97:8082/" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {

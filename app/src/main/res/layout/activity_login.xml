@@ -76,20 +76,6 @@
         app:layout_constraintStart_toStartOf="@+id/login_btn"
         app:layout_constraintTop_toBottomOf="@+id/login_btn" />
 
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/findIdBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="5dp"
-        android:background="#00ff0000"
-        android:text="아이디찾기"
-        android:textColor="#90909F"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_passwd" />
-
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/resetPasswdBtn"
         android:layout_width="wrap_content"
@@ -99,20 +85,5 @@
         android:text="비밀번호 재설정"
         android:textColor="#90909F"
         app:layout_constraintEnd_toEndOf="@+id/login_passwd"
-        app:layout_constraintTop_toBottomOf="@+id/login_passwd" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="15dp"
-        android:gravity="center"
-        android:text="|"
-        android:textSize="20sp"
-        android:textColor="#90909F"
-        app:layout_constraintEnd_toStartOf="@+id/resetPasswdBtn"
-        app:layout_constraintHorizontal_bias="0.28"
-        app:layout_constraintStart_toEndOf="@+id/findIdBtn"
         app:layout_constraintTop_toBottomOf="@+id/login_passwd" />
 </androidx.constraintlayout.widget.ConstraintLayout>

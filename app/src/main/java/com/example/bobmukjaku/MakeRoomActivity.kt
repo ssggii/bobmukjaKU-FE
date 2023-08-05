@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.TextView
@@ -15,12 +16,14 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.databinding.ActivityMakeRoomBinding
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class MakeRoomActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMakeRoomBinding
-    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
+//    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
     val selectFoodType = "KoreaF"
     val selectPersonType = "P2"
 
@@ -120,6 +123,7 @@ class MakeRoomActivity : AppCompatActivity() {
         // 현재 시간 정보 가져오기
         val currentHour = timePicker.hour
         val currentMinute = timePicker.minute
+        Log.i("currentHour", currentHour.toString())
 
         // 분을 10분 단위로 설정
         val adjustedMinute = (currentMinute / 10) * 10
@@ -161,7 +165,7 @@ class MakeRoomActivity : AppCompatActivity() {
     // 현재 날짜를 가져오는 함수
     private fun getCurrentDate(): String {
         val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy년 M월 d일", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(calendar.time)
     }
 
@@ -182,6 +186,7 @@ class MakeRoomActivity : AppCompatActivity() {
             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                 val selectedDate = formatDate(year, month, dayOfMonth)
                 binding.dateArea.text = selectedDate
+                LocalDate.parse(selectedDate, DateTimeFormatter.ISO_DATE) // LocalDate로 변환
             },
             year,
             month,
