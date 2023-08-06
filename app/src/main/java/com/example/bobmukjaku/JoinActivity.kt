@@ -41,16 +41,18 @@ class JoinActivity : AppCompatActivity() {
                     if (memberList != null) {
                         // 회원 리스트에서 닉네임들을 추출하여 중복 여부를 확인
                         val existingUsernames = memberList.map { it.memberNickName }
-                        onSuccess(!existingUsernames.contains(nickname))
+                        onSuccess(existingUsernames.contains(nickname))
                     }
                 } else {
                     // 서버로부터 회원 리스트를 받아오지 못했을 때의 처리
+                    Log.i("회원가입[닉네임중복확인]: ", "서버로부터 리스트 받지 못함")
                     onSuccess(false)
                 }
             }
 
             override fun onFailure(call: Call<List<Member>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                Log.i("회원가입[닉네임중복확인]: ", "네트워크 오류 및 기타 에러")
                 onSuccess(false)
             }
         })
@@ -64,9 +66,9 @@ class JoinActivity : AppCompatActivity() {
             joinButton.isEnabled=false
 
             // 받아온 이메일 넣기
-//            emailArea.setText(email)
-//            emailArea.isEnabled = false
-            emailArea.setText("example@konkuk.ac.kr") // test
+            emailArea.setText(email)
+            emailArea.isEnabled = false
+            //emailArea.setText("example@konkuk.ac.kr") // test
 
             // 닉네임 중복확인 버튼
             binding.nickcheckbtn.setOnClickListener {
@@ -170,12 +172,6 @@ class JoinActivity : AppCompatActivity() {
                             val signUpRequest = SignUpRequest(memberEmail = email, password = passwd, nickname = nickname)
 
                             val call = RetrofitClient.memberService.insertMember(signUpRequest)
-
-//                            // 사용자 정보를 담는 Member 객체 생성
-//                            val member = Member(memberEmail = email, memberNickName = nickname, memberPassword = passwd, certificatedAt = "", profileColor = "bg1", rate = 45, uid=0)
-//
-//                            // MemberService의 insertMember 메서드를 호출하여 사용자 정보를 DB에 저장
-//                            val call = RetrofitClient.memberService.insertMember(member)
 
                             // 네트워크 요청을 비동기적으로 실행하도록 호출
                             call.enqueue(object : Callback<Void> {
