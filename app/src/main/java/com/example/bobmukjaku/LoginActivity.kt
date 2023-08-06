@@ -205,10 +205,10 @@ class LoginActivity : AppCompatActivity() {
             //회원가입 버튼 클릭
             joinBtn.setOnClickListener {
 
-                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
-                startActivity(intent)
-//                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+//                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
 //                startActivity(intent)
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                startActivity(intent)
             }
         }
     }
