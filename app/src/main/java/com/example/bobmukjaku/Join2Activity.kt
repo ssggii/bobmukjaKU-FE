@@ -144,9 +144,6 @@ class Join2Activity : AppCompatActivity() {
                         }else{//회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
                             val intent = Intent(this@Join2Activity, JoinActivity::class.java)
                             intent.putExtra("email", email)
-
-                            // db에 현재 날짜 정보 넘겨주기
-                            updateCertificatedAt()
                             startActivity(intent)
                         }
                     }
@@ -286,43 +283,5 @@ class Join2Activity : AppCompatActivity() {
                 binding.num6.setText("")
             }
         }
-
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updateCertificatedAt() {
-        val memberService = RetrofitClient.memberService
-        val accessToken = SharedPreferences.getString("accessToken", "")
-
-        val authorizationHeader = "Bearer $accessToken"
-
-        val updatedCertificatedAt = LocalDate.now().toString() // 현재 날짜를 가져옴
-
-        val call = accessToken?.let { memberService.updateCertificatedAt(authorizationHeader, updatedCertificatedAt) }
-        call?.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        this@Join2Activity,
-                        "현재 날짜가 업데이트되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    val errorCode = response.code()
-                    Toast.makeText(
-                        this@Join2Activity,
-                        "현재 날짜 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // 네트워크 오류 처리
-                Toast.makeText(this@Join2Activity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 }
