@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -145,7 +144,7 @@ class ProfileFragment : Fragment() {
         val requestBody = mapOf("certificatedAt" to updatedCertificatedAt)
 
         val call = accessToken?.let {
-            memberService.updateCertificatedAt(
+            memberService.updateMember(
                 authorizationHeader,
                 requestBody
             )
