@@ -6,7 +6,6 @@ import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -27,28 +26,31 @@ interface MemberService {
 
     // 사용자 수정
     @PUT("/member/info")
-    fun updateCertificatedAt(
+    fun updateMember(
         @Header("Authorization") authorization: String,
         @Body requestBody: Map<String, String>
     ): Call<Void>
 
-    @PUT("/member/info")
-    @FormUrlEncoded
-    fun updateNickName(
+    // 비밀번호 재설정
+    @PUT("/member/info/password")
+    fun updatePassword(
         @Header("Authorization") authorization: String,
-        @Field("memberNickName") memberNickName: String?
+        @Body requestBody: Map<String, String>
     ): Call<Void>
 
     // 비밀번호 재설정
     @PUT("/member/info/password")
     fun setNewPassword(
         @Header("Authorization") authorization: String,
-        @Body requestBody: Map<String, String>
+        @Body member: UpdatePassword
     ): Call<Void>
 
     // 사용자 삭제
     @DELETE("member/info")
-    fun deleteMember(@Header("Authorization") authorization: String): Call<Void>
+    fun deleteMember(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: Map<String, String>
+    ): Call<Void>
 
     //로그인
     @POST("/login")
@@ -66,7 +68,7 @@ interface MemberService {
 }
 
 object RetrofitClient {
-    private const val BASE_URL = "https://d26c-119-192-114-106.ngrok-free.app" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
