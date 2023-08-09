@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatRoom
 import com.example.bobmukjaku.databinding.ChatroomListBinding
 
-class ChatRoomAllListAdapter(var items: ArrayList<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
+class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
     interface OnItemClickListener{
         fun onItemClick(pos:Int)
     }
@@ -19,6 +19,11 @@ class ChatRoomAllListAdapter(var items: ArrayList<ChatRoom>): RecyclerView.Adapt
                 onItemClickListener?.onItemClick(adapterPosition)
             }
         }
+    }
+
+    fun updateItems(newItems: List<ChatRoom>) {
+        items = newItems
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
