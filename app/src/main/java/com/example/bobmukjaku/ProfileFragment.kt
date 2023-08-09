@@ -3,6 +3,7 @@ package com.example.bobmukjaku
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
@@ -18,6 +20,7 @@ import com.example.bobmukjaku.databinding.FragmentProfileBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDate
 
 class ProfileFragment : Fragment() {
 
@@ -31,6 +34,7 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -40,6 +44,7 @@ class ProfileFragment : Fragment() {
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
+            updateCertificatedAt() // 날짜 전송 테스트용
             startActivityForResult(intent, PROFILE_COLOR_REQUEST_CODE)
         }
 
@@ -127,6 +132,48 @@ class ProfileFragment : Fragment() {
 
         // 정보 수정 버튼 이벤트
         modifyInfo()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateCertificatedAt() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val updatedCertificatedAt = LocalDate.now().toString() // 현재 날짜를 가져옴
+        val requestBody = mapOf("certificatedAt" to updatedCertificatedAt)
+
+        val call = accessToken?.let {
+            memberService.updateCertificatedAt(
+                authorizationHeader,
+                requestBody
+            )
+        }
+        call?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // 성공적으로 업데이트됨
+                    Toast.makeText(
+                        requireContext(),
+                        "현재 날짜가 업데이트되었습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "현재 날짜 업데이트 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // 네트워크 오류 처리
+                Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun displayNickname() {
