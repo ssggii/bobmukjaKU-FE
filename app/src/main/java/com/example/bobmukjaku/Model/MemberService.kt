@@ -86,6 +86,10 @@ object RetrofitClient {
     val memberService: MemberService by lazy {
         retrofit.create(MemberService::class.java)
     }
+
+    val chatRoomService: ChatRoomService by lazy {
+        retrofit.create(ChatRoomService::class.java)
+    }
 }
 
 //앱이 종료되도 데이터(accessToken, refreshToken등)가 저장되도록
