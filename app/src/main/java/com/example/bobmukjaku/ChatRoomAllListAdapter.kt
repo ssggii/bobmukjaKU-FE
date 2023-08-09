@@ -8,7 +8,7 @@ import com.example.bobmukjaku.databinding.ChatroomListBinding
 
 class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
     interface OnItemClickListener{
-        fun onItemClick(pos:Int)
+        fun onItemClick(pos: Int, roomId: Long)
     }
 
     var onItemClickListener:OnItemClickListener? = null
@@ -16,7 +16,13 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
     inner class ViewHolder(var binding: ChatroomListBinding): RecyclerView.ViewHolder(binding.root){
         init{
             binding.root.setOnClickListener {
-                onItemClickListener?.onItemClick(adapterPosition)
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val roomId = items[position].roomId
+                    if (roomId != null) {
+                        onItemClickListener?.onItemClick(position, roomId)
+                    }
+                }
             }
         }
     }
@@ -41,5 +47,12 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
         holder.binding.endTime.text = items[position].endTime
         holder.binding.presentPerson.text = items[position].currentNum.toString()
         holder.binding.totalPerson.text = items[position].total.toString()
+
+        holder.binding.root.setOnClickListener {
+            val roomId = items[position].roomId
+            if (roomId != null) {
+                onItemClickListener?.onItemClick(position, roomId)
+            }
+        }
     }
 }
