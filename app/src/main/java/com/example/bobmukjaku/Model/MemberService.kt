@@ -35,13 +35,6 @@ interface MemberService {
     @PUT("/member/info/password")
     fun updatePassword(
         @Header("Authorization") authorization: String,
-        @Body requestBody: Map<String, String>
-    ): Call<Void>
-
-    // 비밀번호 재설정
-    @PUT("/member/info/password")
-    fun setNewPassword(
-        @Header("Authorization") authorization: String,
         @Body member: UpdatePassword
     ): Call<Void>
 
