@@ -45,6 +45,7 @@
             android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/foodKind"
             android:layout_width="65dp"
             android:layout_height="wrap_content"
             android:text="한식"
@@ -58,6 +59,7 @@
             android:background="@drawable/btn_circle_green"/>
 
         <TextView
+            android:id="@+id/date"
             android:layout_width="65dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
