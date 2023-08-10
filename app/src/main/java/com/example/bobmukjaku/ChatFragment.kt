@@ -57,13 +57,18 @@ class ChatFragment : Fragment() {
         getUid()
 
         binding.sortBtn.setOnClickListener {
-            getLatestSort() // 테스트용 위치
+            if (binding.sortBtn.text == "최신순") {
+                binding.sortBtn.text = "오래된순"
+                getOldList()
+            }else {
+                binding.sortBtn.text = "최신순"
+                getLatestSort()
+            }
         }
         binding.foodBtn.setOnClickListener {
             getFoodLists() // 테스트
         }
-
-        getChatRoomAllList()
+        getLatestSort()
         makeChatRoom()
     }
 
@@ -177,7 +182,7 @@ class ChatFragment : Fragment() {
 //            }
     }
 
-    private fun getChatRoomAllList() {
+    private fun getOldList() {
         val call = chatroomService.setLists(authorizationHeader)
         call.enqueue(object : Callback<List<ChatRoom>> {
             override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
