@@ -57,6 +57,9 @@ interface MemberService {
     @GET("mailAuth")
     fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
 
+    @PUT("message")
+    fun sendMessage(@Body md: ChatModel): Call<Unit>
+
     // 필요한 다른 API 구현
 }
 

@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -7,10 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bobmukjaku.Model.ChatModel
-import com.example.bobmukjaku.Model.Member
-import com.example.bobmukjaku.Model.RetrofitClient
-import com.example.bobmukjaku.Model.WrapperInChatRoomMenu
+import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityChatBinding
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -28,13 +26,19 @@ class ChatActivity : AppCompatActivity() {
     lateinit var adapter2: ChatMenuParticipantsAdapter
 
     lateinit var myName:String
-    lateinit var yourName:String
+    private val chatRoomInfo by lazy{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("data",ChatRoom::class.java)
+        } else {
+            intent.getSerializableExtra("data") as ChatRoom?
+        }
+    }
 
 
     var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()
 
 
-    val chatRoomId = "testChatRoomId"
+    //val chatRoomId = "testChatRoomId"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,19 +54,11 @@ class ChatActivity : AppCompatActivity() {
 
     private fun initData() {
         myName = "kim"//
-        //yourName = intent.getStringExtra("name")!!
 
-
-
-//        Firebase.database.getReference("users/$myUid/username")
-//            .get()
-//            .addOnSuccessListener {
-//                myName = it.value.toString()
-//            }
 
 
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
-        Firebase.database.getReference("message/$chatRoomId")
+        Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
             .get()
             .addOnSuccessListener{
                 chatItem.clear()
@@ -71,7 +67,7 @@ class ChatActivity : AppCompatActivity() {
                     val senderName = chat.child("senderName").value.toString()
                     val time = chat.child("time").value.toString().toLong()
                     val isShareMessage = chat.child("isShareMessage").value.toString().toBoolean()
-                    val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString()
+                    val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString().toLong()
                     chatItem.add(ChatModel(message, senderName, time, isShareMessage, chatRoomIdFromMessage))
                 }
                 adapter.notifyDataSetChanged()
@@ -79,7 +75,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
         //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
-        val rf = Firebase.database.getReference("message/$chatRoomId")
+        val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
         val childEventListener = object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 //Log.i("chat", snapshot.toString())
@@ -88,7 +84,7 @@ class ChatActivity : AppCompatActivity() {
                 val senderName = snapshot.child("senderName").value.toString()
                 val time = snapshot.child("time").value.toString().toLong()
                 val isShareMessage = snapshot.child("isShareMessage").value.toString()
-                val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString()
+                val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
                 chatItem.add(ChatModel(message, senderName, time, isShareMessage = false, chatRoomIdFromMessage))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
@@ -146,7 +142,7 @@ class ChatActivity : AppCompatActivity() {
                             myName,
                             System.currentTimeMillis(),
                             false,
-                            chatRoomId)
+                            chatRoomInfo?.roomId)
                     )
 
                     request.enqueue(object: Callback<Unit>{
