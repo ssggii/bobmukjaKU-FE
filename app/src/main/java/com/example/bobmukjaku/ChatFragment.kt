@@ -59,8 +59,10 @@ class ChatFragment : Fragment() {
         binding.sortBtn.setOnClickListener {
             getLatestSort() // 테스트용 위치
         }
+        binding.foodBtn.setOnClickListener {
+            getFoodLists() // 테스트
+        }
 
-        getChatRoomMyList()
         getChatRoomAllList()
         makeChatRoom()
     }
@@ -73,23 +75,18 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun getChatRoomMyList() {
-        val call = chatroomService.getMyLists(authorizationHeader, uid)
+    private fun getFoodLists() {
+        val call = chatroomService.getFoodLists(authorizationHeader, "한식")
         call.enqueue(object : Callback<List<ChatRoom>> {
             override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
                 if (response.isSuccessful) {
                     val chatroomList = response.body()
                     if (chatroomList != null) {
-                        val roomId = chatroomList.map { it.roomId }
-                        val roomName = chatroomList.map { it.roomName }
-                        val meetingDate = chatroomList.map { it.meetingDate }
-                        val startTime = chatroomList.map { it.startTime }
-                        val endTime = chatroomList.map { it.endTime }
-                        val kindOfFood = chatroomList.map { it.kindOfFood }
-                        val total = chatroomList.map { it.total }
-                        val currentNum = chatroomList.map {it.currentNum}
                         chatMyList.addAll(chatroomList)
                         adapter.updateItems(chatroomList)
+
+                        val successCode = response.code()
+                        Toast.makeText(requireContext(), "내 모집방 목록 로드. 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     val errorCode = response.code()
@@ -108,6 +105,51 @@ class ChatFragment : Fragment() {
         adapter.onItemClickListener = object : ChatRoomAllListAdapter.OnItemClickListener {
             override fun onItemClick(pos: Int, roomInfo: ChatRoom) {
                 joinChatRoomDialog(roomInfo)
+            }
+        }
+        binding.joinRecyclerView.adapter = adapter
+    }
+
+    private fun getChatRoomMyList() {
+        val call = chatroomService.getMyLists(authorizationHeader, uid)
+        call.enqueue(object : Callback<List<ChatRoom>> {
+            override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
+                if (response.isSuccessful) {
+                    val chatroomList = response.body()
+                    if (chatroomList != null) {
+                        chatMyList.addAll(chatroomList)
+                        adapter.updateItems(chatroomList)
+
+                        val successCode = response.code()
+                        Toast.makeText(requireContext(), "내 모집방 목록 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(requireContext(), "내 모집방 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[내 모집방 목록 로드 에러: ]", it1) }
+            }
+        })
+
+        binding.joinRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+        adapter = ChatRoomAllListAdapter(chatMyList)
+        adapter.onItemClickListener = object : ChatRoomAllListAdapter.OnItemClickListener {
+            override fun onItemClick(pos: Int, roomInfo: ChatRoom) {
+                val intent = Intent(requireContext(), ChatActivity::class.java)
+                intent.putExtra("uid", uid)
+                intent.putExtra("roomId", roomInfo.roomId)
+                intent.putExtra("roomName", roomInfo.roomName)
+                intent.putExtra("meetingDate", roomInfo.meetingDate)
+                intent.putExtra("startTime", roomInfo.startTime)
+                intent.putExtra("endTime", roomInfo.endTime)
+                intent.putExtra("kindOfFood", roomInfo.kindOfFood)
+                intent.putExtra("total", roomInfo.total)
+                intent.putExtra("currentNum", roomInfo.currentNum?.plus(1))
+                startActivity(intent)
             }
         }
         binding.joinRecyclerView.adapter = adapter
@@ -142,14 +184,6 @@ class ChatFragment : Fragment() {
                 if (response.isSuccessful) {
                     val chatroomList = response.body()
                     if (chatroomList != null) {
-                        val roomId = chatroomList.map { it.roomId }
-                        val roomName = chatroomList.map { it.roomName }
-                        val meetingDate = chatroomList.map { it.meetingDate }
-                        val startTime = chatroomList.map { it.startTime }
-                        val endTime = chatroomList.map { it.endTime }
-                        val kindOfFood = chatroomList.map { it.kindOfFood }
-                        val total = chatroomList.map { it.total }
-                        val currentNum = chatroomList.map {it.currentNum}
                         chatAllList.addAll(chatroomList)
                         adapter3.updateItems(chatroomList)
                     }
@@ -182,14 +216,6 @@ class ChatFragment : Fragment() {
                 if (response.isSuccessful) {
                     val chatroomList = response.body()
                     if (chatroomList != null) {
-                        val roomId = chatroomList.map { it.roomId }
-                        val roomName = chatroomList.map { it.roomName }
-                        val meetingDate = chatroomList.map { it.meetingDate }
-                        val startTime = chatroomList.map { it.startTime }
-                        val endTime = chatroomList.map { it.endTime }
-                        val kindOfFood = chatroomList.map { it.kindOfFood }
-                        val total = chatroomList.map { it.total }
-                        val currentNum = chatroomList.map {it.currentNum}
                         chatLatestList.addAll(chatroomList)
                         adapter2.updateItems(chatroomList)
                     }
@@ -295,6 +321,7 @@ class ChatFragment : Fragment() {
                     val uidInfo = member?.uid
                     if (uidInfo != null) {
                         uid = uidInfo
+                        getChatRoomMyList()
                     }
                 } else {
                     val errorCode = response.code()

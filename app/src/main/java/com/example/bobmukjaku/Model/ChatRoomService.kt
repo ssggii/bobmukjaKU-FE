@@ -12,7 +12,7 @@ interface ChatRoomService {
     ): Call<ChatRoom>
 
     // 모집방 전체 조회
-    @GET("/chatRooms")
+    @GET("/chatRooms/info")
     fun setLists(@Header("Authorization") authorization: String): Call<List<ChatRoom>>
 
     // 모집방 참여자 추가
@@ -39,6 +39,14 @@ interface ChatRoomService {
     // 최신순 정렬
     @GET("/chatRoom/filter/latest")
     fun getLatestLists(@Header("Authorization") authorization: String): Call<List<ChatRoom>>
+
+    // 음식 종류 정렬
+    @GET("/chatRoom/filter/1/{kindOfFood}")
+    fun getFoodLists(
+        @Header("Authorization") authorization: String,
+        @Path("kindOfFood") kindOfFood: String
+    ): Call<List<ChatRoom>>
+
 
     // 필요한 다른 API 구현
 }

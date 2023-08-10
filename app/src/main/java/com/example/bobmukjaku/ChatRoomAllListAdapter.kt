@@ -9,8 +9,6 @@ import com.example.bobmukjaku.databinding.ChatroomListBinding
 
 class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
 
-    lateinit var binding: ChatroomListBinding
-
     interface OnItemClickListener{
         fun onItemClick(pos: Int, roomInfo: ChatRoom)
     }
@@ -21,11 +19,22 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
         init{
             binding.root.setOnClickListener {
                 val position = adapterPosition
+                val noChatRoomsTextView = binding.noChatRoomsTextView
+                val topContentView = binding.topContent
+                val bottomContentView = binding.bottomContent
+
                 if (position != RecyclerView.NO_POSITION) {
 //                    val roomId = items[position].roomId
                     val roomInfo = items[position]
                     if (roomInfo != null) {
                         onItemClickListener?.onItemClick(position, roomInfo)
+                        noChatRoomsTextView.visibility = View.GONE
+                        topContentView.visibility = View.VISIBLE
+                        bottomContentView.visibility = View.VISIBLE
+                    } else {
+                        noChatRoomsTextView.visibility = View.VISIBLE
+                        topContentView.visibility = View.GONE
+                        bottomContentView.visibility = View.GONE
                     }
                 }
             }
@@ -35,20 +44,6 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
     fun updateItems(newItems: List<ChatRoom>) {
         items = newItems
         notifyDataSetChanged()
-
-        val noChatRoomsTextView = binding.noChatRoomsTextView
-        val topContentView = binding.topContent
-        val bottomContentView = binding.bottomContent
-
-        if (items.isEmpty()) {
-            noChatRoomsTextView.visibility = View.VISIBLE
-            topContentView.visibility = View.GONE
-            bottomContentView.visibility = View.GONE
-        } else {
-            noChatRoomsTextView.visibility = View.GONE
-            topContentView.visibility = View.VISIBLE
-            bottomContentView.visibility = View.VISIBLE
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
