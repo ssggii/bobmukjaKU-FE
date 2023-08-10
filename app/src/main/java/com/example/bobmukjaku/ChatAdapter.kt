@@ -4,10 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatModel
+import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.MessageListMineBinding
 import com.example.bobmukjaku.databinding.MessageListOthersBinding
 
-class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -34,7 +35,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<Recycler
     // 여기 아래 부분 새로 추가 (실제 실행 시 반영 X) 07/31
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
         //return if (items[position].senderUid.equals(myUid)) 1 else 0
-        return if (items[position].senderName == myName) 1 else 0
+        return if (items[position].senderUid == myInfo.uid) 1 else 0
     }
 
     val myName = "kim"
@@ -44,7 +45,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<Recycler
 //        holder.binding.tvName.text = items[position].senderName
 //        holder.binding.tvMessage.text = items[position].message
 
-        if (items[position].senderName == myName) {       //레이아웃 항목 초기화
+        if (items[position].senderUid == myInfo.uid) {       //레이아웃 항목 초기화
             (holder as MyMessageViewHolder).bind(position)
         } else {
             (holder as OtherMessageViewHolder).bind(position)

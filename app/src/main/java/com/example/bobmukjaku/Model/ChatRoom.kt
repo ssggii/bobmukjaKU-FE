@@ -1,7 +1,6 @@
 package com.example.bobmukjaku.Model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.io.Serializable
 
 data class ChatRoom(
     @JsonProperty("roomId") var roomId: Long?,
@@ -12,4 +11,4 @@ data class ChatRoom(
     @JsonProperty("kindOfFood") var kindOfFood: String?,
     @JsonProperty("total") var total: Int?,
     @JsonProperty("currentNum") var currentNum: Int?
-): Serializable
+)

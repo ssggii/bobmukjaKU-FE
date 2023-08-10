@@ -1,8 +1,7 @@
 package com.example.bobmukjaku
 
-import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
+import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +14,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,20 +28,20 @@ class ChatActivity : AppCompatActivity() {
     lateinit var adapter:ChatAdapter
     lateinit var adapter2: ChatMenuParticipantsAdapter
 
-    lateinit var myName:String
-    private val chatRoomInfo by lazy{
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("data",ChatRoom::class.java)
-        } else {
-            intent.getSerializableExtra("data") as ChatRoom?
-        }
+    lateinit var myInfo: Member//내정보
+    private val chatRoomInfo by lazy{//현재 방 정보
+        ChatRoom(intent.getLongExtra("roomId", -1),
+            intent.getStringExtra("roomName"),
+            intent.getStringExtra("meetingDate"),
+            intent.getStringExtra("startTime"),
+            intent.getStringExtra("endTime"),
+            intent.getStringExtra("kindOfFood"),
+            intent.getIntExtra("total", -1),
+            intent.getIntExtra("currentNum", -1)
+        )
     }
+    var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()//채팅 저장 배열
 
-
-    var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()
-
-
-    //val chatRoomId = "testChatRoomId"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,49 +49,37 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initData()
-        initLayout()
-        initRecyclerView()
-        //initParticipantInMenu()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val job = CoroutineScope(Dispatchers.IO).async {
+                getMyInfo()
+            }.await()
+            initFirebase()
+            initRecyclerView()
+            initLayout()
+
+        }
     }
 
-    private fun initData() {
-        myName = "kim"//
-
-
-
+    private fun initFirebase() {
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
-        Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
-            .get()
-            .addOnSuccessListener{
-                chatItem.clear()
-                for (chat in it.children) {
-                    val message = chat.child("message").value.toString()
-                    val senderName = chat.child("senderName").value.toString()
-                    val time = chat.child("time").value.toString().toLong()
-                    val isShareMessage = chat.child("isShareMessage").value.toString().toBoolean()
-                    val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString().toLong()
-                    chatItem.add(ChatModel(message, senderName, time, isShareMessage, chatRoomIdFromMessage))
-                }
-                adapter.notifyDataSetChanged()
-
-            }
-
-        //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
         val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
+
+        chatItem.clear()
+        //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
         val childEventListener = object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 //Log.i("chat", snapshot.toString())
                 val message = snapshot.child("message").value.toString()
-                val senderUid = snapshot.child("senderUid").value.toString()
+                val senderUid = snapshot.child("senderUid").value.toString().toLong()
                 val senderName = snapshot.child("senderName").value.toString()
                 val time = snapshot.child("time").value.toString().toLong()
-                val isShareMessage = snapshot.child("isShareMessage").value.toString()
+                val isShareMessage = snapshot.child("isShareMessage").value.toString().toBoolean()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
-                chatItem.add(ChatModel(message, senderName, time, isShareMessage = false, chatRoomIdFromMessage))
+                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
-
+                Log.i("kim", "AAASDAS")
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -100,7 +91,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                Log.i("kim", chatItem.size.toString())
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -111,6 +102,33 @@ class ChatActivity : AppCompatActivity() {
         }
         rf.addChildEventListener(childEventListener)
 
+
+//        rf.get().addOnSuccessListener{
+//            for (chat in it.children) {
+//                val message = chat.child("message").value.toString()
+//                val senderUid = chat.child("senderUid").value.toString().toLong()
+//                val senderName = chat.child("senderName").value.toString()
+//                val time = chat.child("time").value.toString().toLong()
+//                val isShareMessage = chat.child("isShareMessage").value.toString().toBoolean()
+//                val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString().toLong()
+//                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage))
+//                Log.i("kim", chatItem.size.toString())
+//            }
+//            adapter.notifyDataSetChanged()
+//        }
+
+    }
+
+    private fun getMyInfo(){
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        //서버에서 내정보 가져오기
+        val request = RetrofitClient.memberService.selectOne(
+            "Bearer $accessToken")
+        val response = request.execute()
+        if(response.isSuccessful) {
+            myInfo = response.body()!!
+        }
+        Log.i("kim", "AAA")
     }
 
     private fun initLayout() {
@@ -139,7 +157,8 @@ class ChatActivity : AppCompatActivity() {
                     //val service = retrofit.create(UserApi::class.java)
                     val request = RetrofitClient.memberService.sendMessage(
                         ChatModel(message,
-                            myName,
+                            myInfo.uid,
+                            myInfo.memberNickName,
                             System.currentTimeMillis(),
                             false,
                             chatRoomInfo?.roomId)
@@ -177,12 +196,12 @@ class ChatActivity : AppCompatActivity() {
 
 
     private fun initRecyclerView() {
-
+        Log.i("kim", "BBB")
         //채팅 RecyclerView초기화
         val layoutManager = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
         layoutManager.stackFromEnd = true
         binding.chatRecyclerView.layoutManager = layoutManager
-        adapter = ChatAdapter(chatItem)
+        adapter = ChatAdapter(chatItem, myInfo)
         binding.chatRecyclerView.adapter = adapter
         binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
 
@@ -195,86 +214,16 @@ class ChatActivity : AppCompatActivity() {
         list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
         list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
         list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+
 
 
         adapter2 = ChatMenuParticipantsAdapter(list)
         binding.menuRecyclerview.adapter = adapter2
 
     }
-
-
-
-
-    //메뉴에서 참여자 관련 초기화 코드
-/*    private fun initParticipantInMenu(){
-        //방목록화면에서 참여자 수를 넘겨받았다고 가정
-        val participantsNum = 5
-        val uidList = arrayListOf<Int>()
-        uidList.add(1)
-        uidList.add(2)
-        uidList.add(3)
-        uidList.add(4)
-        uidList.add(5)
-
-        //참가자 수 만큼 뷰생성
-        for(i in 0 until participantsNum) {
-            //LinearLayout 생성
-            var linearLayoutParticipant = LinearLayout(this)
-            var layoutParamsForLinearLayout = LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            linearLayoutParticipant.id = uidList[i]
-            layoutParamsForLinearLayout.topMargin = getFloatToDp(10f)
-            linearLayoutParticipant.layoutParams = layoutParamsForLinearLayout
-            linearLayoutParticipant.orientation = LinearLayout.HORIZONTAL
-
-
-            //참가자 프로필 이미지 뷰 생성하고 LinearLayout에 add
-            var imageParticipant = ImageButton(this)
-            var layoutParams = LayoutParams(getFloatToDp(40f), getFloatToDp(40f))
-            layoutParams.leftMargin = getFloatToDp(30f)
-            imageParticipant.layoutParams = layoutParams
-            imageParticipant.background = ContextCompat.getDrawable(this, R.drawable.ku_3)
-            linearLayoutParticipant.addView(imageParticipant)
-
-            //LinearLayout도 add
-            binding.menuParticipants.addView(linearLayoutParticipant)
-        }
-
-        binding.menuParticipants.removeView(findViewById(uidList[1]))
-
-
-    }*/
-
-    private fun getFloatToDp(float: Float): Int {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, float, resources.displayMetrics)
-            .toInt()
-    }
 }
+
+
+
+
+
