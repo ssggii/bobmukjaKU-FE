@@ -22,5 +22,23 @@ interface ChatRoomService {
         @Body member: AddChatRoomMember
     ): Call<ServerBooleanResponse> // true(입장 성공), false(입장 실패)
 
+    // 방 id로 모집방 조회
+    @GET("/chatRoom/info/1/{roomId}")
+    fun getRoomIdLists(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: Map<String, Long>
+    ): Call<List<ChatRoom>>
+
+    // uid로 참여 중인 모집방 조회
+    @GET("/chatRoom/info/2/{uid}")
+    fun getMyLists(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: Map<String, Long>
+    ): Call<List<ChatRoom>>
+
+    // 최신순 정렬
+    @GET("/chatRoom/filter/latest")
+    fun getLatestLists(@Header("Authorization") authorization: String): Call<List<ChatRoom>>
+
     // 필요한 다른 API 구현
 }
