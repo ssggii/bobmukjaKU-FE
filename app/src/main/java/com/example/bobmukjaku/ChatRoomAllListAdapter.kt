@@ -1,14 +1,18 @@
 package com.example.bobmukjaku
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatRoom
 import com.example.bobmukjaku.databinding.ChatroomListBinding
 
 class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
+
+    lateinit var binding: ChatroomListBinding
+
     interface OnItemClickListener{
-        fun onItemClick(pos: Int, roomId: Long)
+        fun onItemClick(pos: Int, roomInfo: ChatRoom)
     }
 
     var onItemClickListener:OnItemClickListener? = null
@@ -18,9 +22,10 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    val roomId = items[position].roomId
-                    if (roomId != null) {
-                        onItemClickListener?.onItemClick(position, roomId)
+//                    val roomId = items[position].roomId
+                    val roomInfo = items[position]
+                    if (roomInfo != null) {
+                        onItemClickListener?.onItemClick(position, roomInfo)
                     }
                 }
             }
@@ -30,6 +35,20 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
     fun updateItems(newItems: List<ChatRoom>) {
         items = newItems
         notifyDataSetChanged()
+
+        val noChatRoomsTextView = binding.noChatRoomsTextView
+        val topContentView = binding.topContent
+        val bottomContentView = binding.bottomContent
+
+        if (items.isEmpty()) {
+            noChatRoomsTextView.visibility = View.VISIBLE
+            topContentView.visibility = View.GONE
+            bottomContentView.visibility = View.GONE
+        } else {
+            noChatRoomsTextView.visibility = View.GONE
+            topContentView.visibility = View.VISIBLE
+            bottomContentView.visibility = View.VISIBLE
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,9 +68,9 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
         holder.binding.totalPerson.text = items[position].total.toString()
 
         holder.binding.root.setOnClickListener {
-            val roomId = items[position].roomId
-            if (roomId != null) {
-                onItemClickListener?.onItemClick(position, roomId)
+            val roomInfo = items[position]
+            if (roomInfo != null) {
+                onItemClickListener?.onItemClick(position, roomInfo)
             }
         }
     }
