@@ -74,7 +74,7 @@ class ModifyInfoActivity : AppCompatActivity() {
                 updatePassword(passwd)
                 Toast.makeText(
                     this@ModifyInfoActivity,
-                    "비밀번호가 업데이트되었습니다.",
+                    "[최종] 비밀번호가 업데이트되었습니다.",
                     Toast.LENGTH_SHORT
                 ).show()
             } else if (passwd.isEmpty()) {
@@ -179,7 +179,7 @@ class ModifyInfoActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<List<Member>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                Log.i("회원가입[닉네임중복확인]: ", "네트워크 오류 및 기타 에러")
+                t.message?.let { Log.i("회원가입[닉네임중복확인]: ", it) }
                 onSuccess(false)
             }
         })
@@ -191,7 +191,7 @@ class ModifyInfoActivity : AppCompatActivity() {
 
         val authorizationHeader = "Bearer $accessToken"
 
-        val requestBody = mapOf("memberNickName" to nick)
+        val requestBody = mapOf("nickName" to nick)
 
         val call = accessToken?.let {
             memberService.updateMember(
@@ -230,48 +230,16 @@ class ModifyInfoActivity : AppCompatActivity() {
         val accessToken = SharedPreferences.getString("accessToken", "")
 
         val authorizationHeader = "Bearer $accessToken"
-        var checkedPasswd = ""
 
-        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
-        call?.enqueue(object : Callback<Member> {
-            override fun onResponse(call: Call<Member>, response: Response<Member>) {
-                if (response.isSuccessful) {
-                    val member = response.body()
-                    checkedPasswd = member?.memberPassword.toString()
-                } else {
-                    val errorCode = response.code()
-                    if (errorCode == 400) {
-                        // 400 error code (Bad Request)
-                        Toast.makeText(
-                            this@ModifyInfoActivity,
-                            "비밀번호를 가져오는데 실패했습니다. 잘못된 요청입니다.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            this@ModifyInfoActivity,
-                            "비밀번호를 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
+        val requestBody = mapOf("toBePassword" to passwd)
 
-            override fun onFailure(call: Call<Member>, t: Throwable) {
-                // 네트워크 오류 처리
-                Toast.makeText(this@ModifyInfoActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        val passwdRequest = UpdatePassword(tobePassword = passwd, checkPassword = checkedPasswd)
-
-        val call2 = accessToken?.let {
-            memberService.updatePassword(
+        val call = accessToken?.let {
+            memberService.updateMember(
                 authorizationHeader,
-                passwdRequest
+                requestBody
             )
         }
-        call2?.enqueue(object : Callback<Void> {
+        call?.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 업데이트됨
@@ -284,15 +252,15 @@ class ModifyInfoActivity : AppCompatActivity() {
                     val errorCode = response.code()
                     Toast.makeText(
                         this@ModifyInfoActivity,
-                        "비밀번호가 업데이트 실패. 에러 코드: $errorCode",
+                        "비밀번호 업데이트 실패. 에러 코드: $errorCode",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                // 네트워크 오류 처리
-                Toast.makeText(this@ModifyInfoActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { Log.i("비밀번호 업데이트 실패: ", it) }
             }
         })
     }
