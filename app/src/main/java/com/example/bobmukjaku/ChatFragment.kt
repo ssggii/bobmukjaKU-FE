@@ -3,6 +3,7 @@ package com.example.bobmukjaku
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.*
@@ -55,7 +57,13 @@ class ChatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         getUid()
+        init()
+        getLatestSort()
+        makeChatRoom()
+    }
 
+    private fun init() {
+        // 최신순, 오래된 순 정렬
         binding.sortBtn.setOnClickListener {
             if (binding.sortBtn.text == "최신순") {
                 binding.sortBtn.text = "오래된순"
@@ -65,11 +73,31 @@ class ChatFragment : Fragment() {
                 getLatestSort()
             }
         }
+
+        // 시간표 필터링
+        binding.ttBtn.setOnClickListener {
+            if (binding.ttBtn.text == "시간표 ON") {
+                binding.ttBtn.text = "시간표 OFF"
+
+                val textColor = ContextCompat.getColor(requireContext(), R.color.black)
+                val color = ContextCompat.getColor(requireContext(), R.color.gray)
+                binding.ttBtn.setTextColor(textColor)
+                binding.ttBtn.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }else {
+                binding.ttBtn.text = "시간표 ON"
+                val textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                val color = ContextCompat.getColor(requireContext(), R.color.main)
+                binding.ttBtn.setTextColor(textColor)
+                binding.ttBtn.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+        }
+
+        // 시간 필터링
+
+        // 기타 필터링
         binding.foodBtn.setOnClickListener {
             getFoodLists() // 테스트
         }
-        getLatestSort()
-        makeChatRoom()
     }
 
     private fun makeChatRoom() {
@@ -153,7 +181,7 @@ class ChatFragment : Fragment() {
                 intent.putExtra("endTime", roomInfo.endTime)
                 intent.putExtra("kindOfFood", roomInfo.kindOfFood)
                 intent.putExtra("total", roomInfo.total)
-                intent.putExtra("currentNum", roomInfo.currentNum?.plus(1))
+                intent.putExtra("currentNum", roomInfo.currentNum)
                 startActivity(intent)
             }
         }
