@@ -26,14 +26,14 @@ interface ChatRoomService {
     @GET("/chatRoom/info/1/{roomId}")
     fun getRoomIdLists(
         @Header("Authorization") authorization: String,
-        @Body requestBody: Map<String, Long>
+        @Path("roodId") roomId: Long
     ): Call<List<ChatRoom>>
 
     // uid로 참여 중인 모집방 조회
     @GET("/chatRoom/info/2/{uid}")
     fun getMyLists(
         @Header("Authorization") authorization: String,
-        @Body requestBody: Map<String, Long>
+        @Path("uid") uid: Long
     ): Call<List<ChatRoom>>
 
     // 최신순 정렬
