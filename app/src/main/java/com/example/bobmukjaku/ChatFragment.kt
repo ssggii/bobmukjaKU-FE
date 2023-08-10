@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,20 +8,30 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.TimePicker
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bobmukjaku.Model.UserItem
+import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentChatBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.properties.Delegates
 
 class ChatFragment : Fragment() {
 
     lateinit var mContext: Context
     lateinit var binding: FragmentChatBinding
     lateinit var adapter: ChatRoomListAdapter
+    lateinit var adapter2: ChatRoomAllListAdapter
     var chatlist = arrayListOf<UserItem>()
+    var chatAllList = mutableListOf<ChatRoom>()
+    var uid by Delegates.notNull<Long>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -39,6 +50,7 @@ class ChatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         getChatRoomList()
+        getChatRoomAllList()
         makeChatRoom()
     }
 
@@ -60,7 +72,6 @@ class ChatFragment : Fragment() {
                 chatlist.add(UserItem(name, "message", uid))
             }
 
-
                 binding.joinRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
                 adapter = ChatRoomListAdapter(chatlist)
                 adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
@@ -70,9 +81,151 @@ class ChatFragment : Fragment() {
                         intent.putExtra("uid", chatlist[pos].uid)
                         startActivity(intent)
                     }
-
                 }
                 binding.joinRecyclerView.adapter = adapter
             }
+    }
+
+    private fun getChatRoomAllList() {
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        val authorizationHeader = "Bearer $accessToken"
+
+        val chatroomService = RetrofitClient.chatRoomService
+
+        val call = chatroomService.setLists(authorizationHeader)
+        call.enqueue(object : Callback<List<ChatRoom>> {
+            override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
+                if (response.isSuccessful) {
+                    val chatroomList = response.body()
+                    if (chatroomList != null) {
+                        val roomId = chatroomList.map { it.roomId }
+                        val roomName = chatroomList.map { it.roomName }
+                        val meetingDate = chatroomList.map { it.meetingDate }
+                        val startTime = chatroomList.map { it.startTime }
+                        val endTime = chatroomList.map { it.endTime }
+                        val kindOfFood = chatroomList.map { it.kindOfFood }
+                        val total = chatroomList.map { it.total }
+                        val currentNum = chatroomList.map {it.currentNum}
+                        chatAllList.addAll(chatroomList)
+                        adapter2.updateItems(chatroomList)
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(requireContext(), "모집방 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[모집방 목록 로드 에러: ]", it1) }
+            }
+        })
+
+            binding.allRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+            adapter2 = ChatRoomAllListAdapter(chatAllList)
+            adapter2.onItemClickListener = object : ChatRoomAllListAdapter.OnItemClickListener {
+                override fun onItemClick(pos: Int, roomId: Long) {
+                    joinChatRoomDialog(roomId)
+                }
+            }
+            binding.allRecyclerView.adapter = adapter2
+    }
+
+    private fun joinChatRoomDialog(roomId: Long) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.join_chatroom_dialog, null)
+        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
+
+        val builder = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        // 확인 버튼 클릭 이벤트 처리
+        yesButton.setOnClickListener {
+            getUid()
+            val chatroomService = RetrofitClient.chatRoomService
+            val accessToken = SharedPreferences.getString("accessToken", "")
+
+            val authorizationHeader = "Bearer $accessToken"
+
+            val addMember = AddChatRoomMember(roomId = roomId, uid = uid)
+            val call = chatroomService.addMember(authorizationHeader, addMember)
+            call.enqueue(object : Callback<ServerBooleanResponse> {
+                override fun onResponse(call: Call<ServerBooleanResponse>, response: Response<ServerBooleanResponse>) {
+                    if (response.isSuccessful) {
+                        val serverResponse = response.body()
+                        if (serverResponse != null && serverResponse.success) {
+                            // 서버 응답이 true일 경우 처리
+                            val intent = Intent(requireContext(), ChatActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            // 서버 응답이 false일 경우 처리
+                            val errorCode = response.code()
+                            Toast.makeText(
+                                requireContext(),
+                                "모집방 입장 실패 (정원 초과)",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        // 서버 응답이 실패일 경우 처리
+                        val errorCode = response.code()
+                        Toast.makeText(
+                            requireContext(),
+                            "모집방 입장 실패. 에러 코드: $errorCode",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ServerBooleanResponse>, t: Throwable) {
+                    // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                    t.message?.let { it1 -> Log.i("[모집방 입장 실패: ]", it1) }
+                }
+            })
+
+            val intent = Intent(requireContext(), ChatActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 취소 버튼 클릭 이벤트 처리
+        noButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+    }
+
+    private fun getUid() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
+        call?.enqueue(object : Callback<Member> {
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if (response.isSuccessful) {
+                    val member = response.body()
+                    val uidInfo = member?.uid
+                    if (uidInfo != null) {
+                        uid = uidInfo
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[uid 로드 실패: ]", it1) }
+            }
+        })
     }
 }

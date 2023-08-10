@@ -11,10 +11,15 @@ import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.TextView
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityMakeRoomBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -23,9 +28,9 @@ import java.util.*
 class MakeRoomActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMakeRoomBinding
-//    val uid = intent.getStringExtra("uid") // 사용자 uid 주소 가져오기
-    val selectFoodType = "KoreaF"
-    val selectPersonType = "P2"
+
+    private var selectFoodType = "한식"
+    private var selectPersonType = 2
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +51,11 @@ class MakeRoomActivity : AppCompatActivity() {
         binding.ectF.setOnClickListener { selectFoodType(binding.ectF) }
 
         // 인원수 각 버튼에 클릭 이벤트 설정
-        binding.P2.setOnClickListener { selectPersonType(binding.P2) }
-        binding.P3.setOnClickListener { selectPersonType(binding.P3) }
-        binding.P4.setOnClickListener { selectPersonType(binding.P4) }
-        binding.P5.setOnClickListener { selectPersonType(binding.P5) }
-        binding.P6.setOnClickListener { selectPersonType(binding.P6) }
+        binding.P2.setOnClickListener { selectPersonType(2) }
+        binding.P3.setOnClickListener { selectPersonType(3) }
+        binding.P4.setOnClickListener { selectPersonType(4) }
+        binding.P5.setOnClickListener { selectPersonType(5) }
+        binding.P6.setOnClickListener { selectPersonType(6) }
 
         // 모집방 개설 닫기 클릭 이벤트 처리
         binding.cancelBtn.setOnClickListener {
@@ -93,7 +98,50 @@ class MakeRoomActivity : AppCompatActivity() {
 
         // 완료 버튼 클릭 이벤트 처리
         binding.finishBtn.setOnClickListener {
-            // 추후 추가
+            // 모집방 정보 db에 저장
+            val accessToken = SharedPreferences.getString("accessToken", "")
+            val authorizationHeader = "Bearer $accessToken"
+
+            val insertRequest = InsertChatRoomRequest(
+                roomName = binding.nameArea.text.toString(),
+                date = binding.dateArea.text.toString(),
+                startTime = binding.startTimeArea.text.toString(),
+                endTime = binding.endTimeArea.text.toString(),
+                kindOfFood = selectFoodType,
+                total = selectPersonType
+            )
+
+            val call = RetrofitClient.chatRoomService.insertChatRoom(
+                authorizationHeader,
+                insertRequest
+            )
+
+            // 네트워크 요청을 비동기적으로 실행하도록 호출
+            call.enqueue(object : Callback<ChatRoom> {
+                override fun onResponse(call: Call<ChatRoom>, response: Response<ChatRoom>) {
+                    if (response.isSuccessful) {
+                        val insertedChatRoom = response.body()
+                        Log.i("success", insertedChatRoom.toString())
+                        // 데이터 삽입 성공
+                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 성공", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
+                        startActivity(intent)
+                    } else if (response.code() == 400) { // 데이터 삽입 실패
+                        // 400 error code (Bad Request)
+                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 실패. 에러 400", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val errorCode = response.code()
+                        // 400 error code 아닐 때
+                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ChatRoom>, t: Throwable) {
+                    // 네트워크 오류 처리
+                    t.message?.let { it1 -> Log.i("onFailure", it1) }
+                }
+            })
         }
     }
 
@@ -186,7 +234,6 @@ class MakeRoomActivity : AppCompatActivity() {
             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                 val selectedDate = formatDate(year, month, dayOfMonth)
                 binding.dateArea.text = selectedDate
-                LocalDate.parse(selectedDate, DateTimeFormatter.ISO_DATE) // LocalDate로 변환
             },
             year,
             month,
@@ -202,7 +249,7 @@ class MakeRoomActivity : AppCompatActivity() {
     private fun formatDate(year: Int, month: Int, dayOfMonth: Int): String {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, dayOfMonth)
-        val dateFormat = SimpleDateFormat("yyyy년 M월 d일", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(calendar.time)
     }
 
@@ -223,10 +270,22 @@ class MakeRoomActivity : AppCompatActivity() {
         // 선택한 버튼의 스타일 변경
         selectedButton.backgroundTintList = getColorStateList(R.color.main)
         selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white))
+
+        // 선택한 음식 종류 업데이트
+        selectFoodType = when (selectedButton) {
+            binding.KoreaF -> "한식"
+            binding.JapanF -> "일식"
+            binding.ForeignF -> "양식"
+            binding.ChinaF -> "중식"
+            binding.ectF -> "기타"
+            else -> ""
+        }
     }
 
     // 인원수 버튼 클릭 시 호출되는 함수
-    private fun selectPersonType(selectedButton: AppCompatButton) {
+    private fun selectPersonType(selectedPersonType: Int) {
+        selectPersonType = selectedPersonType
+
         // 모든 버튼의 배경색과 텍스트 색상 초기화
         binding.P2.backgroundTintList = getColorStateList(R.color.gray)
         binding.P2.setTextColor(ContextCompat.getColor(this, R.color.black))
@@ -240,7 +299,27 @@ class MakeRoomActivity : AppCompatActivity() {
         binding.P6.setTextColor(ContextCompat.getColor(this, R.color.black))
 
         // 선택한 버튼의 스타일 변경
-        selectedButton.backgroundTintList = getColorStateList(R.color.main)
-        selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white))
+        when (selectedPersonType) {
+            2 -> {
+                binding.P2.backgroundTintList = getColorStateList(R.color.main)
+                binding.P2.setTextColor(ContextCompat.getColor(this, R.color.white))
+            }
+            3 -> {
+                binding.P3.backgroundTintList = getColorStateList(R.color.main)
+                binding.P3.setTextColor(ContextCompat.getColor(this, R.color.white))
+            }
+            4 -> {
+                binding.P4.backgroundTintList = getColorStateList(R.color.main)
+                binding.P4.setTextColor(ContextCompat.getColor(this, R.color.white))
+            }
+            5 -> {
+                binding.P5.backgroundTintList = getColorStateList(R.color.main)
+                binding.P5.setTextColor(ContextCompat.getColor(this, R.color.white))
+            }
+            6 -> {
+                binding.P6.backgroundTintList = getColorStateList(R.color.main)
+                binding.P6.setTextColor(ContextCompat.getColor(this, R.color.white))
+            }
+        }
     }
 }

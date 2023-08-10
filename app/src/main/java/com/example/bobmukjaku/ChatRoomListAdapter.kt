@@ -33,6 +33,6 @@ class ChatRoomListAdapter (var items: ArrayList<UserItem>): RecyclerView.Adapter
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.name.text = items[position].name
-        holder.binding.time.text = items[position].message
+        holder.binding.startTime.text = items[position].message
     }
 }

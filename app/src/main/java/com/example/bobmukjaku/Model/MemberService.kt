@@ -6,12 +6,10 @@ import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.*
-import java.time.LocalDate
 
 interface MemberService {
     // 사용자 추가
@@ -28,24 +26,24 @@ interface MemberService {
 
     // 사용자 수정
     @PUT("/member/info")
-    @FormUrlEncoded
-    fun updateCertificatedAt(
+    fun updateMember(
         @Header("Authorization") authorization: String,
-        @Field("certificatedAt") certificatedAt: String?
+        @Body requestBody: Map<String, String>
     ): Call<Void>
 
-
-    @PUT("/member/info")
-    @FormUrlEncoded
-    fun updateNickName(
+    // 비밀번호 재설정
+    @PUT("/member/info/password")
+    fun updatePassword(
         @Header("Authorization") authorization: String,
-        @Field("memberNickName") memberNickName: String?
+        @Body member: UpdatePassword
     ): Call<Void>
-
 
     // 사용자 삭제
-    @DELETE("delete/{uid}")
-    fun deleteMember(@Path("uid") uid: Long): Call<ResponseBody>
+    @DELETE("member/info")
+    fun deleteMember(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: Map<String, String>
+    ): Call<Void>
 
     //로그인
     @POST("/login")
@@ -63,7 +61,7 @@ interface MemberService {
 }
 
 object RetrofitClient {
-    private const val BASE_URL = "http://172.30.1.97:8082/" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
@@ -73,10 +71,6 @@ object RetrofitClient {
 
 
     private val retrofit: Retrofit by lazy {
-
-
-
-
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
@@ -86,6 +80,10 @@ object RetrofitClient {
 
     val memberService: MemberService by lazy {
         retrofit.create(MemberService::class.java)
+    }
+
+    val chatRoomService: ChatRoomService by lazy {
+        retrofit.create(ChatRoomService::class.java)
     }
 }
 

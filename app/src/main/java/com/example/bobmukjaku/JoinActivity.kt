@@ -188,8 +188,9 @@ class JoinActivity : AppCompatActivity() {
                                         // 400 error code (Bad Request)
                                         Toast.makeText(this@JoinActivity, "회원가입에 실패했습니다. 잘못된 요청입니다.", Toast.LENGTH_SHORT).show()
                                     } else {
+                                        var errorcode = response.code()
                                         // 400 error code 아닐 때
-                                        Toast.makeText(this@JoinActivity, "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this@JoinActivity, "회원가입에 실패했습니다. $errorcode", Toast.LENGTH_SHORT).show()
                                     }
                                 }
 
