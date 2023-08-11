@@ -153,6 +153,9 @@ class ChatActivity : AppCompatActivity() {
     private fun initLayout() {
 
         binding.apply {
+            setBobAppointment.setOnClickListener {
+                //공지화면으로
+            }
 
             //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화
             menuDrawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
