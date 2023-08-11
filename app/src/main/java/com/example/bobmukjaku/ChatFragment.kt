@@ -58,7 +58,9 @@ class ChatFragment : Fragment() {
 
         getUid()
         init()
-        setupSearchListener()
+        if (chatAllList != null) {
+            setupSearchListener()
+        }
         getLatestSort()
         makeChatRoom()
     }
@@ -482,9 +484,11 @@ class ChatFragment : Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // 입력된 텍스트를 기반으로 필터링된 목록을 가져와서 업데이트
-                val filteredList = chatAllList.filter { room -> room.roomName?.contains(s.toString()) ?: false }
-                adapter4.updateItems(filteredList)
+                if (::adapter4.isInitialized) { // adapter4가 초기화되었을 때만 업데이트
+                    // 입력된 텍스트를 기반으로 필터링된 목록을 가져와서 업데이트
+                    val filteredList = chatAllList.filter { room -> room.roomName?.contains(s.toString()) ?: false }
+                    adapter4.updateItems(filteredList)
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
