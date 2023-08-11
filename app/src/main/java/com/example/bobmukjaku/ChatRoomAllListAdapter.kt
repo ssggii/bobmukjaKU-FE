@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.graphics.PorterDuff
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -72,27 +73,27 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
             "한식" -> {
                 holder.binding.foodKind.text = "한식"
                 val color = ContextCompat.getColor(holder.itemView.context, R.color.kor)
-                holder.binding.foodKind.setBackgroundColor(color)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
             "일식" -> {
                 holder.binding.foodKind.text = "일식"
                 val color = ContextCompat.getColor(holder.itemView.context, R.color.jap)
-                holder.binding.foodKind.setBackgroundColor(color)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
             "양식" -> {
                 holder.binding.foodKind.text = "양식"
                 val color = ContextCompat.getColor(holder.itemView.context, R.color.frg)
-                holder.binding.foodKind.setBackgroundColor(color)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
             "중식" -> {
                 holder.binding.foodKind.text = "중식"
                 val color = ContextCompat.getColor(holder.itemView.context, R.color.chi)
-                holder.binding.foodKind.setBackgroundColor(color)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
             "기타" -> {
                 holder.binding.foodKind.text = "기타"
                 val color = ContextCompat.getColor(holder.itemView.context, R.color.ect)
-                holder.binding.foodKind.setBackgroundColor(color)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
         }
 
