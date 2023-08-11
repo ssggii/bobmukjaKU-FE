@@ -47,6 +47,18 @@ interface ChatRoomService {
         @Path("kindOfFood") kindOfFood: String
     ): Call<List<ChatRoom>>
 
+    // 전체 필터링
+    @POST("/chatRooms/filtered")
+    fun filteredLists(
+        @Header("Authorization") authorization: String,
+        @Body filters: List<FilterInfo>
+    ): Call<List<ChatRoom>>
+
+    // 필터링 리스트 조회
+    @GET("/filter/info")
+    fun getFilter(
+        @Header("Authorization") authorization: String
+    ) : Call<List<FilterInfo>>
 
     // 필요한 다른 API 구현
 }
