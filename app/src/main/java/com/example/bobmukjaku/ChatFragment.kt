@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -56,6 +58,7 @@ class ChatFragment : Fragment() {
 
         getUid()
         init()
+        setupSearchListener()
         getLatestSort()
         makeChatRoom()
     }
@@ -466,6 +469,26 @@ class ChatFragment : Fragment() {
             override fun onFailure(call: Call<List<FilterInfo>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
                 t.message?.let { it1 -> Log.i("[필터 제거 기타 에러: ]", it1) }
+            }
+        })
+    }
+
+    private fun setupSearchListener() {
+        val searchEditText = binding.contentSearch
+
+        searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // 사용하지 않음
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // 입력된 텍스트를 기반으로 필터링된 목록을 가져와서 업데이트
+                val filteredList = chatAllList.filter { room -> room.roomName?.contains(s.toString()) ?: false }
+                adapter4.updateItems(filteredList)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // 사용하지 않음
             }
         })
     }
