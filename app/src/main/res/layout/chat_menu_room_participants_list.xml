@@ -4,10 +4,12 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageButton
+    <ImageView
+        android:id="@+id/participant_profile"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/ku_3"
+        android:src="@drawable/ku_3"
+        android:scaleType="fitXY"
         android:layout_marginLeft="30dp"/>
 
     <LinearLayout

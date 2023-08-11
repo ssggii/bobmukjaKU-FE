@@ -41,6 +41,8 @@ class ChatActivity : AppCompatActivity() {
         )
     }
     var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()//채팅 저장 배열
+    var participantsMenuList = arrayListOf<WrapperInChatRoomMenu>()//참가자 목록 저장 배열
+    private val rf by lazy {Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}")}
 
 
 
@@ -55,15 +57,63 @@ class ChatActivity : AppCompatActivity() {
                 getMyInfo()
             }.await()
             initFirebase()
+            registerMyInfoIntoFirebase()
             initRecyclerView()
             initLayout()
-
         }
+    }
+
+    private fun registerMyInfoIntoFirebase() {
+        val mrf = rf.child("participants")
+
+        //나를 참가자로 등록
+        mrf.child(myInfo.uid.toString()).setValue(myInfo)
+
+        val childEventListener = object: ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                //다른 누군가가 채팅방에 입장
+                val participantUid = snapshot.child("uid").value.toString().toLong()
+                val participantName = snapshot.child("memberNickName").value.toString()
+                val participantRate = snapshot.child("rate").value.toString().toInt()
+                val paricipantProfileColor = snapshot.child("profileColor").value.toString()
+                //나머지 정보는 필요없을 듯
+
+                val participantInfo = Member(
+                    participantUid,
+                    null,
+                    null,
+                    participantName,
+                    null,
+                    participantRate,
+                    paricipantProfileColor)
+
+                participantsMenuList.add(WrapperInChatRoomMenu(2, participantInfo))
+                adapter2.notifyDataSetChanged()
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        }
+        mrf.addChildEventListener(childEventListener)
     }
 
     private fun initFirebase() {
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
-        val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
+        //val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
+        val mrf = rf.child("message")
 
         chatItem.clear()
         //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
@@ -79,44 +129,13 @@ class ChatActivity : AppCompatActivity() {
                 chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
-                Log.i("kim", "AAASDAS")
             }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                Log.i("kim", chatItem.size.toString())
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
         }
-        rf.addChildEventListener(childEventListener)
-
-
-//        rf.get().addOnSuccessListener{
-//            for (chat in it.children) {
-//                val message = chat.child("message").value.toString()
-//                val senderUid = chat.child("senderUid").value.toString().toLong()
-//                val senderName = chat.child("senderName").value.toString()
-//                val time = chat.child("time").value.toString().toLong()
-//                val isShareMessage = chat.child("isShareMessage").value.toString().toBoolean()
-//                val chatRoomIdFromMessage = chat.child("chatRoomId").value.toString().toLong()
-//                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage))
-//                Log.i("kim", chatItem.size.toString())
-//            }
-//            adapter.notifyDataSetChanged()
-//        }
-
+        mrf.addChildEventListener(childEventListener)
     }
 
     private fun getMyInfo(){
@@ -128,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
         if(response.isSuccessful) {
             myInfo = response.body()!!
         }
-        Log.i("kim", "AAA")
+        //Log.i("kim", "AAA")
     }
 
     private fun initLayout() {
@@ -189,7 +208,6 @@ class ChatActivity : AppCompatActivity() {
 //                            Log.i("kim", "canceled")
 //                        }
                 }
-
             }
         }
     }
@@ -208,16 +226,12 @@ class ChatActivity : AppCompatActivity() {
         //메뉴recyclerView 초기화
         val layoutManager2 = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
         binding.menuRecyclerview.layoutManager = layoutManager2
-        val list = arrayListOf<WrapperInChatRoomMenu>()
-        list.add(WrapperInChatRoomMenu(1,Member(null,null, null, null, null, null, null)))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        list.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-
-
-
-        adapter2 = ChatMenuParticipantsAdapter(list)
+        participantsMenuList.add(WrapperInChatRoomMenu(1,Member(null,null, null, null, null, null, null)))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+        adapter2 = ChatMenuParticipantsAdapter(participantsMenuList, this@ChatActivity)
         binding.menuRecyclerview.adapter = adapter2
 
     }

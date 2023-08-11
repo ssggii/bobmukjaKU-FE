@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,17 +8,24 @@ import com.example.bobmukjaku.Model.WrapperInChatRoomMenu
 import com.example.bobmukjaku.databinding.ChatMenuRoomInfoBinding
 import com.example.bobmukjaku.databinding.ChatMenuRoomParticipantsListBinding
 
-class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomMenu>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomMenu>, val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    inner class MenuInfoViewHolder(itemView: ChatMenuRoomInfoBinding): RecyclerView.ViewHolder(itemView.root){
+    inner class MenuInfoViewHolder(itemView: ChatMenuRoomInfoBinding)
+        : RecyclerView.ViewHolder(itemView.root){
         fun bind(position: Int){
-
         }
     }
 
-    inner class ParticipantsListViewHolder(itemView: ChatMenuRoomParticipantsListBinding): RecyclerView.ViewHolder(itemView.root){
+    inner class ParticipantsListViewHolder(itemView: ChatMenuRoomParticipantsListBinding)
+        : RecyclerView.ViewHolder(itemView.root){
+        private val participantNameView = itemView.participantName
+        private val participantLevelView = itemView.participantLevel
+        private val participantProfileView = itemView.participantProfile
         fun bind(position: Int){
-
+            participantNameView.text = participants[position].member.memberNickName
+            participantLevelView.text = participants[position].member.rate.toString()
+            participantProfileView.background = context.getDrawable(
+                context.resources.getIdentifier("bg1","drawable", context.packageName))
         }
     }
 
@@ -54,6 +62,4 @@ class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomM
             }
         }
     }
-
-
 }
