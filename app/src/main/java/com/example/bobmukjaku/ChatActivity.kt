@@ -91,21 +91,16 @@ class ChatActivity : AppCompatActivity() {
                 adapter2.notifyDataSetChanged()
             }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
+                participantsMenuList.removeIf {
+                    Log.i("kim", snapshot.key?:"null")
+                    it.member.uid.toString() == snapshot.key
+                }
+                adapter2.notifyDataSetChanged()
             }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
         }
         mrf.addChildEventListener(childEventListener)
     }
@@ -135,6 +130,7 @@ class ChatActivity : AppCompatActivity() {
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         }
+
         mrf.addChildEventListener(childEventListener)
     }
 
@@ -147,14 +143,25 @@ class ChatActivity : AppCompatActivity() {
         if(response.isSuccessful) {
             myInfo = response.body()!!
         }
-        //Log.i("kim", "AAA")
     }
 
     private fun initLayout() {
 
         binding.apply {
+
+            //채팅방 퇴장 버튼
+            exitBtn.setOnClickListener {
+                //파이어베이스에서 자신의 정보 제거
+                rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
+                    Toast.makeText(this@ChatActivity, "퇴장완료", Toast.LENGTH_SHORT).show()
+                }
+
+                //서버에도 퇴장 요청
+            }
+
+            //공지화면으로
             setBobAppointment.setOnClickListener {
-                //공지화면으로
+
             }
 
             //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화

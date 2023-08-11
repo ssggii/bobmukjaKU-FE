@@ -8,7 +8,8 @@
     tools:context=".ChatActivity"
     android:id="@+id/menu_drawer"
     >
-    <!--android:fitsSystemWindows="true"
+
+<!--    android:fitsSystemWindows="true"
     tools:openDrawer="right"-->
 
     <!--메인화면-->
@@ -121,11 +122,12 @@
             android:layout_height="0dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="604dp"
-            android:background="#B6B6B6"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/textView2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/frameLayout"></androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--android:background="#B6B6B6"-->
 
         <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_box"
@@ -238,230 +240,31 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--메뉴-->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="right"
         android:background="@color/white"
+        android:orientation="vertical"
         >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/menu_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-
-        <!--<LinearLayout
-            android:id="@+id/menu_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/line_gray"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="60dp"
-                android:layout_marginBottom="20dp"
-                android:text="채팅방 서랍"
-                android:textColor="@color/main"
-                android:textSize="20sp" />
-
-        </LinearLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
-            android:id="@+id/menu_info"
+            android:id="@+id/menu_bottom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/menu_title"
-            android:background="@drawable/line_gray">
+            android:layout_height="40dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="채팅방 정보"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="30dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="날짜 : "
-                    android:textSize="13sp"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="2023/08/06"
-                    android:textSize="13sp"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="시간 : "
-                    android:textSize="13sp"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="12:00~13:00"
-                    android:textSize="13sp"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="음식 종류 : "
-                    android:textSize="13sp"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="한식"
-                    android:textSize="13sp"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="인원 수 : "
-                    android:textSize="13sp"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="3"
-                    android:textSize="13sp"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="밥약속 정보"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="30dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="시간 : "
-                    android:textSize="13sp"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="오후 13:00"
-                    android:textSize="13sp"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="장소 : "
-                    android:textSize="13sp"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="30dp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="내가 찜한 닭 건대점"
-                    android:textSize="13sp"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="5dp"/>
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/exit_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="?attr/actionModeCloseDrawable" />
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/menu_participants"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/menu_info">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="대화 상대"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="30dp"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/participants_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </androidx.recyclerview.widget.RecyclerView>
-
-        </LinearLayout>-->
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>
