@@ -182,9 +182,11 @@ class ChatActivity : AppCompatActivity() {
 
                     val message = this.message.text.toString()
                     this.message.setText("")
+                    val accessToken = SharedPreferences.getString("accessToken", "")!!
 
                     //val service = retrofit.create(UserApi::class.java)
                     val request = RetrofitClient.memberService.sendMessage(
+                        "Bearer ${accessToken}",
                         ChatModel(message,
                             myInfo.uid,
                             myInfo.memberNickName,
