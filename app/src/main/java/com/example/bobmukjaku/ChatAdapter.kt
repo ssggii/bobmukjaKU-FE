@@ -38,8 +38,6 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
         return if (items[position].senderUid == myInfo.uid) 1 else 0
     }
 
-    val myName = "kim"
-
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 //        holder.binding.tvName.text = items[position].senderName
@@ -63,7 +61,11 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
             var message = items[position]
             var sendDate = message.time
 
-            txtMessage.text = message.message
+            if(items[position].isProfanity){
+                txtMessage.text = "욕설이 감지됐습니다."
+            }else {
+                txtMessage.text = message.message
+            }
             txtName.text = message.senderName
             txtDate.text = getDateText(sendDate.toString())
 
@@ -117,7 +119,12 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
         fun bind(position: Int) {            //메시지 UI 레이아웃 초기화
             var message = items[position]
             var sendDate = message.time
-            txtMessage.text = message.message
+
+            if(items[position].isProfanity){
+                txtMessage.text = "욕설이 감지됐습니다."
+            }else {
+                txtMessage.text = message.message
+            }
 
             txtDate.text = getDateText(sendDate.toString())
 
