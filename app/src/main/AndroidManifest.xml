@@ -24,7 +24,7 @@
             android:name=".ModifyInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".ModifyInfoActivity2"
+            android:name=".BobAppointmentActivity"
             android:exported="false" />
         <activity
             android:name=".MakeRoomActivity"
