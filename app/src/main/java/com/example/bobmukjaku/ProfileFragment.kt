@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.Model.SharedPreferences
@@ -39,6 +41,9 @@ class ProfileFragment : Fragment() {
 
         // 사용자 닉네임 정보 가져와서 화면에 설정
         displayNickname()
+
+        // 사용자 배경색 정보 가져와서 화면에 설정
+        displayProfileColor()
 
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
@@ -190,26 +195,62 @@ class ProfileFragment : Fragment() {
                     binding.nickname.text = nickname
                 } else {
                     val errorCode = response.code()
-                    if (errorCode == 400) {
-                        // 400 error code (Bad Request)
-                        Toast.makeText(
-                            requireContext(),
-                            "닉네임을 가져오는데 실패했습니다. 잘못된 요청입니다.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "닉네임을 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    Toast.makeText(
+                        requireContext(),
+                        "닉네임을 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<Member>, t: Throwable) {
                 // 네트워크 오류 처리
-                Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                t.message?.let { it1 -> Log.i("닉네임 가져오기 실패. 기타 에러", it1) }
+            }
+        })
+    }
+
+    private fun displayProfileColor() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
+        call?.enqueue(object : Callback<Member> {
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if (response.isSuccessful) {
+                    val member = response.body()
+                    val colorResName = member?.profileColor
+
+                    // 리소스 식별자 가져오기
+                    val resourceId = resources.getIdentifier(
+                        colorResName, "drawable", requireContext().packageName
+                    )
+
+                    if (resourceId != 0) {
+                        // 리소스가 존재할 경우 배경색 설정
+                        binding.profileBG.setBackgroundResource(resourceId)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "프로필 배경색 리소스를 찾을 수 없습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "프로필 배경색을 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                // 네트워크 오류 처리
+                t.message?.let { it1 -> Log.i("프로필 배경색 가져오기 실패. 기타 에러", it1) }
             }
         })
     }
@@ -230,8 +271,14 @@ class ProfileFragment : Fragment() {
     // 프로필 배경 변경 후 다시 프로필 화면으로 돌아감
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if ((requestCode == PROFILE_COLOR_REQUEST_CODE && resultCode == RESULT_OK) or
-            (requestCode == PROFILE_MODIFY_REQUEST_CODE && resultCode == RESULT_OK)) {
+        if ((requestCode == PROFILE_COLOR_REQUEST_CODE && resultCode == RESULT_OK)) {
+            // 사용자 배경색 정보 가져와서 화면에 설정
+            displayProfileColor()
+            val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
+            activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
+        } else if ((requestCode == PROFILE_MODIFY_REQUEST_CODE && resultCode == RESULT_OK)) {
+            // 사용자 닉네임 정보 가져와서 화면에 설정
+            displayNickname()
             val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
             activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
         }

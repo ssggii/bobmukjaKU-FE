@@ -1,11 +1,17 @@
 package com.example.bobmukjaku
 
+import android.graphics.PorterDuff
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatRoom
 import com.example.bobmukjaku.databinding.ChatroomListBinding
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<ChatRoomAllListAdapter.ViewHolder>() {
 
@@ -55,12 +61,52 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
         return items.size
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.name.text = items[position].roomName
         holder.binding.startTime.text = items[position].startTime
         holder.binding.endTime.text = items[position].endTime
         holder.binding.presentPerson.text = items[position].currentNum.toString()
         holder.binding.totalPerson.text = items[position].total.toString()
+
+        when (items[position].kindOfFood) {
+            "한식" -> {
+                holder.binding.foodKind.text = "한식"
+                val color = ContextCompat.getColor(holder.itemView.context, R.color.kor)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+            "일식" -> {
+                holder.binding.foodKind.text = "일식"
+                val color = ContextCompat.getColor(holder.itemView.context, R.color.jap)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+            "양식" -> {
+                holder.binding.foodKind.text = "양식"
+                val color = ContextCompat.getColor(holder.itemView.context, R.color.frg)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+            "중식" -> {
+                holder.binding.foodKind.text = "중식"
+                val color = ContextCompat.getColor(holder.itemView.context, R.color.chi)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+            "기타" -> {
+                holder.binding.foodKind.text = "기타"
+                val color = ContextCompat.getColor(holder.itemView.context, R.color.ect)
+                holder.binding.foodKind.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+        }
+
+        val meetingDate = LocalDate.parse(items[position].meetingDate)
+
+        if (meetingDate == LocalDate.now()) {
+            holder.binding.date.text = "오늘"
+        } else if (meetingDate == LocalDate.now().plusDays(1)) {
+            holder.binding.date.text = "내일"
+        } else {
+            val formattedDate = meetingDate.format(DateTimeFormatter.ofPattern("MM/dd"))
+            holder.binding.date.text = formattedDate
+        }
 
         holder.binding.root.setOnClickListener {
             val roomInfo = items[position]

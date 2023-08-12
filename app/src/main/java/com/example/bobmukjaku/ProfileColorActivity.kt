@@ -3,10 +3,18 @@ package com.example.bobmukjaku
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ActivityProfileColorBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.time.LocalDate
 
 class ProfileColorActivity : AppCompatActivity() {
 
@@ -59,6 +67,45 @@ class ProfileColorActivity : AppCompatActivity() {
         val colorResName = "bg" + resources.getResourceEntryName(selectedId).removePrefix("bg").toInt()
         val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
         button.setBackgroundResource(resourceId)
+
+        // 서버에 배경 색상 업데이트
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val requestBody = mapOf("profileColor" to colorResName)
+
+        val call = accessToken?.let {
+            memberService.updateMember(
+                authorizationHeader,
+                requestBody
+            )
+        }
+        call?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // 성공적으로 업데이트됨
+                    Toast.makeText(
+                        this@ProfileColorActivity,
+                        "프로필 배경색 업데이트",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        this@ProfileColorActivity,
+                        "프로필 배경색 업데이트 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // 네트워크 오류 처리
+                t.message?.let { it1 -> Log.i("프로필 배경색 업데이트 실패. 기타 에러", it1) }
+            }
+        })
 
         val colorAttrId = resources.getIdentifier(colorResName, "color", packageName)
         val color = ContextCompat.getColor(this, colorAttrId)
