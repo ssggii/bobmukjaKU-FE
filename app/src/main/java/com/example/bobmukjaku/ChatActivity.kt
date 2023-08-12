@@ -121,7 +121,8 @@ class ChatActivity : AppCompatActivity() {
                 val time = snapshot.child("time").value.toString().toLong()
                 val isShareMessage = snapshot.child("isShareMessage").value.toString().toBoolean()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
-                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage))
+                val isProfanity = snapshot.child("isProfanity").value.toString().toBoolean()
+                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
             }
@@ -186,13 +187,14 @@ class ChatActivity : AppCompatActivity() {
 
                     //val service = retrofit.create(UserApi::class.java)
                     val request = RetrofitClient.memberService.sendMessage(
-                        "Bearer ${accessToken}",
+                        "Bearer $accessToken",
                         ChatModel(message,
                             myInfo.uid,
                             myInfo.memberNickName,
                             System.currentTimeMillis(),
                             false,
-                            chatRoomInfo?.roomId)
+                            chatRoomInfo?.roomId,
+                        isProfanity = false)
                     )
 
                     request.enqueue(object: Callback<Unit>{

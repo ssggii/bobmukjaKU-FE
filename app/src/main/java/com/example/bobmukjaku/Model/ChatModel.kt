@@ -8,4 +8,5 @@ data class ChatModel(
     @JsonProperty val senderName:String?,
     @JsonProperty val time:Long?,
     @JsonProperty val isShareMessage:Boolean?,
-    @JsonProperty val chatRoomId:Long?)
+    @JsonProperty val chatRoomId:Long?,
+    @JsonProperty val isProfanity:Boolean)
