@@ -689,9 +689,7 @@ class ChatFragment : Fragment() {
                     t.message?.let { it1 -> Log.i("[모집방 입장 실패: ]", it1) }
                 }
             })
-
-            val intent = Intent(requireContext(), ChatActivity::class.java)
-            startActivity(intent)
+            alertDialog.dismiss()
         }
 
         // 취소 버튼 클릭 이벤트 처리
