@@ -1,41 +1,31 @@
 package com.example.bobmukjaku
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatModel
+import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.MessageListMineBinding
 import com.example.bobmukjaku.databinding.MessageListOthersBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.R
 
-class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val myUid = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            1 -> {            //메시지가 내 메시지인 경우
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.message_list_mine, parent, false)   //내 메시지 레이아웃으로 초기화
 
-    inner class ViewHolder(var binding:MessageListOthersBinding):RecyclerView.ViewHolder(binding.root){
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = MessageListOthersBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(view)
-
-//        return when (viewType) {
-//            1 -> {            //메시지가 내 메시지인 경우
-//                val view =
-//                    LayoutInflater.from(parent.context)
-//                        .inflate(R.layout.message_list_mine, parent, false)   //내 메시지 레이아웃으로 초기화
-//
-//                MyMessageViewHolder(MessageListMineBinding.bind(view))
-//            }
-//            else -> {      //메시지가 상대 메시지인 경우
-//                val view =
-//                    LayoutInflater.from(context)
-//                        .inflate(R.layout.message_list_others, parent, false)  //상대 메시지 레이아웃으로 초기화
-//                OtherMessageViewHolder(MessageListOthersBinding.bind(view))
-//            }
-//        }
+                MyMessageViewHolder(MessageListMineBinding.bind(view))
+            }
+            else -> {      //메시지가 상대 메시지인 경우
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.message_list_others, parent, false)  //상대 메시지 레이아웃으로 초기화
+                OtherMessageViewHolder(MessageListOthersBinding.bind(view))
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -44,24 +34,29 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<ChatAdap
 
     // 여기 아래 부분 새로 추가 (실제 실행 시 반영 X) 07/31
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
-        return if (items[position].senderUid.equals(myUid)) 1 else 0
+        //return if (items[position].senderUid.equals(myUid)) 1 else 0
+        return if (items[position].senderUid == myInfo.uid) 1 else 0
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.tvName.text = items[position].senderName
-        holder.binding.tvMessage.text = items[position].message
+    val myName = "kim"
 
-//        if (items[position].senderUid.equals(myUid)) {       //레이아웃 항목 초기화
-//            (holder as MyMessageViewHolder).bind(position)
-//        } else {
-//            (holder as OtherMessageViewHolder).bind(position)
-//        }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+//        holder.binding.tvName.text = items[position].senderName
+//        holder.binding.tvMessage.text = items[position].message
+
+        if (items[position].senderUid == myInfo.uid) {       //레이아웃 항목 초기화
+            (holder as MyMessageViewHolder).bind(position)
+        } else {
+            (holder as OtherMessageViewHolder).bind(position)
+        }
     }
 
     inner class OtherMessageViewHolder(itemView: MessageListOthersBinding) :         //상대 메시지 뷰홀더
         RecyclerView.ViewHolder(itemView.root) {
         var background = itemView.background
         var txtMessage = itemView.tvMessage
+        var txtName = itemView.tvName
         var txtDate = itemView.tvDate
 
         fun bind(position: Int) {           //메시지 UI 항목 초기화
@@ -69,7 +64,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<ChatAdap
             var sendDate = message.time
 
             txtMessage.text = message.message
-
+            txtName.text = message.senderName
             txtDate.text = getDateText(sendDate.toString())
 
 //            if (message.confirmed)           //확인 여부 표시
@@ -77,7 +72,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>): RecyclerView.Adapter<ChatAdap
 //            else
 //                txtIsShown.visibility = View.VISIBLE
 
-            setShown(position)             //해당 메시지 확인하여 서버로 전송
+            //setShown(position)             //해당 메시지 확인하여 서버로 전송
         }
 
         fun getDateText(sendDate: String): String {    //메시지 전송 시각 생성

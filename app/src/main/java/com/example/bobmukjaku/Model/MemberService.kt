@@ -57,11 +57,16 @@ interface MemberService {
     @GET("mailAuth")
     fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
 
+    @PUT("message")
+    fun sendMessage(@Header("authorization") authorization: String, @Body md: ChatModel): Call<Unit>
+
     // 필요한 다른 API 구현
+
 }
 
 object RetrofitClient {
-    private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
+    //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "https://0405-211-104-182-71.ngrok-free.app" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
