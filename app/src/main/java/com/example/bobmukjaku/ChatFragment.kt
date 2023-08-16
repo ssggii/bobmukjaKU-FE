@@ -1,9 +1,11 @@
 package com.example.bobmukjaku
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,8 +13,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,17 +26,17 @@ import com.example.bobmukjaku.databinding.FragmentChatBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.*
 
 class ChatFragment : Fragment() {
 
     lateinit var mContext: Context
     lateinit var binding: FragmentChatBinding
     lateinit var adapter: ChatRoomAllListAdapter // 내 모집방 목록
-    lateinit var adapter2: ChatRoomAllListAdapter // 최신순
-    lateinit var adapter3: ChatRoomAllListAdapter // 오래된 순
     lateinit var adapter4: ChatRoomAllListAdapter // 전체 필터링
     var chatMyList = mutableListOf<ChatRoom>()
-    var chatLatestList = mutableListOf<ChatRoom>()
     var chatAllList = mutableListOf<ChatRoom>()
     var uid: Long = 0
 
@@ -53,6 +57,7 @@ class ChatFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -60,11 +65,14 @@ class ChatFragment : Fragment() {
         init()
         if (chatAllList != null) {
             setupSearchListener()
+        } else {
+            Toast.makeText(requireContext(), "검색할 모집방 목록이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
-        getLatestSort()
+//        getLatestSort()
         makeChatRoom()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun init() {
         getFilterFirstInfo() // 처음 정렬
 
@@ -77,9 +85,6 @@ class ChatFragment : Fragment() {
             }else {
                 binding.sortBtn.text = "최신순"
                 val filter = FilterInfo("latest", "")
-//                val filters = listOf(
-//                    FilterInfo("latest", "")
-//                )
                 getFilterInfo(filter)
             }
         }
@@ -102,14 +107,6 @@ class ChatFragment : Fragment() {
             }
         }
 
-        // 날짜 필터링
-        binding.timeBtn.setOnClickListener {
-            val filters = listOf(
-                FilterInfo("meetingDate", "2023-08-12")
-            )
-            getFilteredLists(filters)
-        }
-
         // 전체 필터링
         val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
         val blackColor = ContextCompat.getColor(requireContext(), R.color.black)
@@ -117,11 +114,62 @@ class ChatFragment : Fragment() {
 
         var selected = ""
 
+        // 날짜 필터링
+        binding.timeBtn.setOnClickListener {
+            if (binding.dateFilter.visibility == View.GONE) {
+                binding.dateFilter.visibility = View.VISIBLE
+                binding.personFilter.visibility = View.GONE
+                binding.foodFilter.visibility = View.GONE
+            } else {
+                binding.dateFilter.visibility = View.GONE
+            }
+        }
+
+        binding.today.setOnClickListener {
+            selected = LocalDate.now().toString()
+            val filter = FilterInfo("meetingDate", selected)
+            if (binding.today.currentTextColor == whiteColor) {
+                removeFilterInfo(filter)
+                unselectedDColor()
+                binding.timeBtn.setTextColor(blackColor)
+                binding.timeBtn.background.setColorFilter(whiteColor, PorterDuff.Mode.SRC_IN)
+            }else {
+                getFilterInfo(filter)
+                unselectedDColor()
+                selectedColor(binding.today)
+                binding.timeBtn.setTextColor(whiteColor)
+                binding.timeBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+            }
+        }
+
+        binding.tomorrow.setOnClickListener {
+            selected = LocalDate.now().plusDays(1).toString()
+            val filter = FilterInfo("meetingDate", selected)
+            if (binding.tomorrow.currentTextColor == whiteColor) {
+                removeFilterInfo(filter)
+                unselectedDColor()
+                binding.timeBtn.setTextColor(blackColor)
+                binding.timeBtn.background.setColorFilter(whiteColor, PorterDuff.Mode.SRC_IN)
+            }else {
+                getFilterInfo(filter)
+                unselectedDColor()
+                selectedColor(binding.tomorrow)
+                binding.timeBtn.setTextColor(whiteColor)
+                binding.timeBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+            }
+        }
+
+        binding.otherDate.setOnClickListener {
+            showDatePicker()
+        }
+
         // 음식 필터링
         binding.foodBtn.setOnClickListener {
 //            getFoodLists() // 테스트
             if (binding.foodFilter.visibility == View.GONE) {
                 binding.foodFilter.visibility = View.VISIBLE
+                binding.personFilter.visibility = View.GONE
+                binding.dateFilter.visibility = View.GONE
             } else {
                 binding.foodFilter.visibility = View.GONE
             }
@@ -212,6 +260,8 @@ class ChatFragment : Fragment() {
         binding.personBtn.setOnClickListener {
             if (binding.personFilter.visibility == View.GONE) {
                 binding.personFilter.visibility = View.VISIBLE
+                binding.dateFilter.visibility = View.GONE
+                binding.foodFilter.visibility = View.GONE
             } else {
                 binding.personFilter.visibility = View.GONE
             }
@@ -299,6 +349,58 @@ class ChatFragment : Fragment() {
         }
     }
 
+    // DatePicker 다이얼로그를 띄우는 함수
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val blackColor = ContextCompat.getColor(requireContext(), R.color.black)
+        val mainColor = ContextCompat.getColor(requireContext(), R.color.main)
+
+        // 현재 날짜 기준 2주 뒤까지 날짜 선택 가능
+        calendar.add(Calendar.WEEK_OF_YEAR, 2)
+        val maxDate = calendar.timeInMillis
+
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                val selected = formatDate(year, month, dayOfMonth)
+                val filter = FilterInfo("meetingDate", selected)
+                if (binding.otherDate.currentTextColor == whiteColor) {
+                    removeFilterInfo(filter)
+                    unselectedDColor()
+                    binding.timeBtn.setTextColor(blackColor)
+                    binding.timeBtn.background.setColorFilter(whiteColor, PorterDuff.Mode.SRC_IN)
+                }else {
+                    getFilterInfo(filter)
+                    unselectedDColor()
+                    selectedColor(binding.otherDate)
+                    binding.timeBtn.setTextColor(whiteColor)
+                    binding.timeBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+                }
+            },
+            year,
+            month,
+            day
+        )
+
+        datePickerDialog.datePicker.minDate = Calendar.getInstance().timeInMillis
+        datePickerDialog.datePicker.maxDate = maxDate
+        datePickerDialog.show()
+    }
+
+    // 날짜를 원하는 포맷으로 변환하는 함수
+    private fun formatDate(year: Int, month: Int, dayOfMonth: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, dayOfMonth)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return dateFormat.format(calendar.time)
+    }
+
     private fun selectedColor(selectedButton: AppCompatButton) {
         val textColor = ContextCompat.getColor(requireContext(), R.color.white)
         val color = ContextCompat.getColor(requireContext(), R.color.darkGray)
@@ -344,6 +446,23 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun unselectedDColor() {
+        val dateList = listOf(
+            binding.today,
+            binding.tomorrow,
+            binding.otherDate,
+        )
+        val textColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val originalTextColor = ContextCompat.getColor(requireContext(), R.color.black)
+        val color = ContextCompat.getColor(requireContext(), R.color.gray)
+        for (date in dateList) {
+            if (date.currentTextColor == textColor) {
+                date.setTextColor(originalTextColor)
+                date.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+        }
+    }
+
     private fun makeChatRoom() {
         // 모집방 개설 버튼 클릭 이벤트 처리
         binding.openRoomBtn.setOnClickListener {
@@ -352,7 +471,8 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun getFilteredLists(filters: List<FilterInfo>) {
+    private fun getFilteredLists(filters: List<FilterInfo>, excludedRooms: List<ChatRoom>) {
+        Log.i("filterInfo:", filters.toString())
         val call = chatroomService.filteredLists(authorizationHeader, filters)
         call.enqueue(object : Callback<List<ChatRoom>> {
             override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
@@ -360,21 +480,26 @@ class ChatFragment : Fragment() {
                     val chatroomList = response.body()
                     if (chatroomList != null) {
                         chatAllList.clear()
-                        chatAllList.addAll(chatroomList)
-                        adapter4.updateItems(chatroomList)
+                        chatAllList.addAll(chatroomList.filter { room -> room !in excludedRooms }) // 필터링된 목록에서 내 모집방 제거
+                        adapter4.updateItems(chatAllList)
 
                         val successCode = response.code()
-                        Toast.makeText(requireContext(), "전체 필터링(음식) 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "전체 필터링 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "전체 필터링(음식) 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    if (errorCode == 404) {
+                        chatAllList.clear()
+                        adapter4.updateItems(chatAllList)
+                    }else {
+                        Toast.makeText(requireContext(), "전체 필터링 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[전체 필터링(음식) 에러: ]", it1) }
+                t.message?.let { it1 -> Log.i("[전체 필터링 에러: ]", it1) }
             }
         })
 
@@ -421,7 +546,7 @@ class ChatFragment : Fragment() {
                         }
                     }
                     finalFilters.add(newFilter)
-                    getFilteredLists(finalFilters)
+                    getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
                     Toast.makeText(
@@ -457,7 +582,7 @@ class ChatFragment : Fragment() {
                             }
                         }
                     }
-                    getFilteredLists(finalFilters)
+                    getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
                     Toast.makeText(
@@ -507,13 +632,60 @@ class ChatFragment : Fragment() {
                 if (response.isSuccessful) {
                     // FilterInfo 정보 있으면 반환, 없으면 최신순 필터 적용
                     val filterInfo = response.body()
+                    Log.i("FirstFilterInfo", filterInfo.toString())
                     if (filterInfo != null) {
-                        getFilteredLists(filterInfo)
+                        if (filterInfo.toString() == "[]") {
+                            val filters = listOf(
+                                FilterInfo("latest", "")
+                            )
+                            Log.i("[]", "빈 리스트")
+                            getFilteredLists(filters, chatMyList)
+                        } else {
+                            Log.i("[FilterFirstInfo]", "반환 성공")
+                            for (filters in filterInfo) {
+                                val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
+                                val mainColor = ContextCompat.getColor(requireContext(), R.color.main)
+
+                                if (filters.filterType == "oldest") {
+                                    binding.sortBtn.text = "오래된순"
+                                } else if (filters.filterType == "kindOfFood") {
+                                    binding.foodBtn.setTextColor(whiteColor)
+                                    binding.foodBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+                                    when (filters.filterValue) {
+                                        "한식" -> selectedColor(binding.KoreaF)
+                                        "일식" -> selectedColor(binding.JapanF)
+                                        "양식" -> selectedColor(binding.ForeignF)
+                                        "중식" -> selectedColor(binding.ChinaF)
+                                        "기타" -> selectedColor(binding.ectF)
+                                    }
+                                } else if (filters.filterType == "total") {
+                                    binding.personBtn.setTextColor(whiteColor)
+                                    binding.personBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+                                    when (filters.filterValue) {
+                                        "2" -> selectedColor(binding.P2)
+                                        "3" -> selectedColor(binding.P3)
+                                        "4" -> selectedColor(binding.P4)
+                                        "5" -> selectedColor(binding.P5)
+                                        "6" -> selectedColor(binding.P6)
+                                    }
+                                } else if (filters.filterType == "meetingDate") {
+                                    binding.timeBtn.setTextColor(whiteColor)
+                                    binding.timeBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
+                                    when (filters.filterValue) {
+                                        "오늘" -> selectedColor(binding.today)
+                                        "내일" -> selectedColor(binding.tomorrow)
+                                        else -> selectedColor(binding.otherDate)
+                                    }
+                                }
+                            }
+                            getFilteredLists(filterInfo, chatMyList)
+                        }
                     } else {
                         val filters = listOf(
                             FilterInfo("latest", "")
                         )
-                        getFilteredLists(filters)
+                        Log.i("[FilterFirstInfo]", "null 반환")
+                        getFilteredLists(filters, chatMyList)
                     }
                 } else {
                     val errorCode = response.code()
@@ -575,60 +747,6 @@ class ChatFragment : Fragment() {
             }
         }
         binding.joinRecyclerView.adapter = adapter
-
-//        val db = Firebase.database.getReference("users")
-//        db.get().addOnSuccessListener { dataSnapshot: DataSnapshot ->
-//            for (user in dataSnapshot.children) {
-//                val name = user.child("username").value.toString()
-//                val uid = user.child("uid").value.toString()
-//                Log.i("user", name.plus(uid))
-//                chatlist.add(UserItem(name, "message", uid))
-//            }
-//
-//                binding.joinRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-//                adapter = ChatRoomListAdapter(chatlist)
-//                adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
-//                    override fun onItemClick(pos: Int) {
-//                        val intent = Intent(requireActivity(), ChatActivity::class.java)
-//                        intent.putExtra("name", chatlist[pos].name)
-//                        intent.putExtra("uid", chatlist[pos].uid)
-//                        startActivity(intent)
-//                    }
-//                }
-//                binding.joinRecyclerView.adapter = adapter
-//            }
-    }
-
-    private fun getLatestSort() {
-        val call = chatroomService.getLatestLists(authorizationHeader)
-        call.enqueue(object : Callback<List<ChatRoom>> {
-            override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
-                if (response.isSuccessful) {
-                    val chatroomList = response.body()
-                    if (chatroomList != null) {
-                        chatLatestList.addAll(chatroomList)
-                        adapter2.updateItems(chatroomList)
-                    }
-                } else {
-                    val errorCode = response.code()
-                    Toast.makeText(requireContext(), "모집방 최신 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
-                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[모집방 최신 목록 로드 에러: ]", it1) }
-            }
-        })
-
-        binding.allRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        adapter2 = ChatRoomAllListAdapter(chatLatestList)
-        adapter2.onItemClickListener = object : ChatRoomAllListAdapter.OnItemClickListener {
-            override fun onItemClick(pos: Int, roomInfo: ChatRoom) {
-                joinChatRoomDialog(roomInfo)
-            }
-        }
-        binding.allRecyclerView.adapter = adapter2
     }
 
     private fun joinChatRoomDialog(roomInfo: ChatRoom) {
@@ -689,9 +807,7 @@ class ChatFragment : Fragment() {
                     t.message?.let { it1 -> Log.i("[모집방 입장 실패: ]", it1) }
                 }
             })
-
-            val intent = Intent(requireContext(), ChatActivity::class.java)
-            startActivity(intent)
+            alertDialog.dismiss()
         }
 
         // 취소 버튼 클릭 이벤트 처리

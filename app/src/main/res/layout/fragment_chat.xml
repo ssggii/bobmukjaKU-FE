@@ -127,12 +127,57 @@
         </HorizontalScrollView>
 
         <LinearLayout
+            android:id="@+id/dateFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/today"
+                android:layout_width="65dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="12dp"
+                android:text="오늘"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="#F5F5F5"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/tomorrow"
+                android:layout_width="65dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="내일"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="#F5F5F5"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/otherDate"
+                android:layout_width="65dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="기타"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="#F5F5F5"
+                android:background="@drawable/btn_circle_gray" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/personFilter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:background="@drawable/line_gray"
             android:visibility="gone"
             android:orientation="horizontal">
 
@@ -203,7 +248,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:background="@drawable/line_gray"
             android:visibility="gone"
             android:orientation="horizontal">
 
