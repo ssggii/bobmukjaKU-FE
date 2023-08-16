@@ -1,7 +1,6 @@
 package com.example.bobmukjaku
 
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -14,7 +13,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Log.i("kim" , message.toString())
         Log.i("kim", message.notification?.title!!)
         Log.i("kim", message.notification?.body!!)
-        //Log.i("kim", "data는 ${message.data.get("키이니라")}")
-        Toast.makeText(this@MyFirebaseMessagingService, "메시지수신", Toast.LENGTH_SHORT).show()
+        Log.i("kim", "data는 ${message.data.get("key")}")
+        //Toast.makeText(this@MyFirebaseMessagingService, "메시지수신", Toast.LENGTH_SHORT).show()
     }
 }

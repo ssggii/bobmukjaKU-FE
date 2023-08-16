@@ -164,12 +164,72 @@ class ChatActivity : AppCompatActivity() {
 
             //채팅방 퇴장 버튼
             exitBtn.setOnClickListener {
-                //파이어베이스에서 자신의 정보 제거
-                rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
-                    Toast.makeText(this@ChatActivity, "퇴장완료", Toast.LENGTH_SHORT).show()
-                }
+                //먼저 현재 채팅방의 남은 인원이 2명 이상인지 확인
+                val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken","")!!)
+                Log.i("abcabc", chatRoomInfo.roomId.toString())
+                RetrofitClient.chatRoomService.getRoomIdLists(accessToken, chatRoomInfo.roomId!!)
+                    .enqueue(object: Callback<List<ChatRoom>>{
+                        override fun onResponse(
+                            call: Call<List<ChatRoom>>,
+                            response: Response<List<ChatRoom>>
+                        ) {
+                            if(response.isSuccessful){
+                                val currentParticipantsNum = response.body()?.get(0)?.currentNum!!
+                                if(currentParticipantsNum > 1) {
+                                    //파이어베이스에서 자신의 정보 제거
+                                    rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
+                                        //서버에도 나가기api를 사용하여 참가자에서 자신을 제거
+                                        val accessToken =
+                                            "Bearer ".plus(SharedPreferences.getString("accessToken", "")!!)
+                                        val exitBody = AddChatRoomMember(chatRoomInfo.roomId, myInfo.uid)
+                                        val request =
+                                            RetrofitClient.chatRoomService.exitChatRoom(accessToken, exitBody)
+                                        request.enqueue(object : Callback<ServerBooleanResponse> {
+                                            override fun onResponse(
+                                                call: Call<ServerBooleanResponse>,
+                                                response: Response<ServerBooleanResponse>
+                                            ) {
+                                                if (response.isSuccessful) {
+                                                    when (response.code()) {
+                                                        200 -> {
+                                                            Log.i("exittt", "퇴장완료")
+                                                            Toast.makeText(
+                                                                this@ChatActivity,
+                                                                "퇴장완료",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                        else -> {
+                                                            Log.i("exittt", "퇴장에러")
+                                                            Toast.makeText(
+                                                                this@ChatActivity,
+                                                                "퇴장완료",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    }
+                                                } else {
+                                                    Log.i("exittt", response.code().toString())
+                                                }
+                                            }
 
-                //서버에도 퇴장 요청
+                                            override fun onFailure(
+                                                call: Call<ServerBooleanResponse>,
+                                                t: Throwable
+                                            ) {
+                                                Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
+                                            }
+                                        })
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
+
+                        }
+                    })
+
             }
 
             //공지화면으로

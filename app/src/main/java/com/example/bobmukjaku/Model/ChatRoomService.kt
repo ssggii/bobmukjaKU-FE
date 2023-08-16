@@ -26,7 +26,7 @@ interface ChatRoomService {
     @GET("/chatRoom/info/1/{roomId}")
     fun getRoomIdLists(
         @Header("Authorization") authorization: String,
-        @Path("roodId") roomId: Long
+        @Path("roomId") roomId: Long
     ): Call<List<ChatRoom>>
 
     // uid로 참여 중인 모집방 조회
@@ -59,6 +59,13 @@ interface ChatRoomService {
     fun getFilter(
         @Header("Authorization") authorization: String
     ) : Call<List<FilterInfo>>
+
+    // 모집방 나가기
+    @POST("/chatRoom/member/exit")
+    fun exitChatRoom(
+        @Header("Authorization") authorization: String,
+        @Body member: AddChatRoomMember
+    ): Call<ServerBooleanResponse> // true(퇴장 성공), false(퇴장 실패)
 
     // 필요한 다른 API 구현
 }

@@ -65,7 +65,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://df8a-211-104-182-71.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://172.30.1.64:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.219.107:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
