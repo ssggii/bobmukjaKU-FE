@@ -28,11 +28,8 @@ class ChatFragment : Fragment() {
     lateinit var mContext: Context
     lateinit var binding: FragmentChatBinding
     lateinit var adapter: ChatRoomAllListAdapter // 내 모집방 목록
-    lateinit var adapter2: ChatRoomAllListAdapter // 최신순
-    lateinit var adapter3: ChatRoomAllListAdapter // 오래된 순
     lateinit var adapter4: ChatRoomAllListAdapter // 전체 필터링
     var chatMyList = mutableListOf<ChatRoom>()
-    var chatLatestList = mutableListOf<ChatRoom>()
     var chatAllList = mutableListOf<ChatRoom>()
     var uid: Long = 0
 
@@ -60,6 +57,8 @@ class ChatFragment : Fragment() {
         init()
         if (chatAllList != null) {
             setupSearchListener()
+        } else {
+            Toast.makeText(requireContext(), "검색할 모집방 목록이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
 //        getLatestSort()
         makeChatRoom()
@@ -77,9 +76,6 @@ class ChatFragment : Fragment() {
             }else {
                 binding.sortBtn.text = "최신순"
                 val filter = FilterInfo("latest", "")
-//                val filters = listOf(
-//                    FilterInfo("latest", "")
-//                )
                 getFilterInfo(filter)
             }
         }
@@ -108,7 +104,7 @@ class ChatFragment : Fragment() {
                 FilterInfo("meetingDate", "2023-08-15"),
                 FilterInfo("kindOfFood", "한식")
             )
-            getFilteredLists(filters)
+            getFilteredLists(filters, chatMyList)
         }
 
         // 전체 필터링
@@ -353,7 +349,7 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun getFilteredLists(filters: List<FilterInfo>) {
+    private fun getFilteredLists(filters: List<FilterInfo>, excludedRooms: List<ChatRoom>) {
         Log.i("filterInfo:", filters.toString())
         val call = chatroomService.filteredLists(authorizationHeader, filters)
         call.enqueue(object : Callback<List<ChatRoom>> {
@@ -362,8 +358,8 @@ class ChatFragment : Fragment() {
                     val chatroomList = response.body()
                     if (chatroomList != null) {
                         chatAllList.clear()
-                        chatAllList.addAll(chatroomList)
-                        adapter4.updateItems(chatroomList)
+                        chatAllList.addAll(chatroomList.filter { room -> room !in excludedRooms }) // 필터링된 목록에서 내 모집방 제거
+                        adapter4.updateItems(chatAllList)
 
                         val successCode = response.code()
                         Toast.makeText(requireContext(), "전체 필터링 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
@@ -423,7 +419,7 @@ class ChatFragment : Fragment() {
                         }
                     }
                     finalFilters.add(newFilter)
-                    getFilteredLists(finalFilters)
+                    getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
                     Toast.makeText(
@@ -459,7 +455,7 @@ class ChatFragment : Fragment() {
                             }
                         }
                     }
-                    getFilteredLists(finalFilters)
+                    getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
                     Toast.makeText(
@@ -516,17 +512,17 @@ class ChatFragment : Fragment() {
                                 FilterInfo("latest", "")
                             )
                             Log.i("[]", "빈 리스트")
-                            getFilteredLists(filters)
+                            getFilteredLists(filters, chatMyList)
                         } else {
                             Log.i("[FilterFirstInfo]", "반환 성공")
-                            getFilteredLists(filterInfo)
+                            getFilteredLists(filterInfo, chatMyList)
                         }
                     } else {
                         val filters = listOf(
                             FilterInfo("latest", "")
                         )
                         Log.i("[FilterFirstInfo]", "null 반환")
-                        getFilteredLists(filters)
+                        getFilteredLists(filters, chatMyList)
                     }
                 } else {
                     val errorCode = response.code()
