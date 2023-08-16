@@ -119,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:text="2023.07.20"
+                android:text="2023-07-20"
                 android:textColor="#787878"
                 android:textSize="14sp"
                 android:fontFamily="@font/notosans_light" />
@@ -161,6 +161,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/total_level_bar"
         android:layout_width="match_parent"
         android:layout_height="18dp"
         android:layout_marginTop="230dp"
@@ -169,7 +170,8 @@
         android:src="@drawable/level_gray" />
 
     <ImageView
-        android:layout_width="100dp"
+        android:id="@+id/green_level"
+        android:layout_width="0dp"
         android:layout_height="18dp"
         android:layout_marginTop="230dp"
         android:layout_marginLeft="45dp"

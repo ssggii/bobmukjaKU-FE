@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
@@ -39,8 +40,8 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 사용자 닉네임 정보 가져와서 화면에 설정
-        displayNickname()
+        // 사용자 정보 가져와서 화면에 설정
+        displayInfo()
 
         // 사용자 배경색 정보 가져와서 화면에 설정
         displayProfileColor()
@@ -180,7 +181,7 @@ class ProfileFragment : Fragment() {
         })
     }
 
-    private fun displayNickname() {
+    private fun displayInfo() {
         val memberService = RetrofitClient.memberService
         val accessToken = SharedPreferences.getString("accessToken", "")
 
@@ -192,7 +193,37 @@ class ProfileFragment : Fragment() {
                 if (response.isSuccessful) {
                     val member = response.body()
                     val nickname = member?.memberNickName
+                    var level = member?.rate.toString().toInt()
+                    if (level <= 20) {
+                        binding.level.text = "1"
+                    } else if (level <= 40) {
+                        level -= 20
+                        binding.level.text = "2"
+                    } else if (level <= 60) {
+                        level -= 40
+                        binding.level.text = "3"
+                    } else if (level <= 80) {
+                        level -= 60
+                        binding.level.text = "4"
+                    } else {
+                        level -= 80
+                        binding.level.text = "5"
+                    }
+
+                    val levelProgressBar = binding.greenLevel
+                    val totalWidth = binding.totalLevelBar.width // 전체 바의 너비
+
+                    val levelRange = 20
+
+                    val params = levelProgressBar.layoutParams as ViewGroup.MarginLayoutParams
+                    val greenBarWidth = (level.toFloat() / levelRange) * totalWidth
+                    params.width = greenBarWidth.toInt()
+
+                    levelProgressBar.layoutParams = params
+
+                    val certificatedDate = member?.certificatedAt
                     binding.nickname.text = nickname
+                    binding.studentCheck.text = certificatedDate
                 } else {
                     val errorCode = response.code()
                     Toast.makeText(
@@ -278,7 +309,7 @@ class ProfileFragment : Fragment() {
             activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
         } else if ((requestCode == PROFILE_MODIFY_REQUEST_CODE && resultCode == RESULT_OK)) {
             // 사용자 닉네임 정보 가져와서 화면에 설정
-            displayNickname()
+            displayInfo()
             val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
             activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
         }
