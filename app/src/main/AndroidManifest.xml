@@ -14,6 +14,14 @@
         android:theme="@style/Theme.BobmukjaKU"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity android:name=".GiveScoreActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="FCM_EXE_ACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ChangePasswordctivity2"
             android:exported="false" />
