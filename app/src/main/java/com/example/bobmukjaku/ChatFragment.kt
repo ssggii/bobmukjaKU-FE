@@ -61,7 +61,7 @@ class ChatFragment : Fragment() {
         if (chatAllList != null) {
             setupSearchListener()
         }
-        getLatestSort()
+//        getLatestSort()
         makeChatRoom()
     }
 
@@ -105,7 +105,8 @@ class ChatFragment : Fragment() {
         // 날짜 필터링
         binding.timeBtn.setOnClickListener {
             val filters = listOf(
-                FilterInfo("meetingDate", "2023-08-12")
+                FilterInfo("meetingDate", "2023-08-15"),
+                FilterInfo("kindOfFood", "한식")
             )
             getFilteredLists(filters)
         }
@@ -353,6 +354,7 @@ class ChatFragment : Fragment() {
     }
 
     private fun getFilteredLists(filters: List<FilterInfo>) {
+        Log.i("filterInfo:", filters.toString())
         val call = chatroomService.filteredLists(authorizationHeader, filters)
         call.enqueue(object : Callback<List<ChatRoom>> {
             override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
@@ -364,17 +366,17 @@ class ChatFragment : Fragment() {
                         adapter4.updateItems(chatroomList)
 
                         val successCode = response.code()
-                        Toast.makeText(requireContext(), "전체 필터링(음식) 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "전체 필터링 성공 $successCode $chatroomList", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "전체 필터링(음식) 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "전체 필터링 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[전체 필터링(음식) 에러: ]", it1) }
+                t.message?.let { it1 -> Log.i("[전체 필터링 에러: ]", it1) }
             }
         })
 
@@ -507,12 +509,23 @@ class ChatFragment : Fragment() {
                 if (response.isSuccessful) {
                     // FilterInfo 정보 있으면 반환, 없으면 최신순 필터 적용
                     val filterInfo = response.body()
+                    Log.i("FirstFilterInfo", filterInfo.toString())
                     if (filterInfo != null) {
-                        getFilteredLists(filterInfo)
+                        if (filterInfo.toString() == "[]") {
+                            val filters = listOf(
+                                FilterInfo("latest", "")
+                            )
+                            Log.i("[]", "빈 리스트")
+                            getFilteredLists(filters)
+                        } else {
+                            Log.i("[FilterFirstInfo]", "반환 성공")
+                            getFilteredLists(filterInfo)
+                        }
                     } else {
                         val filters = listOf(
                             FilterInfo("latest", "")
                         )
+                        Log.i("[FilterFirstInfo]", "null 반환")
                         getFilteredLists(filters)
                     }
                 } else {
@@ -575,60 +588,6 @@ class ChatFragment : Fragment() {
             }
         }
         binding.joinRecyclerView.adapter = adapter
-
-//        val db = Firebase.database.getReference("users")
-//        db.get().addOnSuccessListener { dataSnapshot: DataSnapshot ->
-//            for (user in dataSnapshot.children) {
-//                val name = user.child("username").value.toString()
-//                val uid = user.child("uid").value.toString()
-//                Log.i("user", name.plus(uid))
-//                chatlist.add(UserItem(name, "message", uid))
-//            }
-//
-//                binding.joinRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-//                adapter = ChatRoomListAdapter(chatlist)
-//                adapter.onItemClickListener = object:ChatRoomListAdapter.OnItemClickListener{
-//                    override fun onItemClick(pos: Int) {
-//                        val intent = Intent(requireActivity(), ChatActivity::class.java)
-//                        intent.putExtra("name", chatlist[pos].name)
-//                        intent.putExtra("uid", chatlist[pos].uid)
-//                        startActivity(intent)
-//                    }
-//                }
-//                binding.joinRecyclerView.adapter = adapter
-//            }
-    }
-
-    private fun getLatestSort() {
-        val call = chatroomService.getLatestLists(authorizationHeader)
-        call.enqueue(object : Callback<List<ChatRoom>> {
-            override fun onResponse(call: Call<List<ChatRoom>>, response: Response<List<ChatRoom>>) {
-                if (response.isSuccessful) {
-                    val chatroomList = response.body()
-                    if (chatroomList != null) {
-                        chatLatestList.addAll(chatroomList)
-                        adapter2.updateItems(chatroomList)
-                    }
-                } else {
-                    val errorCode = response.code()
-                    Toast.makeText(requireContext(), "모집방 최신 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
-                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[모집방 최신 목록 로드 에러: ]", it1) }
-            }
-        })
-
-        binding.allRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        adapter2 = ChatRoomAllListAdapter(chatLatestList)
-        adapter2.onItemClickListener = object : ChatRoomAllListAdapter.OnItemClickListener {
-            override fun onItemClick(pos: Int, roomInfo: ChatRoom) {
-                joinChatRoomDialog(roomInfo)
-            }
-        }
-        binding.allRecyclerView.adapter = adapter2
     }
 
     private fun joinChatRoomDialog(roomInfo: ChatRoom) {
