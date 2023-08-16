@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,16 +12,16 @@ import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityMakeRoomBinding
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class MakeRoomActivity : AppCompatActivity() {
@@ -124,6 +123,18 @@ class MakeRoomActivity : AppCompatActivity() {
                         Log.i("success", insertedChatRoom.toString())
                         // 데이터 삽입 성공
                         Toast.makeText(this@MakeRoomActivity, "모집방 개설 성공", Toast.LENGTH_SHORT).show()
+
+                        val topic = insertedChatRoom?.roomId.toString()
+                        //모집방id를 주제로 구독 -> 이후 서버에서 알림을 받을 수 있도록
+                        FirebaseMessaging.getInstance().subscribeToTopic(topic)
+                            .addOnSuccessListener {
+                                Toast.makeText(this@MakeRoomActivity, "구독성공", Toast.LENGTH_SHORT).show()
+                                Log.i("subscribe", "구독성공")
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this@MakeRoomActivity, "구독실패", Toast.LENGTH_SHORT).show()
+                                Log.i("subscribe", "구독실패")
+                            }
 
                         val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
                         startActivity(intent)

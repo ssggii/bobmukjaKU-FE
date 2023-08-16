@@ -33,6 +33,10 @@ class BobAppointmentActivity : AppCompatActivity() {
             dateTime.setOnClickListener {
                 showStartTimePickerDialog()
             }
+
+            setCompleteBtn.setOnClickListener{
+
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package com.example.bobmukjaku
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -146,9 +148,19 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    val appointLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode == Activity.RESULT_OK){
+            //공지설정화면에서 공지를 설정하면 일어나는 일
+        }
+    }
+
     private fun initLayout() {
 
         binding.apply {
+            setBobAppointment.setOnClickListener {
+
+            }
 
             //채팅방 퇴장 버튼
             exitBtn.setOnClickListener {
