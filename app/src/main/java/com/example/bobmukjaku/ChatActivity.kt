@@ -166,15 +166,14 @@ class ChatActivity : AppCompatActivity() {
             exitBtn.setOnClickListener {
                 //먼저 현재 채팅방의 남은 인원이 2명 이상인지 확인
                 val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken","")!!)
-                Log.i("abcabc", chatRoomInfo.roomId.toString())
                 RetrofitClient.chatRoomService.getRoomIdLists(accessToken, chatRoomInfo.roomId!!)
-                    .enqueue(object: Callback<List<ChatRoom>>{
+                    .enqueue(object: Callback<ChatRoom>{
                         override fun onResponse(
-                            call: Call<List<ChatRoom>>,
-                            response: Response<List<ChatRoom>>
+                            call: Call<ChatRoom>,
+                            response: Response<ChatRoom>
                         ) {
                             if(response.isSuccessful){
-                                val currentParticipantsNum = response.body()?.get(0)?.currentNum!!
+                                val currentParticipantsNum = response.body()?.currentNum!!
                                 if(currentParticipantsNum > 1) {
                                     //파이어베이스에서 자신의 정보 제거
                                     rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
@@ -225,8 +224,8 @@ class ChatActivity : AppCompatActivity() {
                             }
                         }
 
-                        override fun onFailure(call: Call<List<ChatRoom>>, t: Throwable) {
-
+                        override fun onFailure(call: Call<ChatRoom>, t: Throwable) {
+                            Log.i("abcabc", t.message!!)
                         }
                     })
 

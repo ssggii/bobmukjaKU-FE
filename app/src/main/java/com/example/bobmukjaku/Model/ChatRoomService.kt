@@ -27,7 +27,7 @@ interface ChatRoomService {
     fun getRoomIdLists(
         @Header("Authorization") authorization: String,
         @Path("roomId") roomId: Long
-    ): Call<List<ChatRoom>>
+    ): Call<ChatRoom>
 
     // uid로 참여 중인 모집방 조회
     @GET("/chatRoom/info/2/{uid}")
