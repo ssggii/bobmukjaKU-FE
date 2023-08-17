@@ -18,6 +18,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.Model.SharedPreferences
+import com.example.bobmukjaku.Model.TimeBlock
 import com.example.bobmukjaku.databinding.FragmentProfileBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,6 +47,15 @@ class ProfileFragment : Fragment() {
         // 사용자 배경색 정보 가져와서 화면에 설정
         displayProfileColor()
 
+        // 시간표 첫 로드
+        displayTimeTable()
+
+        // 시간표 설정하기
+        setTimeTable()
+
+        // 정보 수정 버튼 이벤트
+        modifyInfo()
+
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
@@ -58,7 +68,92 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
             startActivityForResult(intent, PROFILE_COLOR_REQUEST_CODE)
         }
+    }
 
+    private fun displayTimeTable() {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        val authorizationHeader = "Bearer $accessToken"
+
+        val call = accessToken?.let { memberService.getTimeTable(authorizationHeader) }
+        call?.enqueue(object : Callback<List<TimeBlock>> {
+            override fun onResponse(call: Call<List<TimeBlock>>, response: Response<List<TimeBlock>>) {
+                if (response.isSuccessful) {
+                    val timeBlocks = response.body()
+
+                    if (timeBlocks != null) {
+                        // 시간표 정보를 가져온 경우에만 처리
+                        updateTimetableUI(timeBlocks)
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "시간표 정보 조회 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<TimeBlock>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[시간표 조회 에러: ]", it1) }
+            }
+        })
+    }
+
+    // 시간표 UI 업데이트 함수
+    private fun updateTimetableUI(timeBlocks: List<TimeBlock>) {
+        val timetableCells = arrayOf(
+            arrayOf(binding.tt00, binding.tt01, binding.tt02, binding.tt03, binding.tt04),
+            arrayOf(binding.tt10, binding.tt11, binding.tt12, binding.tt13, binding.tt14),
+            arrayOf(binding.tt20, binding.tt21, binding.tt22, binding.tt23, binding.tt24),
+            arrayOf(binding.tt30, binding.tt31, binding.tt32, binding.tt33, binding.tt34),
+            arrayOf(binding.tt40, binding.tt41, binding.tt42, binding.tt43, binding.tt44),
+            arrayOf(binding.tt50, binding.tt51, binding.tt52, binding.tt53, binding.tt54),
+            arrayOf(binding.tt60, binding.tt61, binding.tt62, binding.tt63, binding.tt64),
+            arrayOf(binding.tt70, binding.tt71, binding.tt72, binding.tt73, binding.tt74),
+            arrayOf(binding.tt80, binding.tt81, binding.tt82, binding.tt83, binding.tt84),
+            arrayOf(binding.tt90, binding.tt91, binding.tt92, binding.tt93, binding.tt94),
+            arrayOf(binding.tt100, binding.tt101, binding.tt102, binding.tt103, binding.tt104),
+            arrayOf(binding.tt110, binding.tt111, binding.tt112, binding.tt113, binding.tt114),
+            arrayOf(binding.tt120, binding.tt121, binding.tt122, binding.tt123, binding.tt124),
+            arrayOf(binding.tt130, binding.tt131, binding.tt132, binding.tt133, binding.tt134),
+            arrayOf(binding.tt140, binding.tt141, binding.tt142, binding.tt143, binding.tt144),
+            arrayOf(binding.tt150, binding.tt151, binding.tt152, binding.tt153, binding.tt154),
+            arrayOf(binding.tt160, binding.tt161, binding.tt162, binding.tt163, binding.tt164),
+            arrayOf(binding.tt170, binding.tt171, binding.tt172, binding.tt173, binding.tt174)
+        )
+
+        for (timeBlock in timeBlocks) {
+            val dayOfWeek = timeBlock.dayOfWeek.toIntOrNull()
+            val time = timeBlock.time
+
+            if (dayOfWeek != null && dayOfWeek in 1..5) {
+                val colIndex = dayOfWeek - 1  // API에서 요일은 1부터 시작하므로 -1
+                val rowIndex = getIndexFromTime(time)
+
+                if (rowIndex in timetableCells.indices) {
+                    timetableCells[rowIndex][colIndex].setBackgroundColor(
+                        ContextCompat.getColor(requireContext(), R.color.ttColor)
+                    )
+                }
+            }
+        }
+    }
+
+    // 시간을 인덱스로 변환하는 함수
+    private fun getIndexFromTime(time: String): Int {
+        val startTime = 9  // 시작 시간은 9시
+        val timeUnit = 30  // 시간 단위는 30분
+        val parts = time.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1].toInt()
+        val elapsedMinutes = (hour - startTime) * 60 + minute
+        return elapsedMinutes / timeUnit
+    }
+
+    private fun setTimeTable() {
         // 시간표 각 배열 정보 저장 0(white), 1(lightgreen)
         val cellInformation = Array(18) { IntArray(5) { 0 } }
 
@@ -132,11 +227,67 @@ class ProfileFragment : Fragment() {
                 // 안내 문구 변경
                 binding.timetableInfo.text = "시간표 수정을 원하시면 시간표 옆 아이콘을 클릭하세요."
                 binding.editTimetable.clearColorFilter()
+                saveTimeTable(cellInformation)
+            }
+        }
+    }
+
+    // 시간표 정보를 서버에 저장하는 함수
+    private fun saveTimeTable(timeTable: Array<IntArray>) {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        val authorizationHeader = "Bearer $accessToken"
+
+        val timeBlockList = mutableListOf<TimeBlock>()
+
+        for (rowIndex in timeTable.indices) {
+            for (colIndex in timeTable[rowIndex].indices) {
+                if (timeTable[rowIndex][colIndex] == 1) {
+                    // 값이 1인 경우에만 시간표 정보를 생성하여 리스트에 추가
+                    val dayOfWeek = (colIndex + 1).toString()  // 요일은 1부터 시작하므로 +1
+                    val time = getTimeFromIndex(rowIndex)
+                    timeBlockList.add(TimeBlock(dayOfWeek, time))
+                }
             }
         }
 
-        // 정보 수정 버튼 이벤트
-        modifyInfo()
+        val call = accessToken?.let {
+            memberService.saveTimeTable(authorizationHeader, timeBlockList)
+        }
+
+        call?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // 시간표 정보 저장 성공 처리
+                    Toast.makeText(
+                        requireContext(),
+                        "시간표 정보가 저장되었습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "시간표 정보 저장 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[시간표 저장 에러: ]", it1) }
+            }
+        })
+    }
+
+    // 인덱스를 시간으로 변환하는 함수
+    private fun getTimeFromIndex(index: Int): String {
+        val startTime = 9  // 시작 시간은 9시
+        val timeUnit = 30  // 시간 단위는 30분
+        val hour = startTime + (index * timeUnit) / 60
+        val minute = (index * timeUnit) % 60
+        return String.format("%02d:%02d", hour, minute)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

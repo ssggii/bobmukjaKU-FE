@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChangePasswordctivity2"
+            android:name=".ChangePasswordActivity2"
             android:exported="false" />
         <activity
             android:name=".ChangePasswordActivity"

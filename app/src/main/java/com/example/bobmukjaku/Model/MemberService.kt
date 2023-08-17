@@ -10,6 +10,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.*
+import java.sql.Time
 
 interface MemberService {
     // 사용자 추가
@@ -45,11 +46,24 @@ interface MemberService {
         @Body requestBody: Map<String, String>
     ): Call<Void>
 
-    //로그인
+    // 로그인
     @POST("/login")
     fun login(@Body loginDto: LoginDto): Call<Void>
 
-    //인증날짜만료 체크
+    // 시간표 저장
+    @POST("/member/info/timeTable")
+    fun saveTimeTable(
+        @Header("Authorization") authorization: String,
+        @Body requestBody: List<TimeBlock>
+    ): Call<Void>
+
+    // 시간표 조회
+    @GET("/timeTable")
+    fun getTimeTable(
+        @Header("Authorization") authorization: String
+    ): Call<List<TimeBlock>>
+
+    // 인증날짜만료 체크
     @GET("certificatedAtCheck")
     fun certificatedAtCheck(@Header("accessToken") accessToken: String): Call<Member>
 
@@ -61,11 +75,12 @@ interface MemberService {
     fun sendMessage(@Header("authorization") authorization: String, @Body md: ChatModel): Call<Unit>
 
     // 필요한 다른 API 구현
+
 }
 
 object RetrofitClient {
-    //private const val BASE_URL = "https://df8a-211-104-182-71.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://172.30.1.87:8080" // 여기에 서버 URL 넣기
+    //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http:/172.30.1.17:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {

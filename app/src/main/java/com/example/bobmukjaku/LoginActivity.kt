@@ -204,54 +204,17 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
 
-            //회원가입 버튼 클릭
+            // 회원가입 버튼 클릭
             joinBtn.setOnClickListener {
-
                 val intent = Intent(this@LoginActivity, JoinActivity::class.java)
                 startActivity(intent)
-//                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-//                startActivity(intent)
+            }
+
+            // 비밀번호 재설정 버튼 클릭
+            resetPasswdBtn.setOnClickListener {
+                val intent = Intent(this@LoginActivity, ChangePasswordActivity::class.java)
+                startActivity(intent)
             }
         }
     }
-    //파이어베이스로 로그인을 구현한 파트
-    /*private fun initLayout() {
-        binding.apply {
-            loginBtn.setOnClickListener {
-                val id = loginId.text.toString()
-                val passwd = loginPasswd.text.toString()
-
-                auth = Firebase.auth
-
-                if (id.isEmpty() && passwd.isEmpty()) {
-                    Toast.makeText(this@LoginActivity, "아이디와 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                } else if (id.isEmpty()) {
-                    Toast.makeText(this@LoginActivity, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                } else if (passwd.isEmpty()) {
-                    Toast.makeText(this@LoginActivity, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                } else {
-                    auth.signInWithEmailAndPassword(id, passwd)
-                        .addOnCompleteListener(this@LoginActivity) { task ->
-                            if (task.isSuccessful) {
-                                // Sign in success, update UI with the signed-in user's information
-
-                                //데이터베이스에 user정보를 넣어줘야함
-                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(intent)
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                //updateUI(null)
-                                Toast.makeText(this@LoginActivity, "login 실패", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                }
-            }
-
-            joinBtn.setOnClickListener {
-                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
-                startActivity(intent)
-            }
-        }
-    }*/
 }
