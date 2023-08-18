@@ -10,7 +10,6 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.*
-import java.sql.Time
 
 interface MemberService {
     // 사용자 추가
@@ -80,7 +79,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http:/172.30.1.17:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.219.100:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
