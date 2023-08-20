@@ -63,9 +63,14 @@ class ChatRoomAllListAdapter(var items: List<ChatRoom>): RecyclerView.Adapter<Ch
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val startTime = items[position].startTime
+        val endTime = items[position].endTime
+        val formattedStartTime = startTime?.substring(0, 5)
+        val formattedEndTime = endTime?.substring(0, 5)
+
         holder.binding.name.text = items[position].roomName
-        holder.binding.startTime.text = items[position].startTime
-        holder.binding.endTime.text = items[position].endTime
+        holder.binding.startTime.text = formattedStartTime
+        holder.binding.endTime.text = formattedEndTime
         holder.binding.presentPerson.text = items[position].currentNum.toString()
         holder.binding.totalPerson.text = items[position].total.toString()
 

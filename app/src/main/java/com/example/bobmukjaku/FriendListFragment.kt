@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -21,6 +22,11 @@ class FriendListFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    lateinit var mContext: Context
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

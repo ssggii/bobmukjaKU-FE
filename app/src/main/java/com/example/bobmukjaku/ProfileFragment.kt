@@ -1,6 +1,7 @@
 package com.example.bobmukjaku
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Build
@@ -28,6 +29,11 @@ import java.time.LocalDate
 class ProfileFragment : Fragment() {
 
     lateinit var binding: FragmentProfileBinding
+    lateinit var mContext: Context
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

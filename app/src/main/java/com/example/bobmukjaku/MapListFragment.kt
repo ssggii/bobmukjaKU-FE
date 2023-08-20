@@ -1,3 +1,4 @@
+import android.content.Context
 import android.graphics.PointF
 import android.os.Bundle
 import android.util.Log
@@ -31,7 +32,11 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     private val markerInfoWindowMap = mutableMapOf<Marker, DialogFragment>()
 
     lateinit var binding: FragmentMapListBinding
-
+    lateinit var mContext: Context
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

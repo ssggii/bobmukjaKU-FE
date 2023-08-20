@@ -1,6 +1,7 @@
 package com.example.bobmukjaku
 
 import MapListFragment
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -14,7 +15,11 @@ import com.google.android.material.tabs.TabLayout
 class MapFragment : Fragment() {
 
     lateinit var binding: FragmentMapBinding
-
+    lateinit var mContext: Context
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
