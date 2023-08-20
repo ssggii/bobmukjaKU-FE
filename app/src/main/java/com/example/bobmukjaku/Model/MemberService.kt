@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
+import com.example.bobmukjaku.Dto.RateUpdateDto
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -30,6 +31,12 @@ interface MemberService {
         @Header("Authorization") authorization: String,
         @Body requestBody: Map<String, String>
     ): Call<Void>
+
+    // rate 업데이트
+    @PUT("/member/info/rate")
+    fun rateUpdate(
+        @Header("Authorization") authorization: String,
+        @Body rateUpdateDto: RateUpdateDto): Call<Void>
 
     // 비밀번호 재설정
     @PUT("/member/info/password")
@@ -70,8 +77,16 @@ interface MemberService {
     @GET("mailAuth")
     fun RequestMailAuth(@Query("email") email:String):Call<HashedAuthCode>
 
+    //메시지 전송
     @PUT("message")
     fun sendMessage(@Header("authorization") authorization: String, @Body md: ChatModel): Call<Unit>
+
+    //방id로 모든 참여자 조회
+    @GET("/chatRoom/joiners/{roomId}")
+    fun getParticipantsInRoom(
+        @Header("authorization") authorization: String,
+        @Path("roomId") roomId: Long
+    ): Call<List<Member>>
 
     // 필요한 다른 API 구현
 

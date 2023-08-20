@@ -56,7 +56,7 @@ class ChatActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val job = CoroutineScope(Dispatchers.IO).async {
-                getMyInfo()
+                myInfo = getMyInfoFromServer()
             }.await()
             initFirebase()
             registerMyInfoIntoFirebase()
@@ -137,15 +137,13 @@ class ChatActivity : AppCompatActivity() {
         mrf.addChildEventListener(childEventListener)
     }
 
-    private fun getMyInfo(){
+    private fun getMyInfoFromServer(): Member{
         val accessToken = SharedPreferences.getString("accessToken", "")
         //서버에서 내정보 가져오기
         val request = RetrofitClient.memberService.selectOne(
             "Bearer $accessToken")
         val response = request.execute()
-        if(response.isSuccessful) {
-            myInfo = response.body()!!
-        }
+        return response.body()!!
     }
 
     val appointLauncher = registerForActivityResult(
