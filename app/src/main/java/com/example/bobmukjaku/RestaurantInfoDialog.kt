@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentRestaurantInfoDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -52,6 +53,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 스크랩 등록 완료
+                    binding.scrapBtn.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.ect)
                     Toast.makeText(requireContext(), "스크랩 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                 } else {
                     val errorCode = response.code()
