@@ -23,14 +23,20 @@
             android:textSize="20sp"
             android:textColor="@color/black" />
 
-        <ImageView
-            android:id="@+id/btn_add"
+        <TextView
+            android:id="@+id/count_scrap"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginTop="12dp"
             android:layout_marginLeft="6dp"
             android:layout_gravity="center"
-            android:src="@drawable/heart" />
+            android:text="0"
+            android:paddingTop="3sp"
+            android:textSize="9sp"
+            android:fontFamily="@font/notosans_semibold"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:background="@drawable/heart" />
 
         <TextView
             android:id="@+id/category"

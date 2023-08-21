@@ -5,11 +5,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.bobmukjaku.*
+import com.example.bobmukjaku.Model.Member
+import com.example.bobmukjaku.Model.RetrofitClient
+import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.FragmentMapListBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
@@ -18,6 +22,9 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MapListFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapView: MapView
@@ -26,6 +33,10 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
 
     lateinit var binding: FragmentMapListBinding
     lateinit var mContext: Context
+
+    private val accessToken = SharedPreferences.getString("accessToken", "")
+    private val authorizationHeader = "Bearer $accessToken"
+    var uid: Long = 0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -91,7 +102,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
 //                        marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.kor) // 한식
                             marker.map = naverMap
 
-                            val restaurantInfoDialog = RestaurantInfoDialog(restaurant)
+                            val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
                             marker.setOnClickListener {
                                 if (markerInfoWindowMap.containsKey(marker)) {
                                     markerInfoWindowMap[marker]?.dismiss()
@@ -117,6 +128,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.map_view)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        getUid()
     }
 
     override fun onStart() {
@@ -152,5 +165,34 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
+    }
+
+    private fun getUid() {
+        val memberService = RetrofitClient.memberService
+
+        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
+        call?.enqueue(object : Callback<Member> {
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if (response.isSuccessful) {
+                    val member = response.body()
+                    val uidInfo = member?.uid
+                    if (uidInfo != null) {
+                        uid = uidInfo
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[uid 로드 실패: ]", it1) }
+            }
+        })
     }
 }
