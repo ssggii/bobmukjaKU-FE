@@ -10,14 +10,14 @@ interface RestaurantService {
     @POST("/place/review")
     fun addReview(
         @Header("Authorization") authorization: String,
-        @Body lists: List<ReviewInfo>
+        @Body lists: ReviewInfo
     ): Call<Void>
 
     // 스크랩 등록
     @POST("/place/scrap")
     fun addScrap(
         @Header("Authorization") authorization: String,
-        @Body lists: List<ScrapInfo>
+        @Body lists: ScrapInfo
     ): Call<Void>
 
     // 필요한 다른 API 구현
