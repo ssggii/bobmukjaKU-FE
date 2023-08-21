@@ -51,7 +51,8 @@ class RestaurantRepository {
             when (eventType) {
                 XmlPullParser.START_TAG -> {
                     when (parser.name) {
-                        "item" -> currentRestaurant = RestaurantList("", "", "", "", 0.0, 0.0)
+                        "item" -> currentRestaurant = RestaurantList("", "", "", "", "", 0.0, 0.0)
+                        "bizesId" -> currentRestaurant?.bizesId = parser.nextText()
                         "bizesNm" -> currentRestaurant?.bizesNm = parser.nextText()
                         "indsMclsNm" -> currentRestaurant?.indsMclsNm = parser.nextText()
                         "indsSclsNm" -> currentRestaurant?.indsSclsNm = parser.nextText()
