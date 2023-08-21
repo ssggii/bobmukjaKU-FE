@@ -68,7 +68,6 @@ class ChatFragment : Fragment() {
         } else {
             Toast.makeText(requireContext(), "검색할 모집방 목록이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
-//        getLatestSort()
         makeChatRoom()
     }
 
@@ -98,12 +97,19 @@ class ChatFragment : Fragment() {
                 val color = ContextCompat.getColor(requireContext(), R.color.gray)
                 binding.ttBtn.setTextColor(textColor)
                 binding.ttBtn.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+                val filter = FilterInfo("timeTable", "")
+                removeFilterInfo(filter)
             }else {
                 binding.ttBtn.text = "시간표 ON"
+
                 val textColor = ContextCompat.getColor(requireContext(), R.color.white)
                 val color = ContextCompat.getColor(requireContext(), R.color.main)
                 binding.ttBtn.setTextColor(textColor)
                 binding.ttBtn.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+                val filter = FilterInfo("timeTable", uid.toString())
+                getFilterInfo(filter)
             }
         }
 
@@ -676,6 +682,10 @@ class ChatFragment : Fragment() {
                                         "내일" -> selectedColor(binding.tomorrow)
                                         else -> selectedColor(binding.otherDate)
                                     }
+                                } else if (filters.filterType == "timeTable") {
+                                    binding.ttBtn.text = "시간표 ON"
+                                    binding.ttBtn.setTextColor(whiteColor)
+                                    binding.ttBtn.background.setColorFilter(mainColor, PorterDuff.Mode.SRC_IN)
                                 }
                             }
                             getFilteredLists(filterInfo, chatMyList)
