@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -142,6 +143,11 @@ class GiveScoreActivity : AppCompatActivity() {
                     })
                 }
             }
+
+            //리뷰 화면으로 이동
+            val intent = Intent(this, ReviewActivity::class.java)
+            intent.putExtra("myInfo", myInfo)
+            startActivity(intent)
         }
     }
 }

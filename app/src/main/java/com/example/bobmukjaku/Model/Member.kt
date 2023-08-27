@@ -13,4 +13,4 @@ data class Member(
     @JsonProperty("rate")var rate: Int?,
     @JsonProperty("profileColor")var profileColor: String?,
     //var role: Role,
-)
+) : java.io.Serializable
