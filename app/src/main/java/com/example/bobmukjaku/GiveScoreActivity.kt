@@ -1,6 +1,7 @@
 package com.example.bobmukjaku
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Dto.RateUpdateDto
@@ -22,22 +23,38 @@ class GiveScoreActivity : AppCompatActivity() {
     lateinit var binding: ActivityGiveScoreBinding
     var participants = arrayListOf<UpdateScoreInfo>()
     lateinit var adapter: GiveScoreAdapter
-    val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "")?:"")
+    lateinit var accessToken: String
     val memberService = RetrofitClient.memberService
     lateinit var myInfo: Member
+    var roomId = 0L
 
-    val roomId: Long = 1//방id는 FCM메시지로부터 받아온다고 가정
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGiveScoreBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        try{
+            roomId = intent.getLongExtra("roomId", -1)
+        }catch (e: Exception){
+            Log.i("errorMessage", "roomId문제 ${e.message}")
+        }
+
+        try {
+            SharedPreferences.initSharedPreferences(applicationContext)
+            accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "") ?: "")
+            Log.i("errorMessage", accessToken)
+        }catch (e: java.lang.Exception){
+            Log.i("errorMessage", "SharedPreference문제 ${e.message}")
+        }
+
+
         val getMyInfoJob = CoroutineScope(Dispatchers.IO).async {
             getMyInfoFromServer()
         }
 
-
-
+//        Log.i("errorMessage", roomId.toString())
         CoroutineScope(Dispatchers.Main).launch {
             myInfo = getMyInfoJob.await()
             val getAllParticipantsInRoomJob = CoroutineScope(Dispatchers.IO).async {
@@ -45,7 +62,6 @@ class GiveScoreActivity : AppCompatActivity() {
             }
             getAllParticipantsInRoomJob.await()
             initRecyclerView()
-
             initLayout()
         }
 
@@ -59,7 +75,6 @@ class GiveScoreActivity : AppCompatActivity() {
         val response = request.execute()
         return response.body()!!
     }
-
     private fun initRecyclerView() {
         //참가자목록을 담는 recyclerView 초기화
 
@@ -103,7 +118,7 @@ class GiveScoreActivity : AppCompatActivity() {
 
                 if(result.thumbUp){
                     val request = memberService.rateUpdate(accessToken, RateUpdateDto(result.participant.uid, 1))
-                    request.enqueue(object: Callback<Void>{
+                    request.enqueue(object: Callback<Void> {
                         override fun onResponse(call: Call<Void>, response: Response<Void>) {
 
                         }
@@ -124,7 +139,6 @@ class GiveScoreActivity : AppCompatActivity() {
                         override fun onFailure(call: Call<Void>, t: Throwable) {
 
                         }
-
                     })
                 }
             }

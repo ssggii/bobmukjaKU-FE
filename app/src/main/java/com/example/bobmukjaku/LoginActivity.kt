@@ -173,10 +173,10 @@ class LoginActivity : AppCompatActivity() {
                                             certificatedAtCheck()
 
                                             //메인화면으로 전환
-//                                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-//                                            startActivity(intent)
-                                            val intent = Intent(this@LoginActivity, GiveScoreActivity::class.java)
+                                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
                                             startActivity(intent)
+//                                            val intent = Intent(this@LoginActivity, GiveScoreActivity::class.java)
+//                                            startActivity(intent)
 
                                             Toast.makeText(this@LoginActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
                                         }

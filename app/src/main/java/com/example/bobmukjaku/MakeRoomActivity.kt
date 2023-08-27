@@ -126,15 +126,27 @@ class MakeRoomActivity : AppCompatActivity() {
 
                         val topic = insertedChatRoom?.roomId.toString()
                         //모집방id를 주제로 구독 -> 이후 서버에서 알림을 받을 수 있도록
-                        FirebaseMessaging.getInstance().subscribeToTopic(topic)
-                            .addOnSuccessListener {
-                                Toast.makeText(this@MakeRoomActivity, "구독성공", Toast.LENGTH_SHORT).show()
-                                Log.i("subscribe", "구독성공")
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(this@MakeRoomActivity, "구독실패", Toast.LENGTH_SHORT).show()
-                                Log.i("subscribe", "구독실패")
-                            }
+
+                        Log.i("fcmmessage", topic)
+                        if(topic.isNotEmpty()) {
+                            FirebaseMessaging.getInstance().subscribeToTopic(topic)
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        this@MakeRoomActivity,
+                                        "구독성공",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Log.i("fcmmessage", "구독성공")
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(
+                                        this@MakeRoomActivity,
+                                        "구독실패",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    Log.i("fcmmessage", "구독실패")
+                                }
+                        }
 
                         val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
                         startActivity(intent)
