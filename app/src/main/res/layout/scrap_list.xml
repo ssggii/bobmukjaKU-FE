@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/line_gray"
+    android:elevation="10dp"
+    android:padding="15dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp" >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="name"
+        android:textColor="@color/black"
+        android:fontFamily="@font/notosans_bold"
+        android:textSize="18dp"/>
+
+    <LinearLayout
+        android:id="@+id/top_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="3dp"
+        android:background="@drawable/line_gray"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="등록된 한 줄 리뷰 총 "
+            android:fontFamily="@font/notosans_bold"
+            android:textSize="14dp"/>
+
+        <TextView
+            android:id="@+id/total_scrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/main"
+            android:fontFamily="@font/notosans_bold"
+            android:textSize="14dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="건"
+            android:fontFamily="@font/notosans_bold"
+            android:textSize="14dp"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/reviewList"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/scrapBtn"
+            android:layout_width="90dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:backgroundTint="@color/ect"
+            android:background="@drawable/btn_circle_green"
+            android:text="스크랩"
+            android:textSize="12sp"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/shareBtn"
+            android:layout_width="90dp"
+            android:layout_height="25dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/btn_circle_darkgray"
+            android:text="공유하기"
+            android:textSize="12sp"
+            android:textColor="@color/black" />
+    </LinearLayout>
+</LinearLayout>
