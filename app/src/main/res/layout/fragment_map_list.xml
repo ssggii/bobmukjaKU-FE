@@ -6,6 +6,223 @@
     android:layout_height="match_parent"
     tools:context=".MapListFragment">
 
+    <com.naver.maps.map.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/townBtn"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="12dp"
+                android:text="광진구"
+                android:fontFamily="@font/notosans_semibold"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/foodBtn"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="12dp"
+                android:text="한식"
+                android:fontFamily="@font/notosans_semibold"
+                android:background="@drawable/btn_circle_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="ex"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:id="@+id/townFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/gjGoo"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="12dp"
+                android:text="광진구"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/jyDong"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="자양동"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/GE1Dong"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="구의1동"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/GE2Dong"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="구의2동"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/GE3Dong"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="구의3동"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/GJDong"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="군자동"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:id="@+id/foodFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/KoreaF"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="12dp"
+                android:text="한식"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/JapanF"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="일식"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ForeignF"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="양식"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ChinaF"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="중식"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ectF"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="12dp"
+                android:text="기타"
+                android:fontFamily="@font/notosans_bold"
+                android:backgroundTint="@color/gray"
+                android:background="@drawable/btn_circle_gray" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
@@ -16,9 +233,4 @@
         android:backgroundTint="#EDF4F1"
         android:clickable="true"
         android:src="@drawable/round_menu" />
-
-    <com.naver.maps.map.MapView
-        android:id="@+id/map_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </FrameLayout>
