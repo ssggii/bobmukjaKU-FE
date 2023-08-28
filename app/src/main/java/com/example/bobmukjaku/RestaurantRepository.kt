@@ -29,11 +29,11 @@ class RestaurantRepository {
         val pageNo = "&pageNo=1"
         val numOfRows = "&numOfRows=300"
         val dong = "&divId=adongCd"
-        val key = "&key=11215710" // 동단위 key
+        val key = "&key=11215710" // 동단위 key(화양동) // (화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
         val indsLclsCd = "&indsLclsCd=I2" // 대분류
         val indsMclsCd = "&indsMclsCd=$categoryList" // 중분류
         val type = "&type=xml"
-        val url = "https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInDong?serviceKey=" +
+        var url = "https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInDong?serviceKey=" +
                 "$serviceKey$pageNo$numOfRows$dong$key$indsLclsCd$indsMclsCd$type"
 
         val apiUrl = URL(url)
