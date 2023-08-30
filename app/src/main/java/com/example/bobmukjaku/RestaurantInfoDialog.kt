@@ -56,8 +56,8 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
 
     private fun init() {
         val call = restaurantService.getRestaurantScrap(authorizationHeader, placeId = restaurant.bizesId)
-        call.enqueue(object : Callback<List<ScrapInfo>> {
-            override fun onResponse(call: Call<List<ScrapInfo>>, response: Response<List<ScrapInfo>>) {
+        call.enqueue(object : Callback<List<ScrapPost>> {
+            override fun onResponse(call: Call<List<ScrapPost>>, response: Response<List<ScrapPost>>) {
                 if (response.isSuccessful) {
                     val successResponse = response.body() // 서버에서 받은 스크랩 목록
                     if (successResponse != null) {
@@ -75,7 +75,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 }
             }
 
-            override fun onFailure(call: Call<List<ScrapInfo>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ScrapPost>>, t: Throwable) {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
                 t.message?.let { it1 -> Log.i("[스크랩 여부 확인 에러: ]", it1) }
             }
