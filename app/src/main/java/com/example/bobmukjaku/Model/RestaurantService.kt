@@ -15,8 +15,7 @@ interface RestaurantService {
     @POST("/place/review/info")
     fun deleteReview(
         @Header("Authorization") authorization: String,
-        @Path("uid") uid: Long,
-        @Path("placeId") placeId: String
+        @Body lists: ScrapInfo
     ): Call<Void>
 
     // uid로 리뷰 조회
