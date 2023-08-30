@@ -66,7 +66,7 @@ interface RestaurantService {
     fun getRestaurantScrap(
         @Header("Authorization") authorization: String,
         @Path("placeId") placeId: String
-    ): Call<List<ScrapInfo>>
+    ): Call<List<ScrapPost>>
 
     // 필요한 다른 API 구현
 }
