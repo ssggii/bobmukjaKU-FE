@@ -34,7 +34,7 @@
             android:textSize="14dp"/>
 
         <TextView
-            android:id="@+id/total_scrap"
+            android:id="@+id/total_review"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
