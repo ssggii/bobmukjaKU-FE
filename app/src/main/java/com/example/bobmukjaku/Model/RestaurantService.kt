@@ -12,10 +12,11 @@ interface RestaurantService {
     ): Call<Void>
 
     // 리뷰 삭제
-    @DELETE("/place/review/info/{reviewId}")
+    @POST("/place/review/info")
     fun deleteReview(
         @Header("Authorization") authorization: String,
-        @Path("reviewId") reviewId: Long
+        @Path("uid") uid: Long,
+        @Path("placeId") placeId: String
     ): Call<Void>
 
     // uid로 리뷰 조회
@@ -36,7 +37,7 @@ interface RestaurantService {
     @POST("/place/scrap")
     fun addScrap(
         @Header("Authorization") authorization: String,
-        @Body lists: ScrapInfo
+        @Body lists: ScrapPost
     ): Call<Void>
 
     // 스크랩 해제
@@ -51,7 +52,7 @@ interface RestaurantService {
     fun getMyScrap(
         @Header("Authorization") authorization: String,
         @Path("uid") uid: Long
-    ): Call<List<ScrapInfo>>
+    ): Call<List<ScrapPost>>
 
     // 음식점 스크랩 수 조회
     @GET("/place/scrap/count/{placeId}")

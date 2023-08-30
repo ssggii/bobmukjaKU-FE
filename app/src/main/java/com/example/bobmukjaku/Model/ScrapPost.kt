@@ -2,10 +2,8 @@ package com.example.bobmukjaku.Model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class ReviewResponse(
+data class ScrapPost(
     @JsonProperty("uid")val uid: Long,
     @JsonProperty("placeId")val placeId: String,
-    @JsonProperty("placeName")val placeName: String,
-    @JsonProperty("contents")val contents: String,
-    @JsonProperty("imageUrl")val imageUrl: String
+    @JsonProperty("placeName")val placeName: String
 )

@@ -105,7 +105,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
     }
 
     private fun addScrap() {
-        val scrapInfo = ScrapInfo(uid = uid, placeId = restaurant.bizesId)
+        val scrapInfo = ScrapPost(uid = uid, placeId = restaurant.bizesId, placeName = restaurant.bizesNm)
         Log.i("scrapInfo", scrapInfo.toString())
         // API 호출
         restaurantService.addScrap(authorizationHeader, scrapInfo).enqueue(object : Callback<Void> {

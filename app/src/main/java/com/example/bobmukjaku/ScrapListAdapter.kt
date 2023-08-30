@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.RestaurantList
 import com.example.bobmukjaku.Model.ScrapInfo
+import com.example.bobmukjaku.Model.ScrapPost
 import com.example.bobmukjaku.databinding.ScrapListBinding
 
-class ScrapListAdapter(var items: List<ScrapInfo>, private val restaurantList: List<RestaurantList>): RecyclerView.Adapter<ScrapListAdapter.ViewHolder>() {
+class ScrapListAdapter(var items: List<ScrapPost>, private val restaurantList: List<RestaurantList>): RecyclerView.Adapter<ScrapListAdapter.ViewHolder>() {
 
     interface OnItemClickListener{
-        fun onItemClick(pos: Int, scrapInfo: ScrapInfo)
+        fun onItemClick(pos: Int, scrapInfo: ScrapPost)
     }
 
     var onItemClickListener:OnItemClickListener? = null
@@ -23,7 +24,7 @@ class ScrapListAdapter(var items: List<ScrapInfo>, private val restaurantList: L
         }
     }
 
-    fun updateItems(newItems: List<ScrapInfo>) {
+    fun updateItems(newItems: List<ScrapPost>) {
         items = newItems
         notifyDataSetChanged()
     }

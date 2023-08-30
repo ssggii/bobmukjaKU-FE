@@ -56,7 +56,7 @@ class ReviewListAdapter(var items: List<ReviewResponse>): RecyclerView.Adapter<R
     }
 
     private fun deleteReview(reviewInfo: ReviewResponse) {
-        val call = restaurantService.deleteReview(authorizationHeader, reviewId = 1)
+        val call = restaurantService.deleteReview(authorizationHeader, uid = reviewInfo.uid, placeId = reviewInfo.placeId)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
