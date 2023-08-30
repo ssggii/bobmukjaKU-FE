@@ -7,13 +7,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.Model.ReviewResponse
+import com.example.bobmukjaku.Model.ScrapInfo
 import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ReviewListBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ReviewListAdapter(var items: List<ReviewResponse>): RecyclerView.Adapter<ReviewListAdapter.ViewHolder>() {
+class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long): RecyclerView.Adapter<ReviewListAdapter.ViewHolder>() {
 
     private val restaurantService = RetrofitClient.restaurantService
     private val accessToken = SharedPreferences.getString("accessToken", "")
@@ -44,7 +45,7 @@ class ReviewListAdapter(var items: List<ReviewResponse>): RecyclerView.Adapter<R
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val reviewInfo = items[position]
-        holder.binding.name.text = reviewInfo.contents
+        holder.binding.name.text = reviewInfo.placeName
 
         holder.binding.deleteBtn.setOnClickListener {
             deleteReview(reviewInfo)
@@ -56,7 +57,8 @@ class ReviewListAdapter(var items: List<ReviewResponse>): RecyclerView.Adapter<R
     }
 
     private fun deleteReview(reviewInfo: ReviewResponse) {
-        val call = restaurantService.deleteReview(authorizationHeader, uid = reviewInfo.uid, placeId = reviewInfo.placeId)
+        val review = ScrapInfo(uid = uid, placeId = reviewInfo.placeId)
+        val call = restaurantService.deleteReview(authorizationHeader, review)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {

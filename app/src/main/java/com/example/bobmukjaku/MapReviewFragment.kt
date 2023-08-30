@@ -73,7 +73,7 @@ class MapReviewFragment : Fragment() {
         })
 
         binding.myRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        adapter = ReviewListAdapter(reviewList)
+        adapter = ReviewListAdapter(reviewList, uid)
         adapter.onItemClickListener = object : ReviewListAdapter.OnItemClickListener {
             override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
             }
