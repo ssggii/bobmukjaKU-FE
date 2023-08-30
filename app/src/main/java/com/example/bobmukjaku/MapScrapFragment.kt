@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentMapScrapBinding
@@ -16,12 +15,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MapScrapFragment : Fragment() {
+class MapScrapFragment : Fragment(), ScrapListAdapter.OnScrapRemovedListener {
 
     lateinit var mContext: Context
     lateinit var binding: FragmentMapScrapBinding
     lateinit var adapter: ScrapListAdapter
-    private lateinit var viewModel: MapListViewModel
     var scrapList = mutableListOf<ScrapPost>()
     var uid: Long = 0
 
@@ -32,9 +30,6 @@ class MapScrapFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
-        val repository = RestaurantRepository()
-        val viewModelFactory = MapListViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory)[MapListViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -52,13 +47,6 @@ class MapScrapFragment : Fragment() {
     }
 
     private fun getScrapList() {
-        val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
-        val restaurantList2 = viewModel.restaurantList.value ?: emptyList()
-//        for (categoryList in indsMclsCdList) {
-//            viewModel.fetchRestaurantList(categoryList)
-//            val restaurantList = viewModel.restaurantList.value ?: emptyList()
-//        }
-
         val call = restaurantService.getMyScrap(authorizationHeader, uid)
         call.enqueue(object : Callback<List<ScrapPost>> {
             override fun onResponse(call: Call<List<ScrapPost>>, response: Response<List<ScrapPost>>) {
@@ -86,11 +74,18 @@ class MapScrapFragment : Fragment() {
         })
 
         binding.myRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        adapter = ScrapListAdapter(scrapList, restaurantList = restaurantList2)
+        adapter = ScrapListAdapter(scrapList, uid, this@MapScrapFragment)
         adapter.onItemClickListener = object : ScrapListAdapter.OnItemClickListener {
             override fun onItemClick(pos: Int, scrapInfo: ScrapPost) {
             }
         }
+//        adapter.onScrapRemovedListener = object  : ScrapListAdapter.OnScrapRemovedListener {
+//            override fun onScrapRemoved(position: Int) {
+//                // 스크랩이 해제되었을 때 해당 아이템을 목록에서 제거하고 어댑터에 반영
+//                scrapList.removeAt(position)
+//                adapter.notifyDataSetChanged()
+//            }
+//        }
         binding.myRecyclerView.adapter = adapter
     }
 
@@ -122,5 +117,11 @@ class MapScrapFragment : Fragment() {
                 t.message?.let { it1 -> Log.i("[uid 로드 실패: ]", it1) }
             }
         })
+    }
+
+    override fun onScrapRemoved(position: Int) {
+        scrapList.removeAt(position)
+        binding.totalScrap.text = scrapList.size.toString()
+        adapter.notifyDataSetChanged()
     }
 }

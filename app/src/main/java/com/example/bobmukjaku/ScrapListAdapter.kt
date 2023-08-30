@@ -1,15 +1,28 @@
 package com.example.bobmukjaku
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bobmukjaku.Model.RestaurantList
-import com.example.bobmukjaku.Model.ScrapInfo
-import com.example.bobmukjaku.Model.ScrapPost
+import com.example.bobmukjaku.Model.*
+import com.example.bobmukjaku.Model.RetrofitClient.restaurantService
 import com.example.bobmukjaku.databinding.ScrapListBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class ScrapListAdapter(var items: List<ScrapPost>, private val restaurantList: List<RestaurantList>): RecyclerView.Adapter<ScrapListAdapter.ViewHolder>() {
+class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRemovedListener: OnScrapRemovedListener): RecyclerView.Adapter<ScrapListAdapter.ViewHolder>() {
+
+    lateinit var reviewAdapter: ScrapReviewListAdapter
+    private val accessToken = SharedPreferences.getString("accessToken", "")
+    private val authorizationHeader = "Bearer $accessToken"
+
+    var reviewList = mutableListOf<ReviewResponse>()
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, scrapInfo: ScrapPost)
@@ -17,11 +30,11 @@ class ScrapListAdapter(var items: List<ScrapPost>, private val restaurantList: L
 
     var onItemClickListener:OnItemClickListener? = null
 
+    interface OnScrapRemovedListener {
+        fun onScrapRemoved(position: Int)
+    }
+
     inner class ViewHolder(var binding: ScrapListBinding): RecyclerView.ViewHolder(binding.root){
-        init{
-            binding.root.setOnClickListener {
-            }
-        }
     }
 
     fun updateItems(newItems: List<ScrapPost>) {
@@ -34,16 +47,74 @@ class ScrapListAdapter(var items: List<ScrapPost>, private val restaurantList: L
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val scrapInfo = items[position]
-//        Log.i("res", restaurantList.toString())
-//        for (lists in restaurantList) {
-//            if (lists.bizesId == scrapInfo.placeId) {
-//                holder.binding.name.text = lists.bizesNm
-//            }
-//        }
 
-        holder.binding.name.text = scrapInfo.placeId
+        holder.binding.name.text = scrapInfo.placeName
+
+        // 리뷰 목록 API
+        val call = restaurantService.getRestaurantReview(authorizationHeader, scrapInfo.placeId)
+        call.enqueue(object : Callback<List<ReviewResponse>> {
+            override fun onResponse(call: Call<List<ReviewResponse>>, response: Response<List<ReviewResponse>>) {
+                if (response.isSuccessful) {
+                    val reviewListResponse = response.body() // 서버에서 받은 리뷰 목록
+                    if (reviewListResponse != null) {
+                        reviewList.clear()
+                        reviewList.addAll(reviewListResponse) // reviewList에 업데이트된 리뷰 목록 저장
+                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
+
+                        holder.binding.totalReview.text = reviewList.size.toString()
+                    }
+                    val successCode = response.code()
+                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드. 성공 $successCode $scrapInfo.placeId", Toast.LENGTH_SHORT).show()
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<ReviewResponse>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[음식점 리뷰 목록 로드 에러: ]", it1) }
+            }
+        })
+
+        holder.binding.reviewList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.VERTICAL, false)
+        reviewAdapter = ScrapReviewListAdapter(reviewList)
+        reviewAdapter.onItemClickListener = object : ScrapReviewListAdapter.OnItemClickListener {
+            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
+            }
+        }
+        holder.binding.reviewList.adapter = reviewAdapter
+
+        // 스크랩 버튼 이벤트
+        holder.binding.scrapBtn.setOnClickListener {
+            val scrapInfo = ScrapInfo(uid = uid, placeId = items[position].placeId)
+            restaurantService.deleteScrap(authorizationHeader, scrapInfo).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        // 성공적으로 스크랩 해제 완료
+                        holder.binding.scrapBtn.backgroundTintList = ContextCompat.getColorStateList(holder.binding.root.context, R.color.main)
+                        Toast.makeText(holder.binding.root.context, "스크랩 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                        // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
+                        onScrapRemovedListener.onScrapRemoved(position)
+                    } else {
+                        val errorCode = response.code()
+                        Toast.makeText(
+                            holder.binding.root.context,
+                            "스크랩 해제에 실패했습니다. 에러 코드: $errorCode",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                    t.message?.let { Log.i("[스크랩 해제 실패: ]", it) }
+                }
+            })
+        }
     }
 
     override fun getItemCount(): Int {
