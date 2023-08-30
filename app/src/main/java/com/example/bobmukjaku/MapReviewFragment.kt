@@ -15,7 +15,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MapReviewFragment : Fragment() {
+class MapReviewFragment : Fragment(), ReviewListAdapter.OnReviewRemovedListener {
 
     lateinit var mContext: Context
     lateinit var binding: FragmentMapReviewBinding
@@ -73,7 +73,7 @@ class MapReviewFragment : Fragment() {
         })
 
         binding.myRecyclerView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-        adapter = ReviewListAdapter(reviewList, uid)
+        adapter = ReviewListAdapter(reviewList, uid, this@MapReviewFragment)
         adapter.onItemClickListener = object : ReviewListAdapter.OnItemClickListener {
             override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
             }
@@ -109,5 +109,11 @@ class MapReviewFragment : Fragment() {
                 t.message?.let { it1 -> Log.i("[uid 로드 실패: ]", it1) }
             }
         })
+    }
+
+    override fun onReviewRemoved(position: Int) {
+        reviewList.removeAt(position)
+        binding.totalReview.text = reviewList.size.toString()
+        adapter.notifyDataSetChanged()
     }
 }
