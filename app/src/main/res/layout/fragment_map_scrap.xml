@@ -5,10 +5,66 @@
     android:layout_height="match_parent"
     tools:context=".MapScrapFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="25dp"
+        android:text="스크랩 목록 보기"
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        android:fontFamily="@font/notosans_bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/line_main"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="내가 스크랩 한 음식점 총 "
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            android:fontFamily="@font/notosans_semibold" />
+
+        <TextView
+            android:id="@+id/totalScrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/main"
+            android:textSize="14dp"
+            android:fontFamily="@font/notosans_bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="곳"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            android:fontFamily="@font/notosans_semibold" />
+    </LinearLayout>
+
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_marginTop="85dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/my_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
 
 </FrameLayout>
