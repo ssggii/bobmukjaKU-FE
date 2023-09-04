@@ -1,11 +1,13 @@
 package com.example.bobmukjaku
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 
 class ChatActivity : AppCompatActivity() {
@@ -48,6 +51,7 @@ class ChatActivity : AppCompatActivity() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -58,9 +62,9 @@ class ChatActivity : AppCompatActivity() {
             val job = CoroutineScope(Dispatchers.IO).async {
                 myInfo = getMyInfoFromServer()
             }.await()
+            initRecyclerView()
             initFirebase()
             registerMyInfoIntoFirebase()
-            initRecyclerView()
             initLayout()
         }
     }
@@ -153,6 +157,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
 
         binding.apply {
@@ -242,13 +247,10 @@ class ChatActivity : AppCompatActivity() {
                 menuDrawer.openDrawer(Gravity.RIGHT)
             }
 
+            //message전송
             sendMsg.setOnClickListener {
-
-
-
-                //message전송
-                sendMsg.setOnClickListener {
                     //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
+                    Log.i("kimsend", "send")
 
                     val message = this.message.text.toString()
                     this.message.setText("")
@@ -276,22 +278,7 @@ class ChatActivity : AppCompatActivity() {
                         }
 
                     })
-
-
-//                    FirebaseMessaging.getInstance().subscribeToTopic("111111")
-//                        .addOnCompleteListener {task->
-//                            var msg = "Subscribed"
-//                            if(!task.isSuccessful){
-//                                msg = "Subscribed failed"
-//                            }
-//                            Log.i("kim", msg)
-//                            Toast.makeText(this@ChatActivity, msg, Toast.LENGTH_SHORT).show()
-//                        }
-//                        .addOnCanceledListener {
-//                            Log.i("kim", "canceled")
-//                        }
                 }
-            }
         }
     }
 
@@ -300,7 +287,7 @@ class ChatActivity : AppCompatActivity() {
         Log.i("kim", "BBB")
         //채팅 RecyclerView초기화
         val layoutManager = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
-        layoutManager.stackFromEnd = true
+        //layoutManager.stackFromEnd = true
         binding.chatRecyclerView.layoutManager = layoutManager
         adapter = ChatAdapter(chatItem, myInfo)
         binding.chatRecyclerView.adapter = adapter
