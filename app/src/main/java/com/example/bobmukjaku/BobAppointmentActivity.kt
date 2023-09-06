@@ -2,8 +2,12 @@ package com.example.bobmukjaku
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
+import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.DatePicker
@@ -11,12 +15,31 @@ import android.widget.TextView
 import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.bobmukjaku.databinding.ActivityBobAppointmentBinding
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.NaverMap
+import com.naver.maps.map.overlay.Marker
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class BobAppointmentActivity : AppCompatActivity() {
     lateinit var binding: ActivityBobAppointmentBinding
+    private lateinit var viewModel: MapListViewModel
+
+    override fun onAttachFragment(childFragment: Fragment) {
+        super.onAttachFragment(childFragment)
+        attachContextToViewModel(childFragment.requireContext())
+    }
+
+    private fun attachContextToViewModel(context: Context) {
+        val repository = RestaurantRepository()
+        val viewModelFactory = MapListViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory)[MapListViewModel::class.java]
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +60,42 @@ class BobAppointmentActivity : AppCompatActivity() {
             setCompleteBtn.setOnClickListener{
 
             }
+
+            editText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // 사용하지 않음
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    lifecycleScope.launch {
+                        val dong = listOf(
+                            "11215710",
+                            "30110590",
+                            "11215850",
+                            "11215860",
+                            "11215870",
+                            "41390581"
+                        )
+                        val indsMclsCdList =
+                            listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
+
+                        for (lists in indsMclsCdList) {
+                            viewModel.fetchRestaurantList(lists)
+                            val restaurantList = viewModel.restaurantList.value ?: emptyList()
+
+                            for (restaurant in restaurantList) {
+                                if (restaurant.bizesNm.contains(s.toString())) {
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                    // 사용하지 않음
+                }
+            })
         }
     }
 
