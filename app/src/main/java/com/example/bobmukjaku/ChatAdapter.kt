@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,6 +8,7 @@ import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.MessageListMineBinding
 import com.example.bobmukjaku.databinding.MessageListOthersBinding
+import java.util.*
 
 class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -67,7 +69,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                 txtMessage.text = message.message
             }
             txtName.text = message.senderName
-            txtDate.text = getDateText(sendDate.toString())
+            Log.i("kkkkk",sendDate.toString())
+            txtDate.text = getTime(sendDate)
 
 //            if (message.confirmed)           //확인 여부 표시
 //                txtIsShown.visibility = View.GONE
@@ -107,6 +110,25 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
 //                    Log.i("checkShown", "성공")
 //                }
         }
+
+        fun getTime(milliseconds: Long?): String?{
+            val calendar = Calendar.getInstance()
+            if(milliseconds != null) {
+                calendar.timeInMillis = milliseconds
+                val hour = calendar[Calendar.HOUR_OF_DAY]
+                val minutes = calendar[Calendar.MINUTE]
+                when{
+                    (hour > 12) -> {
+                        return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
+                    }
+                    else->{
+                        return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
+                    }
+                }
+            }else{
+                return null
+            }
+        }
     }
 
     inner class MyMessageViewHolder(itemView: MessageListMineBinding) :       // 내 메시지용 ViewHolder
@@ -126,7 +148,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                 txtMessage.text = message.message
             }
 
-            txtDate.text = getDateText(sendDate.toString())
+            //txtDate.text = getDateText(sendDate.toString())
+            txtDate.text = getTime(sendDate)
 
 //            if (message.confirmed)
 //                txtIsShown.visibility = View.GONE
@@ -153,6 +176,25 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                 }
             }
             return dateText
+        }
+
+        fun getTime(milliseconds: Long?): String?{
+            val calendar = Calendar.getInstance()
+            if(milliseconds != null) {
+                calendar.timeInMillis = milliseconds
+                val hour = calendar[Calendar.HOUR_OF_DAY]
+                val minutes = calendar[Calendar.MINUTE]
+                when{
+                    (hour > 12) -> {
+                        return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
+                    }
+                    else->{
+                        return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
+                    }
+                }
+            }else{
+                return null
+            }
         }
     }
 }
