@@ -35,7 +35,7 @@ class ReviewActivity : AppCompatActivity() {
     val myInfo by lazy {
         intent.getSerializableExtra("myInfo") as Member
     }
-    val placeId = "placeId1234"
+    val placeId = "MA010120220805044528"
     val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "") ?: null)
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -95,10 +95,12 @@ class ReviewActivity : AppCompatActivity() {
     private fun registerReviewIntoServer(path: String) {//리뷰를 등록
         val reviewText = binding.reviewText.text.toString()
         if(reviewText != ""){
-            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, placeId,path,reviewText))
+            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, placeId,path,reviewText,"장인 닭갈비"))
             request.enqueue(object: Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.i("review", "리뷰 등록 성공")
+                    val intent = Intent(this@ReviewActivity, MainActivity::class.java)
+                    startActivity(intent)
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
