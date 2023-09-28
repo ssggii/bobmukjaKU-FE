@@ -14,11 +14,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.example.bobmukjaku.Model.Member
-import com.example.bobmukjaku.Model.RetrofitClient
-import com.example.bobmukjaku.Model.ReviewInfo
-import com.example.bobmukjaku.Model.SharedPreferences
+import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityReviewBinding
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import retrofit2.Call
@@ -35,7 +33,12 @@ class ReviewActivity : AppCompatActivity() {
     val myInfo by lazy {
         intent.getSerializableExtra("myInfo") as Member
     }
-    val placeId = "MA010120220805044528"
+    lateinit var restaurantId:String
+    lateinit var restaurantName:String
+//    val roomId by lazy{
+//        intent.getLongExtra("roomId", -1)
+//    }
+    val roomId = 1
     val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "") ?: null)
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -45,8 +48,27 @@ class ReviewActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Log.i("myInfo", myInfo.toString())//내정보 잘 전달받았는지 확인용
+        getRestaurantInfo()
         initLayout()
+
     }
+
+    private fun getRestaurantInfo() {
+        //파이어베이스에 저장돼있는 공지로부터 음식점정보를 가져온다.
+        val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
+        rf.get().addOnCompleteListener {
+            if(it.isSuccessful){
+
+                restaurantId = it.result.child("restaurantId").value.toString()
+                restaurantName = it.result.child("restaurantName").value.toString()
+                //val starttime = it.result.child("starttime").value.toString().toLong()
+                Log.i("kim", restaurantName)
+                Log.i("kim", restaurantId)
+                //Log.i("kim", starttime.toString())
+            }
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun initLayout() {
@@ -69,7 +91,7 @@ class ReviewActivity : AppCompatActivity() {
         if(bitmapForUpload != null){
             val timeStamp = System.currentTimeMillis().toString()
             val fileName = "${myInfo.uid}_${myInfo.memberNickName}_${timeStamp}.jpg"
-            val fullPath = "/${placeId}/${fileName}"
+            val fullPath = "/${restaurantId}/${fileName}"
             val ref = Firebase.storage.reference.child(fullPath)
 
             val baos = ByteArrayOutputStream()
@@ -95,7 +117,7 @@ class ReviewActivity : AppCompatActivity() {
     private fun registerReviewIntoServer(path: String) {//리뷰를 등록
         val reviewText = binding.reviewText.text.toString()
         if(reviewText != ""){
-            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, placeId,path,reviewText,"장인 닭갈비"))
+            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, restaurantId,path,reviewText,restaurantName))
             request.enqueue(object: Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.i("review", "리뷰 등록 성공")

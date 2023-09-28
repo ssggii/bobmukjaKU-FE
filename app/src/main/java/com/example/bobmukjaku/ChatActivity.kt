@@ -1,6 +1,7 @@
 package com.example.bobmukjaku
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -236,7 +237,9 @@ class ChatActivity : AppCompatActivity() {
 
             //공지화면으로
             setBobAppointment.setOnClickListener {
-
+                val intent = Intent(this@ChatActivity, BobAppointmentActivity::class.java)
+                intent.putExtra("roomId", chatRoomInfo.roomId)
+                startActivity(intent)
             }
 
             //스와이프할때 메뉴탭이 열리거나 닫히지 않도록 lock으로 초기화

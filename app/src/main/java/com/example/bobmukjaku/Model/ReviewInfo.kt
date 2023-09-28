@@ -7,5 +7,5 @@ data class ReviewInfo(
     @JsonProperty("placeId")val placeId: String,
     @JsonProperty("imageUrl")val imageUrl: String,
     @JsonProperty("contents")val contents: String,
-    @JsonProperty("placeName")val imageName: String
+    @JsonProperty("placeName")val placeName: String
 )

@@ -147,6 +147,7 @@ class GiveScoreActivity : AppCompatActivity() {
             //리뷰 화면으로 이동
             val intent = Intent(this, ReviewActivity::class.java)
             intent.putExtra("myInfo", myInfo)
+            intent.putExtra("roomId", roomId)
             startActivity(intent)
         }
     }
