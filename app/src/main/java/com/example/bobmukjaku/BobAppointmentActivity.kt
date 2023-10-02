@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.bobmukjaku.CustomTimePicker.Companion.getDisplayedMinute
+import com.example.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.example.bobmukjaku.Dto.NoticeDto
 import com.example.bobmukjaku.Model.RestaurantList
 import com.example.bobmukjaku.databinding.ActivityBobAppointmentBinding
@@ -67,15 +69,18 @@ class BobAppointmentActivity : AppCompatActivity() {
                 val restaurantList = viewModel.restaurantList.value ?: emptyList()
                 restaurants = restaurants + restaurantList
             }
-            Log.i("kkk", restaurants.size.toString())
+            Log.i("kkk", restaurants.toString())
 
             //autoCompleteTextView를 초기화
             initAutoCompleteTextView()
         }
     }
 
+    val test = arrayListOf<String>()
     //AutoCompleteTextView 초기화
     private fun initAutoCompleteTextView() {
+
+        //val adapter = ArrayAdapter(this@BobAppointmentActivity, android.R.layout.simple_spinner_dropdown_item, restaurants)
         val adapter = ArrayAdapter(this@BobAppointmentActivity, android.R.layout.simple_spinner_dropdown_item, restaurants)
         binding.apply {
            autocompleteRestaurant.setAdapter(adapter)
@@ -89,17 +94,19 @@ class BobAppointmentActivity : AppCompatActivity() {
                 showStartTimePickerDialog()
             }
 
+
             setCompleteBtn.setOnClickListener{
                 val selectedRestaurant = restaurants.find { it.bizesNm==autocompleteRestaurant.text.toString()}
 
                 if (selectedRestaurant != null) {//실제 음식점 이름을 입력했을 경우에만 공지등록
                     val restaurantId = selectedRestaurant.bizesId
                     val restaurantName = selectedRestaurant.bizesNm
+                    val newStartTime = binding.dateTime.text.toString()
 
                     //파이어베이스 realtimebase에 공지추가
                     Log.i("kim", "$roomId|$restaurantId|$restaurantName")
                     val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
-                    rf.setValue(NoticeDto(restaurantId,restaurantName, 1234L)).addOnCompleteListener {
+                    rf.setValue(NoticeDto(restaurantId,restaurantName, newStartTime)).addOnCompleteListener {
                         if(it.isSuccessful){
                             Toast.makeText(this@BobAppointmentActivity, "공지등록완료", Toast.LENGTH_SHORT).show()
 
@@ -159,16 +166,24 @@ class BobAppointmentActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun showStartTimePickerDialog() {
         showTimePickerDialog { hour, minute ->
-            val selectedTime = String.format("%02d:%02d", hour, minute)
-            //binding.startTimeArea.text = selectedTime
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun showEndTimePickerDialog() {
-        showTimePickerDialog { hour, minute ->
-            val selectedTime = String.format("%02d:%02d", hour, minute)
-            //binding.endTimeArea.text = selectedTime
+            var selectedTime = String.format("%02d:%02d", hour, minute)
+            var hour = selectedTime.substring(0,2).toInt()
+            val minute = selectedTime.substring(3,5).toInt()
+            when{
+                (hour in 0..11)->{
+                    if(hour == 0){
+                        hour=12
+                    }
+                    selectedTime = "오전 $hour:$minute"
+                }
+                (hour in 12..23)->{
+                    if(hour != 12){
+                        hour -= 12
+                    }
+                    selectedTime = "오후 $hour:$minute"
+                }
+            }
+            binding.dateTime.text = selectedTime
         }
     }
 
@@ -179,23 +194,14 @@ class BobAppointmentActivity : AppCompatActivity() {
         val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
         val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
 
+
+        timePicker.setTimeInterval(10)
+
         // 현재 시간 정보 가져오기
         val currentHour = timePicker.hour
-        val currentMinute = timePicker.minute
-        Log.i("currentHour", currentHour.toString())
+        val currentMinute = timePicker.getDisplayedMinute()
 
-        // 분을 10분 단위로 설정
-        val adjustedMinute = (currentMinute / 10) * 10
 
-        // 시간과 분 설정
-        timePicker.hour = currentHour
-        timePicker.minute = adjustedMinute
-
-        // 분을 10분 단위로 변경하기 위한 리스너 설정
-        timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
-            val adjustedMinute = (minute / 10) * 10
-            timePicker.minute = adjustedMinute
-        }
 
         val builder = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -204,11 +210,14 @@ class BobAppointmentActivity : AppCompatActivity() {
         val alertDialog = builder.create()
         alertDialog.show()
 
+
         // 확인 버튼 클릭 이벤트 처리
         yesButton.setOnClickListener {
             val hour = timePicker.hour
-            val minute = timePicker.minute
+            //val minute = timePicker.minute
+            val minute = timePicker.getDisplayedMinute()
 
+            Log.i("currentHour", "$hour : $minute")
             // 선택한 시간 정보를 콜백 함수를 통해 전달합니다.
             onTimeSet(hour, minute)
 

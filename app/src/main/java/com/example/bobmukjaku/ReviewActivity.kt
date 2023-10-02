@@ -49,12 +49,11 @@ class ReviewActivity : AppCompatActivity() {
 
         Log.i("myInfo", myInfo.toString())//내정보 잘 전달받았는지 확인용
         getRestaurantInfo()
-        initLayout()
-
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getRestaurantInfo() {
-        //파이어베이스에 저장돼있는 공지로부터 음식점정보를 가져온다.
+        //파이어베이스에 저장되어있는 공지로부터 음식점정보를 가져온다.
         val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
         rf.get().addOnCompleteListener {
             if(it.isSuccessful){
@@ -65,6 +64,8 @@ class ReviewActivity : AppCompatActivity() {
                 Log.i("kim", restaurantName)
                 Log.i("kim", restaurantId)
                 //Log.i("kim", starttime.toString())
+
+                initLayout()
             }
         }
     }
@@ -74,6 +75,8 @@ class ReviewActivity : AppCompatActivity() {
     private fun initLayout() {
 
         binding.apply{
+
+            placeName.setText(restaurantName)
             imageBtn.setOnClickListener {
                 //해당 버튼을 누르면 갤러리or사진촬영으로 bitmap(리뷰이미지)를 선택
                 cameraAction()

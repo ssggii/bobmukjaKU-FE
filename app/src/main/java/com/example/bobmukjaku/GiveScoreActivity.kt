@@ -38,6 +38,7 @@ class GiveScoreActivity : AppCompatActivity() {
 
         try{
             roomId = intent.getLongExtra("roomId", -1)
+            Log.i("roomroom", "$roomId")
         }catch (e: Exception){
             Log.i("errorMessage", "roomId문제 ${e.message}")
         }
@@ -95,6 +96,7 @@ class GiveScoreActivity : AppCompatActivity() {
         val response = request.execute()
         if(response.isSuccessful){
             val participantList = response.body()
+            Log.i("참여자", participantList.toString())
             if(!participantList.isNullOrEmpty()){
                 for(participant in participantList){
                     if(myInfo.uid == participant.uid)continue

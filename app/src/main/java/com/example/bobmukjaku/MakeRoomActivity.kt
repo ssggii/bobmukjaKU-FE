@@ -17,7 +17,12 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityMakeRoomBinding
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -131,25 +136,24 @@ class MakeRoomActivity : AppCompatActivity() {
                         if(topic.isNotEmpty()) {
                             FirebaseMessaging.getInstance().subscribeToTopic(topic)
                                 .addOnSuccessListener {
-                                    Toast.makeText(
-                                        this@MakeRoomActivity,
-                                        "구독성공",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(this@MakeRoomActivity, "구독성공", Toast.LENGTH_SHORT).show()
                                     Log.i("fcmmessage", "구독성공")
+
+                                    //파이어베이스에도 자신을 참가자로 등록
+                                    val job = CoroutineScope(Dispatchers.IO).launch{
+                                        registerMyInfoIntoFirebase(insertedChatRoom?.roomId!!)
+                                        val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
+                                        startActivity(intent)
+                                    }
                                 }
                                 .addOnFailureListener {
-                                    Toast.makeText(
-                                        this@MakeRoomActivity,
-                                        "구독실패",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(this@MakeRoomActivity, "구독실패", Toast.LENGTH_SHORT).show()
                                     Log.i("fcmmessage", "구독실패")
                                 }
                         }
 
-                        val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
-                        startActivity(intent)
+//                        val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
+//                        startActivity(intent)
                     } else if (response.code() == 400) { // 데이터 삽입 실패
                         // 400 error code (Bad Request)
                         Toast.makeText(this@MakeRoomActivity, "모집방 개설 실패. 에러 400", Toast.LENGTH_SHORT).show()
@@ -167,6 +171,10 @@ class MakeRoomActivity : AppCompatActivity() {
             })
         }
     }
+
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun showStartTimePickerDialog() {
@@ -344,5 +352,27 @@ class MakeRoomActivity : AppCompatActivity() {
                 binding.P6.setTextColor(ContextCompat.getColor(this, R.color.white))
             }
         }
+    }
+
+    //내정보 가져오기
+    private fun getMyInfoFromServer(): Member{
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        //서버에서 내정보 가져오기
+        val request = RetrofitClient.memberService.selectOne(
+            "Bearer $accessToken")
+        val response = request.execute()
+        return response.body()!!
+    }
+
+    private val myInfo by lazy {
+        getMyInfoFromServer()
+    }
+
+    //방에 입장할 떄 파이어베이스에도 자신의 정보 업데이트
+    private fun registerMyInfoIntoFirebase(chatRoomId: Long) {
+        val rf = Firebase.database.getReference("chatRoom/$chatRoomId/participants")
+
+        //나를 참가자로 등록
+        rf.child(myInfo.uid.toString()).setValue(myInfo)
     }
 }

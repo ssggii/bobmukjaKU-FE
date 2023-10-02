@@ -8,4 +8,8 @@ data class RestaurantList(
     var lnoAdr: String,
     var lat: Double,
     var lon: Double
-)
+){
+    override fun toString(): String {
+        return bizesNm
+    }
+}

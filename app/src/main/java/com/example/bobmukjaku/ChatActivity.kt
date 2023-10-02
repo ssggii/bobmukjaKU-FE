@@ -17,6 +17,7 @@ import com.example.bobmukjaku.databinding.ActivityChatBinding
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
@@ -65,9 +66,35 @@ class ChatActivity : AppCompatActivity() {
             }.await()
             initRecyclerView()
             initFirebase()
+            initNotice()
             registerMyInfoIntoFirebase()
             initLayout()
         }
+    }
+
+    fun initNotice(){
+        val mrf = rf.child("notice")
+
+        val childEventListener = object:ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.i("noticefb", snapshot.value.toString())
+                val noticeValue = snapshot.value
+                if(noticeValue != null){
+                    val restaurantName = snapshot.child("restaurantName").value.toString()
+                    val startTime = snapshot.child("starttime").value.toString()
+                    binding.noticeContent.text = "$restaurantName\n$startTime"
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+
+        }
+
+        mrf.addValueEventListener(childEventListener)
     }
 
     private fun registerMyInfoIntoFirebase() {
