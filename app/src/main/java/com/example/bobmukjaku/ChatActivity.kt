@@ -47,6 +47,12 @@ class ChatActivity : AppCompatActivity() {
             intent.getIntExtra("currentNum", -1)
         )
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("aaa", "destroy")
+    }
+
     var chatItem:ArrayList<ChatModel> = arrayListOf<ChatModel>()//채팅 저장 배열
     var participantsMenuList = arrayListOf<WrapperInChatRoomMenu>()//참가자 목록 저장 배열
     private val rf by lazy {Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}")}
@@ -153,12 +159,15 @@ class ChatActivity : AppCompatActivity() {
                 val senderUid = snapshot.child("senderUid").value.toString().toLong()
                 val senderName = snapshot.child("senderName").value.toString()
                 val time = snapshot.child("time").value.toString().toLong()
-                val isShareMessage = snapshot.child("isShareMessage").value.toString().toBoolean()
+                val isShareMessage = snapshot.child("shareMessage").value.toString().toBoolean()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
-                val isProfanity = snapshot.child("isProfanity").value.toString().toBoolean()
+                val isProfanity = snapshot.child("profanity").value.toString().toBoolean()
+                Log.i("kim", "$message&&$isShareMessage")
+
                 chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
+
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
@@ -277,40 +286,72 @@ class ChatActivity : AppCompatActivity() {
                 menuDrawer.openDrawer(Gravity.RIGHT)
             }
 
-            //message전송
+                    //message전송
             sendMsg.setOnClickListener {
-                    //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
-                    Log.i("kimsend", "send")
 
-                    val message = this.message.text.toString()
-                    this.message.setText("")
-                    val accessToken = SharedPreferences.getString("accessToken", "")!!
+                //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
+                //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
+                Log.i("kimsend", "send")
 
-                    //val service = retrofit.create(UserApi::class.java)
-                    val request = RetrofitClient.memberService.sendMessage(
-                        "Bearer $accessToken",
-                        ChatModel(message,
-                            myInfo.uid,
-                            myInfo.memberNickName,
-                            System.currentTimeMillis(),
-                            false,
-                            chatRoomInfo?.roomId,
-                        isProfanity = false)
-                    )
+                val message = this.message.text.toString()
 
-                    request.enqueue(object: Callback<Unit>{
-                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                            Toast.makeText(this@ChatActivity, "메시지 전송 성공", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-                            Toast.makeText(this@ChatActivity, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
-                        }
-
-                    })
+                if (message.isNotEmpty()){
+                   sendMessage(message, false)//일반 메시지 전송
+                }else{
+                    //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
+                    val intent = Intent(this@ChatActivity, TestActivity::class.java)
+                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
                 }
+            }
         }
     }
+
+
+    //일반 메시지 전송 메서드
+    private fun sendMessage(message: String, isSharingMessage: Boolean){
+
+        binding.message.setText("")
+        val accessToken = SharedPreferences.getString("accessToken", "")!!
+
+        Log.i("kim", isSharingMessage.toString())
+        val request = RetrofitClient.memberService.sendMessage(
+            "Bearer $accessToken",
+            ChatModel(
+                message,
+                myInfo.uid,
+                myInfo.memberNickName,
+                System.currentTimeMillis(),
+                isSharingMessage,
+                chatRoomInfo?.roomId,
+                profanity = false
+            )
+        )
+        request.enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Toast.makeText(this@ChatActivity, "메시지 전송 성공", Toast.LENGTH_SHORT).show()
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Toast.makeText(this@ChatActivity, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    //맛지도에서 음식점 공유메시지를 누르고 ChatActivity로 돌아왔을 때 수행할 콜백 등록
+    private val shareMessageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode == Activity.RESULT_OK){
+            val placeName = it.data?.getStringExtra("placeName")
+            val placeAddress = it.data?.getStringExtra("placeAddress")
+            val imageUrl = it.data?.getStringExtra("imageUrl")
+            //Log.i("testActivity", "$placeName | $placeAddress | $imageUrl")
+
+            //음식점 공유메시지 전송
+            //sendMessage("", true, RestaurantInfoForShareMessage(placeName, placeAddress, imageUrl))
+            val message = "$placeName|$placeAddress|$imageUrl"
+            sendMessage(message, true)
+        }
+    }
+
+
 
 
     private fun initRecyclerView() {

@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,12 +9,17 @@ import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.MessageListMineBinding
 import com.example.bobmukjaku.databinding.MessageListOthersBinding
+import com.example.bobmukjaku.databinding.SharemessageMineBinding
+import com.example.bobmukjaku.databinding.SharemessageOtherBinding
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.util.*
 
 class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
+
             1 -> {            //메시지가 내 메시지인 경우
                 val view =
                     LayoutInflater.from(parent.context)
@@ -21,11 +27,26 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
 
                 MyMessageViewHolder(MessageListMineBinding.bind(view))
             }
-            else -> {      //메시지가 상대 메시지인 경우
+            2->{
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.sharemessage_mine, parent, false)   //내 메시지 레이아웃으로 초기화
+
+                MyShareMessageViewHolder(SharemessageMineBinding.bind(view))
+            }
+            3 -> {      //메시지가 상대 메시지인 경우
                 val view =
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.message_list_others, parent, false)  //상대 메시지 레이아웃으로 초기화
                 OtherMessageViewHolder(MessageListOthersBinding.bind(view))
+            }
+            else ->{
+                //미완성
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.sharemessage_other, parent, false)   //내 메시지 레이아웃으로 초기화
+
+                OtherShareMessageViewHolder(SharemessageOtherBinding.bind(view))
             }
         }
     }
@@ -35,9 +56,22 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
     }
 
     // 여기 아래 부분 새로 추가 (실제 실행 시 반영 X) 07/31
+//    override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
+//        //return if (items[position].senderUid.equals(myUid)) 1 else 0
+//        return if (items[position].senderUid == myInfo.uid) 1 else 0
+//    }
+
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
         //return if (items[position].senderUid.equals(myUid)) 1 else 0
-        return if (items[position].senderUid == myInfo.uid) 1 else 0
+        return if ((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == false)){
+            1
+        }else if((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == true)){
+            2
+        }else if((items[position].senderUid != myInfo.uid)&&(items[position].shareMessage == false)){
+            3
+        }else{
+            4
+        }
     }
 
 
@@ -45,10 +79,14 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
 //        holder.binding.tvName.text = items[position].senderName
 //        holder.binding.tvMessage.text = items[position].message
 
-        if (items[position].senderUid == myInfo.uid) {       //레이아웃 항목 초기화
+        if ((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == false)) {       //레이아웃 항목 초기화
             (holder as MyMessageViewHolder).bind(position)
-        } else {
+        }else if((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == true)){
+            (holder as MyShareMessageViewHolder).bind(position)
+        }else if((items[position].senderUid != myInfo.uid) && (items[position].shareMessage == false)){
             (holder as OtherMessageViewHolder).bind(position)
+        }else{
+            (holder as OtherShareMessageViewHolder).bind(position)
         }
     }
 
@@ -63,7 +101,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
             var message = items[position]
             var sendDate = message.time
 
-            if(items[position].isProfanity){
+            if(items[position].profanity){
                 txtMessage.text = "욕설이 감지됐습니다."
             }else {
                 txtMessage.text = message.message
@@ -110,26 +148,90 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
 //                    Log.i("checkShown", "성공")
 //                }
         }
+    }
 
-        fun getTime(milliseconds: Long?): String?{
-            val calendar = Calendar.getInstance()
-            if(milliseconds != null) {
-                calendar.timeInMillis = milliseconds
-                val hour = calendar[Calendar.HOUR_OF_DAY]
-                val minutes = calendar[Calendar.MINUTE]
-                when{
-                    (hour > 12) -> {
-                        return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
-                    }
-                    else->{
-                        return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
-                    }
+    fun getTime(milliseconds: Long?): String?{
+        val calendar = Calendar.getInstance()
+        if(milliseconds != null) {
+            calendar.timeInMillis = milliseconds
+            val hour = calendar[Calendar.HOUR_OF_DAY]
+            val minutes = calendar[Calendar.MINUTE]
+            when{
+                (hour > 12) -> {
+                    return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
                 }
-            }else{
-                return null
+                else->{
+                    return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
+                }
             }
+        }else{
+            return null
         }
     }
+
+    inner class OtherShareMessageViewHolder(itemView: SharemessageOtherBinding) :
+        RecyclerView.ViewHolder(itemView.root){
+
+            var restaurantNameTxt = itemView.restaurantName
+            var restaurantAddressTxt = itemView.restaurantAddress
+            var reviewImg = itemView.reviewImg
+            var timeTxt = itemView.txtDate
+            var nameTxt = itemView.tvName
+
+            fun bind(position: Int){
+                var contentList = items[position].message!!.split("|")
+                var restaurantName = contentList[0]
+                var restaurantAddress = contentList[1]
+                var imageUrl = contentList[2]
+
+
+                nameTxt.text = items[position].senderName
+                restaurantNameTxt.text = restaurantName
+                restaurantAddressTxt.text = restaurantAddress
+                timeTxt.text = getTime(items[position].time)
+                val rf = Firebase.storage.reference.child(imageUrl)
+                val ONE_MEGABYTE: Long = 1024 * 1024
+                rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                    Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
+                    val reviewImagelayoutparams = reviewImg.layoutParams
+                    reviewImagelayoutparams.width = bitmap.width * 60 / 100
+                    reviewImagelayoutparams.height = bitmap.height * 60 / 100
+                    reviewImg.layoutParams = reviewImagelayoutparams
+                    reviewImg.setImageBitmap(bitmap)
+                }
+            }
+        }
+
+    inner class MyShareMessageViewHolder(itemView: SharemessageMineBinding) :
+        RecyclerView.ViewHolder(itemView.root){
+            var restaurantNameTxt = itemView.restaurantName
+            var restaurantAddressTxt = itemView.restaurantAddress
+            var reviewImg = itemView.reviewImg
+            var timeTxt = itemView.txtDate
+            fun bind(position: Int){
+                var contentList = items[position].message!!.split("|")
+                var restaurantName = contentList[0]
+                var restaurantAddress = contentList[1]
+                var imageUrl = contentList[2]
+
+
+                restaurantNameTxt.text = restaurantName
+                restaurantAddressTxt.text = restaurantAddress
+                timeTxt.text = getTime(items[position].time)
+                val rf = Firebase.storage.reference.child(imageUrl)
+                val ONE_MEGABYTE: Long = 1024 * 1024
+                rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                    Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
+                    val reviewImagelayoutparams = reviewImg.layoutParams
+                    reviewImagelayoutparams.width = bitmap.width * 60 / 100
+                    reviewImagelayoutparams.height = bitmap.height * 60 / 100
+                    reviewImg.layoutParams = reviewImagelayoutparams
+                    reviewImg.setImageBitmap(bitmap)
+                }
+            }
+        }
 
     inner class MyMessageViewHolder(itemView: MessageListMineBinding) :       // 내 메시지용 ViewHolder
         RecyclerView.ViewHolder(itemView.root) {
@@ -142,7 +244,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
             var message = items[position]
             var sendDate = message.time
 
-            if(items[position].isProfanity){
+            if(items[position].profanity){
                 txtMessage.text = "욕설이 감지됐습니다."
             }else {
                 txtMessage.text = message.message
@@ -176,25 +278,6 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                 }
             }
             return dateText
-        }
-
-        fun getTime(milliseconds: Long?): String?{
-            val calendar = Calendar.getInstance()
-            if(milliseconds != null) {
-                calendar.timeInMillis = milliseconds
-                val hour = calendar[Calendar.HOUR_OF_DAY]
-                val minutes = calendar[Calendar.MINUTE]
-                when{
-                    (hour > 12) -> {
-                        return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
-                    }
-                    else->{
-                        return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
-                    }
-                }
-            }else{
-                return null
-            }
         }
     }
 }
