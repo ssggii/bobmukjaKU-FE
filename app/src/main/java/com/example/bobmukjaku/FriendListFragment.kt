@@ -2,64 +2,85 @@ package com.example.bobmukjaku
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.example.bobmukjaku.Dto.FriendInfoDto
+import com.example.bobmukjaku.Model.*
+import com.example.bobmukjaku.databinding.FragmentFriendListBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FriendListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FriendListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class FriendListFragment : Fragment(), FriendListAdapter.OnFriendRemovedListener {
 
     lateinit var mContext: Context
+    lateinit var binding: FragmentFriendListBinding
+    lateinit var adapter: FriendListAdapter
+    var friendList = mutableListOf<FriendInfoDto>()
+
+    var uid: Long = 0
+
+    private val friendService = RetrofitClient.friendService
+    private val accessToken = SharedPreferences.getString("accessToken", "")
+    private val authorizationHeader = "Bearer $accessToken"
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_friend_list, container, false)
+        binding = FragmentFriendListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FriendListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FriendListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        getUid()
+    }
+
+    private fun getUid() {
+        val memberService = RetrofitClient.memberService
+
+        val call = accessToken?.let { memberService.selectOne(authorizationHeader) }
+        call?.enqueue(object : Callback<Member> {
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if (response.isSuccessful) {
+                    val member = response.body()
+                    val uidInfo = member?.uid
+                    if (uidInfo != null) {
+                        uid = uidInfo
+//                        getScrapList()
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        requireContext(),
+                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
+
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[uid 로드 실패: ]", it1) }
+            }
+        })
+    }
+
+    override fun onFriendRemoved(position: Int) {
+        friendList.removeAt(position)
+        binding.totalFriend.text = friendList.size.toString()
+        adapter.notifyDataSetChanged()
     }
 }
