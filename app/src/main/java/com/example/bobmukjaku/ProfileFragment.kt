@@ -353,18 +353,23 @@ class ProfileFragment : Fragment() {
                     var level = member?.rate.toString().toInt()
                     if (level <= 20) {
                         binding.level.text = "1"
+                        binding.profileImg.setBackgroundResource(R.drawable.ku_1)
                     } else if (level <= 40) {
                         level -= 20
                         binding.level.text = "2"
+                        binding.profileImg.setBackgroundResource(R.drawable.ku_2)
                     } else if (level <= 60) {
                         level -= 40
                         binding.level.text = "3"
+                        binding.profileImg.setBackgroundResource(R.drawable.ku_3)
                     } else if (level <= 80) {
                         level -= 60
                         binding.level.text = "4"
+                        binding.profileImg.setBackgroundResource(R.drawable.ku_4)
                     } else {
                         level -= 80
                         binding.level.text = "5"
+                        binding.profileImg.setBackgroundResource(R.drawable.ku_5)
                     }
 
                     val levelProgressBar = binding.greenLevel
