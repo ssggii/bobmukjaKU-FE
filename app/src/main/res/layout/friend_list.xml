@@ -24,7 +24,6 @@
         android:padding="10dp"
         android:src="@drawable/ku_3"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/linear_itemChatting"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
