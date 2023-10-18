@@ -5,11 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bobmukjaku.Dto.BlockInfoDto
 import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Model.*
+import com.example.bobmukjaku.databinding.BlockListBinding
 import com.example.bobmukjaku.databinding.FriendListBinding
 
-class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListener: OnFriendRemovedListener): RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
+class BlockAdapter(var items: List<BlockInfoDto>, var onBlockRemovedListener: OnBlockRemovedListener): RecyclerView.Adapter<BlockAdapter.ViewHolder>() {
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, friendInfo: FriendInfoDto)
@@ -17,26 +19,26 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListe
 
     var onItemClickListener:OnItemClickListener? = null
 
-    interface OnFriendRemovedListener {
-        fun onFriendRemoved(position: Int)
+    interface OnBlockRemovedListener {
+        fun onBlockRemoved(position: Int)
     }
 
-    inner class ViewHolder(var binding: FriendListBinding): RecyclerView.ViewHolder(binding.root){
+    inner class ViewHolder(var binding: BlockListBinding): RecyclerView.ViewHolder(binding.root){
     }
 
-    fun updateItems(newItems: List<FriendInfoDto>) {
+    fun updateItems(newItems: List<BlockInfoDto>) {
         items = newItems
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = FriendListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = BlockListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        val friendInfo = items[position]
-        val bgResourceId = when (friendInfo.friendProfileColor) {
+        val blockInfo = items[position]
+        val bgResourceId = when (blockInfo.blockProfileColor) {
             "bg1" -> R.drawable.bg1
             "bg2" -> R.drawable.bg2
             "bg3" -> R.drawable.bg3
@@ -60,9 +62,9 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListe
         }
 
         holder.binding.imgProfileBg.setBackgroundResource(bgResourceId)
-        holder.binding.tvItemChattingName.text = friendInfo.friendNickname
+        holder.binding.tvItemChattingName.text = blockInfo.blockNickname
 
-        var level = friendInfo.friendRate.toString().toInt()
+        var level = blockInfo.blockRate.toString().toInt()
         if (level <= 20) {
             holder.binding.level.text = "1"
             holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_1)
