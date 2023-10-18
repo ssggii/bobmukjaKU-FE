@@ -4,24 +4,15 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FriendListBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class FriendListAdapter(var items: List<FriendInfoDto>, var uid: Long, var onFriendRemovedListener: OnFriendRemovedListener): RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
-
-    private val accessToken = SharedPreferences.getString("accessToken", "")
-    private val authorizationHeader = "Bearer $accessToken"
+class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListener: OnFriendRemovedListener): RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
 
     interface OnItemClickListener{
-        fun onItemClick(pos: Int, scrapInfo: ScrapPost)
+        fun onItemClick(pos: Int, friendInfo: FriendInfoDto)
     }
 
     var onItemClickListener:OnItemClickListener? = null
@@ -45,73 +36,53 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var uid: Long, var onFri
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val friendInfo = items[position]
+        val bgResourceId = when (friendInfo.friendProfileColor) {
+            "bg1" -> R.drawable.bg1
+            "bg2" -> R.drawable.bg2
+            "bg3" -> R.drawable.bg3
+            "bg4" -> R.drawable.bg4
+            "bg5" -> R.drawable.bg5
+            "bg6" -> R.drawable.bg6
+            "bg7" -> R.drawable.bg7
+            "bg8" -> R.drawable.bg8
+            "bg9" -> R.drawable.bg9
+            "bg10" -> R.drawable.bg10
+            "bg11" -> R.drawable.bg11
+            "bg12" -> R.drawable.bg12
+            "bg13" -> R.drawable.bg13
+            "bg14" -> R.drawable.bg14
+            "bg15" -> R.drawable.bg15
+            "bg16" -> R.drawable.bg16
+            "bg17" -> R.drawable.bg17
+            "bg18" -> R.drawable.bg18
+            // 다른 리소스에 대한 처리 추가
+            else -> R.drawable.bg1 // 디폴트 리소스 ID 또는 오류 처리 리소스 사용
+        }
 
-//        holder.binding.name.text = scrapInfo.placeName
-//
-//        // 리뷰 목록 API
-//        val call = RetrofitClient.restaurantService.getRestaurantReview(authorizationHeader, scrapInfo.placeId)
-//        call.enqueue(object : Callback<List<ReviewResponse>> {
-//            override fun onResponse(call: Call<List<ReviewResponse>>, response: Response<List<ReviewResponse>>) {
-//                if (response.isSuccessful) {
-//                    val reviewListResponse = response.body() // 서버에서 받은 리뷰 목록
-//                    if (reviewListResponse != null) {
-//                        reviewList.clear()
-//                        reviewList.addAll(reviewListResponse) // reviewList에 업데이트된 리뷰 목록 저장
-//                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
-//
-//                        holder.binding.totalReview.text = reviewList.size.toString()
-//                    }
-//                    val successCode = response.code()
-//                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드. 성공 $successCode $scrapInfo.placeId", Toast.LENGTH_SHORT).show()
-//                } else {
-//                    val errorCode = response.code()
-//                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<ReviewResponse>>, t: Throwable) {
-//                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-//                t.message?.let { it1 -> Log.i("[음식점 리뷰 목록 로드 에러: ]", it1) }
-//            }
-//        })
-//
-//        holder.binding.reviewList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.VERTICAL, false)
-//        reviewAdapter = ScrapReviewListAdapter(reviewList)
-//        reviewAdapter.onItemClickListener = object : ScrapReviewListAdapter.OnItemClickListener {
-//            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
-//            }
-//        }
-//        holder.binding.reviewList.adapter = reviewAdapter
-//
-//        // 스크랩 버튼 이벤트
-//        holder.binding.scrapBtn.setOnClickListener {
-//            val scrapInfo = ScrapInfo(uid = uid, placeId = items[position].placeId)
-//            RetrofitClient.restaurantService.deleteScrap(authorizationHeader, scrapInfo).enqueue(object :
-//                Callback<Void> {
-//                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-//                    if (response.isSuccessful) {
-//                        // 성공적으로 스크랩 해제 완료
-//                        holder.binding.scrapBtn.backgroundTintList = ContextCompat.getColorStateList(holder.binding.root.context, R.color.main)
-//                        Toast.makeText(holder.binding.root.context, "스크랩 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-//
-//                        // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
-//                        onScrapRemovedListener.onScrapRemoved(position)
-//                    } else {
-//                        val errorCode = response.code()
-//                        Toast.makeText(
-//                            holder.binding.root.context,
-//                            "스크랩 해제에 실패했습니다. 에러 코드: $errorCode",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<Void>, t: Throwable) {
-//                    // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-//                    t.message?.let { Log.i("[스크랩 해제 실패: ]", it) }
-//                }
-//            })
-//        }
+        holder.binding.imgProfileBg.setBackgroundResource(bgResourceId)
+        holder.binding.tvItemChattingName.text = friendInfo.friendNickname
+
+        var level = friendInfo.friendRate.toString().toInt()
+        if (level <= 20) {
+            holder.binding.level.text = "1"
+            holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_1)
+        } else if (level <= 40) {
+            level -= 20
+            holder.binding.level.text = "2"
+            holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_2)
+        } else if (level <= 60) {
+            level -= 40
+            holder.binding.level.text = "3"
+            holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_3)
+        } else if (level <= 80) {
+            level -= 60
+            holder.binding.level.text = "4"
+            holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_4)
+        } else {
+            level -= 80
+            holder.binding.level.text = "5"
+            holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_5)
+        }
     }
 
     override fun getItemCount(): Int {
