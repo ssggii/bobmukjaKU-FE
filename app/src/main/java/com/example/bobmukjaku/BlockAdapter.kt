@@ -4,14 +4,23 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Dto.BlockInfoDto
 import com.example.bobmukjaku.Dto.FriendInfoDto
+import com.example.bobmukjaku.Dto.FriendUpdateDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.BlockListBinding
 import com.example.bobmukjaku.databinding.FriendListBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class BlockAdapter(var items: List<BlockInfoDto>, var onBlockRemovedListener: OnBlockRemovedListener): RecyclerView.Adapter<BlockAdapter.ViewHolder>() {
+
+    private val accessToken = SharedPreferences.getString("accessToken", "")
+    private val authorizationHeader = "Bearer $accessToken"
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, friendInfo: FriendInfoDto)
@@ -84,6 +93,35 @@ class BlockAdapter(var items: List<BlockInfoDto>, var onBlockRemovedListener: On
             level -= 80
             holder.binding.level.text = "5"
             holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_5)
+        }
+
+        // 차단 해제 버튼 이벤트
+        holder.binding.blockBtn.setOnClickListener {
+            val blockInfo = FriendUpdateDto(friendUid = blockInfo.blockUid)
+            RetrofitClient.friendService.removeBlock(authorizationHeader, blockInfo).enqueue(object :
+                Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        // 성공적으로 차단 해제 완료
+                        Toast.makeText(holder.binding.root.context, "차단 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                        // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
+                        onBlockRemovedListener.onBlockRemoved(position)
+                    } else {
+                        val errorCode = response.code()
+                        Toast.makeText(
+                            holder.binding.root.context,
+                            "차단 해제에 실패했습니다. 에러 코드: $errorCode",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                    t.message?.let { Log.i("[스크랩 해제 실패: ]", it) }
+                }
+            })
         }
     }
 
