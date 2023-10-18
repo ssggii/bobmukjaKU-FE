@@ -21,6 +21,8 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bobmukjaku.Dto.BlockInfoDto
+import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentChatBinding
 import retrofit2.Call
@@ -38,9 +40,12 @@ class ChatFragment : Fragment() {
     lateinit var adapter4: ChatRoomAllListAdapter // 전체 필터링
     var chatMyList = mutableListOf<ChatRoom>()
     var chatAllList = mutableListOf<ChatRoom>()
+    var friendList = mutableListOf<FriendInfoDto>()
+    var blockList = mutableListOf<BlockInfoDto>()
     var uid: Long = 0
 
     private val chatroomService = RetrofitClient.chatRoomService
+    private val friendService = RetrofitClient.friendService
     private val accessToken = SharedPreferences.getString("accessToken", "")
     private val authorizationHeader = "Bearer $accessToken"
 
@@ -73,6 +78,8 @@ class ChatFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun init() {
+        getFriendList()
+        getBlockList()
         getFilterFirstInfo() // 처음 정렬
 
         // 최신순, 오래된 순 정렬
@@ -469,6 +476,64 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun getBlockList() {
+        val call = friendService.getBlockList(authorizationHeader)
+
+        call.enqueue(object : Callback<List<BlockInfoDto>> {
+            override fun onResponse(
+                call: Call<List<BlockInfoDto>>,
+                response: Response<List<BlockInfoDto>>
+            ) {
+                if (response.isSuccessful) {
+                    val blockListResponse = response.body() // 서버에서 받은 친구 목록
+                    if (blockListResponse != null) {
+                        blockList.clear()
+                        blockList.addAll(blockListResponse) // friendList에 업데이트된 친구 목록 저장
+                    }
+                    val successCode = response.code()
+                    Log.i("내 차단 목록 로드", "성공 $blockList $successCode")
+                } else {
+                    val errorCode = response.code()
+                    Log.i("내 차단 목록 로드", "에러 $errorCode")
+                }
+            }
+
+            override fun onFailure(call: Call<List<BlockInfoDto>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[내 차단 목록 로드 에러: ]", it1) }
+            }
+        })
+    }
+
+    private fun getFriendList() {
+        val call = friendService.getFriendList(authorizationHeader)
+
+        call.enqueue(object : Callback<List<FriendInfoDto>> {
+            override fun onResponse(
+                call: Call<List<FriendInfoDto>>,
+                response: Response<List<FriendInfoDto>>
+            ) {
+                if (response.isSuccessful) {
+                    val friendListResponse = response.body() // 서버에서 받은 친구 목록
+                    if (friendListResponse != null) {
+                        friendList.clear()
+                        friendList.addAll(friendListResponse) // friendList에 업데이트된 친구 목록 저장
+                    }
+                    val successCode = response.code()
+                    Log.i("내 친구 목록 로드", "성공 $friendList $successCode")
+                } else {
+                    val errorCode = response.code()
+                    Log.i("내 친구 목록 로드", "에러 $errorCode")
+                }
+            }
+
+            override fun onFailure(call: Call<List<FriendInfoDto>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[내 친구 목록 로드 에러: ]", it1) }
+            }
+        })
+    }
+
     private fun makeChatRoom() {
         // 모집방 개설 버튼 클릭 이벤트 처리
         binding.openRoomBtn.setOnClickListener {
@@ -529,6 +594,17 @@ class ChatFragment : Fragment() {
                 if (response.isSuccessful) {
                     val filterInfo = response.body()
                     val finalFilters = mutableListOf<FilterInfo>()
+
+                    for (i in 0 until blockList.size) {
+                        Log.i("blockList", blockList[i].blockUid.toString())
+                        finalFilters.add(FilterInfo("block", blockList[i].blockUid.toString()))
+                    }
+
+                    for (i in 0 until friendList.size) {
+                        Log.i("friendList", friendList[i].friendUid.toString())
+                        finalFilters.add(FilterInfo("friend", friendList[i].friendUid.toString()))
+                    }
+
                     if (filterInfo != null) {
                         if (newFilter.filterType == "oldest") {
                             for (filter in filterInfo) {
@@ -545,7 +621,7 @@ class ChatFragment : Fragment() {
                         } else {
                             // newFilter의 타입과 다른 필터만 finalFilters에 추가
                             for (filter in filterInfo) {
-                                if (filter.filterType != newFilter.filterType) {
+                                if (filter.filterType != newFilter.filterType && filter.filterType != "block" && filter.filterType != "friend") {
                                     finalFilters.add(filter)
                                 }
                             }
@@ -641,9 +717,19 @@ class ChatFragment : Fragment() {
                     Log.i("FirstFilterInfo", filterInfo.toString())
                     if (filterInfo != null) {
                         if (filterInfo.toString() == "[]") {
-                            val filters = listOf(
-                                FilterInfo("latest", "")
-                            )
+                            val filters = mutableListOf<FilterInfo>()
+
+                            for (i in 0 until blockList.size) {
+                                filters.add(FilterInfo("block", blockList[i].blockUid.toString()))
+                            }
+
+                            for (i in 0 until friendList.size) {
+                                Log.i("friendList", friendList[i].friendUid.toString())
+                                filters.add(FilterInfo("friend", friendList[i].friendUid.toString()))
+                            }
+
+                            filters.add(FilterInfo("latest", ""))
+
                             Log.i("[]", "빈 리스트")
                             getFilteredLists(filters, chatMyList)
                         } else {
