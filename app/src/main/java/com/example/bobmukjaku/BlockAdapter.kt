@@ -5,14 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Dto.BlockInfoDto
 import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Dto.FriendUpdateDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.BlockListBinding
-import com.example.bobmukjaku.databinding.FriendListBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
