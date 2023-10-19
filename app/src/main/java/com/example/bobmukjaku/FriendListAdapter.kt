@@ -3,13 +3,22 @@ package com.example.bobmukjaku
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Dto.FriendInfoDto
+import com.example.bobmukjaku.Dto.FriendUpdateDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FriendListBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListener: OnFriendRemovedListener): RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
+
+    private val accessToken = SharedPreferences.getString("accessToken", "")
+    private val authorizationHeader = "Bearer $accessToken"
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, friendInfo: FriendInfoDto)
@@ -34,6 +43,7 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListe
         return ViewHolder(view)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val friendInfo = items[position]
         val bgResourceId = when (friendInfo.friendProfileColor) {
@@ -82,6 +92,41 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListe
             level -= 80
             holder.binding.level.text = "5"
             holder.binding.imgProfile.setBackgroundResource(R.drawable.ku_5)
+        }
+
+        // 친구 해제 스와이프 이벤트
+        holder.binding.root.setOnTouchListener { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                // 사용자가 스와이프를 시작하면 친구 해제 동작을 수행
+                val friendCheck = FriendUpdateDto(friendUid = friendInfo.friendUid)
+                RetrofitClient.friendService.removeBlock(authorizationHeader, friendCheck).enqueue(object :
+                    Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            // 성공적으로 밥친구 해제 완료
+                            Toast.makeText(holder.binding.root.context, "밥친구 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                            // 밥친구 해제한 아이템의 위치를 리스너를 통해 알림
+                            onFriendRemovedListener.onFriendRemoved(position)
+                        } else {
+                            val errorCode = response.code()
+                            Toast.makeText(
+                                holder.binding.root.context,
+                                "밥친구 해제에 실패했습니다. 에러 코드: $errorCode",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                        t.message?.let { Log.i("[밥친구 해제 실패: ]", it) }
+                    }
+                })
+                    true // 스와이프 동작을 소비
+            } else {
+                false // 다른 동작은 그대로 처리
+            }
         }
     }
 
