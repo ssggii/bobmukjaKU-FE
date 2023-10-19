@@ -2,6 +2,7 @@ package com.example.bobmukjaku.Model
 
 import android.content.Context
 import android.content.SharedPreferences
+//import android.os.Build.VERSION_CODES.R
 import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.Dto.RateUpdateDto
@@ -94,7 +95,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://192.168.56.1:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://172.30.1.63:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
@@ -132,6 +133,7 @@ object RetrofitClient {
 //SharedPreference클래스를 싱글통으로 정의
 object SharedPreferences{
     private lateinit var sharedPreferences: SharedPreferences
+
 
     fun initSharedPreferences(context: Context){
         sharedPreferences = context

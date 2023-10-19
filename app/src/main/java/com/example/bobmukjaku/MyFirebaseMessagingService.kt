@@ -57,8 +57,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         notificationManager.createNotificationChannel(notificationChannel)
         notificationManager.notify(1, notification)
     }
-
-
 }
 
 

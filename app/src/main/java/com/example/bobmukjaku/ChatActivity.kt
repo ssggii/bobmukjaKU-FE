@@ -1,17 +1,23 @@
 package com.example.bobmukjaku
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bobmukjaku.Dto.BlockInfoDto
+import com.example.bobmukjaku.Dto.FriendInfoDto
+import com.example.bobmukjaku.Dto.FriendUpdateDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityChatBinding
 import com.google.firebase.database.ChildEventListener
@@ -20,6 +26,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -34,6 +41,7 @@ class ChatActivity : AppCompatActivity() {
     lateinit var binding: ActivityChatBinding
     lateinit var adapter:ChatAdapter
     lateinit var adapter2: ChatMenuParticipantsAdapter
+    val accessToken by lazy{ SharedPreferences.getString("accessToken", "") }
 
     lateinit var myInfo: Member//내정보
     private val chatRoomInfo by lazy{//현재 방 정보
@@ -65,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        Log.i("onCreateCheck", "create!!")
         CoroutineScope(Dispatchers.Main).launch {
             val job = CoroutineScope(Dispatchers.IO).async {
                 myInfo = getMyInfoFromServer()
@@ -111,24 +119,104 @@ class ChatActivity : AppCompatActivity() {
 
         val childEventListener = object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+
                 //다른 누군가가 채팅방에 입장
                 val participantUid = snapshot.child("uid").value.toString().toLong()
                 val participantName = snapshot.child("memberNickName").value.toString()
                 val participantRate = snapshot.child("rate").value.toString().toInt()
                 val paricipantProfileColor = snapshot.child("profileColor").value.toString()
+                //var friendOrBlock = snapshot.child("friendOrBlock").value.toString()
                 //나머지 정보는 필요없을 듯
 
-                val participantInfo = Member(
-                    participantUid,
-                    null,
-                    null,
-                    participantName,
-                    null,
-                    participantRate,
-                    paricipantProfileColor)
+                var blockList : List<BlockInfoDto>
+                var friendList : List<FriendInfoDto>
+                var friendOrBlock = "na"
+                //if(friendOrBlock.isNullOrBlank()) friendOrBlock="na"//na -> 친구도 차단하지도 않음(해당사항 없음)
+                RetrofitClient.friendService.getFriendList("Bearer $accessToken")
+                    .enqueue(object: Callback<List<FriendInfoDto>>{
+                        override fun onResponse(
+                            call: Call<List<FriendInfoDto>>,
+                            response: Response<List<FriendInfoDto>>
+                        ) {
+                            //Log.i("kkkkkk", "여기까지")
+                            if(response.code() == 200 || response.code() == 204){
+                                when(response.code()){
+                                    200->{
+                                        friendList = response.body()!!
+                                        for (item in friendList) {
+                                            if (item.friendUid == participantUid){
+                                                friendOrBlock = "friend"
+                                                break
+                                            }
+                                        }
+                                    }
+                                    204->{
+                                        Log.i("aaaaaa", "친구0명")
+                                    }
+                                }
+                                //Log.i("kkkkkk", "여기까지")
+                                //if (friendOrBlock != "friend"){
+                                    RetrofitClient.friendService.getBlockList("Bearer $accessToken")
+                                        .enqueue(object : Callback<List<BlockInfoDto>> {
+                                            override fun onResponse(
+                                                call: Call<List<BlockInfoDto>>,
+                                                response: Response<List<BlockInfoDto>>
+                                            ) {
+                                                if(response.code() == 200 || response.code() == 204){
+                                                    when(response.code()){
+                                                        200->{
+                                                            blockList = response.body()!!
+                                                            //Log.i("kkkkkk", "여기까지")
+                                                            for(item in blockList){
+                                                                if(item.blockUid == participantUid) {
+                                                                    friendOrBlock = "block"
+                                                                    break
+                                                                }
+                                                            }
+                                                        }
+                                                        204->{
+                                                            Log.i("aaaaaa", "차단0명")
+                                                        }
+                                                    }
+                                                    Log.i("kkkkkk", "여기까지")
+                                                    if(participantUid != myInfo.uid) {
+                                                        val participantInfo = Member(
+                                                            participantUid,
+                                                            null,
+                                                            null,
+                                                            participantName,
+                                                            null,
+                                                            participantRate,
+                                                            paricipantProfileColor
+                                                        )
 
-                participantsMenuList.add(WrapperInChatRoomMenu(2, participantInfo))
-                adapter2.notifyDataSetChanged()
+                                                        participantsMenuList.add(
+                                                            WrapperInChatRoomMenu(
+                                                                2,
+                                                                participantInfo,
+                                                                friendOrBlock
+                                                            )
+                                                        )
+                                                        adapter2.notifyDataSetChanged()
+                                                    }
+                                                }
+                                            }
+
+                                            override fun onFailure(
+                                                call: Call<List<BlockInfoDto>>,
+                                                t: Throwable
+                                            ) {
+                                                Log.i("aaaaaa", t.message.toString())
+                                            }
+                                        })
+                                //}
+                            }
+                        }
+
+                        override fun onFailure(call: Call<List<FriendInfoDto>>, t: Throwable) {
+                            Log.i("aaaaaa", t.message.toString())
+                        }
+                    })
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -149,7 +237,6 @@ class ChatActivity : AppCompatActivity() {
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
         //val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
         val mrf = rf.child("message")
-
         chatItem.clear()
         //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
         val childEventListener = object: ChildEventListener {
@@ -162,7 +249,8 @@ class ChatActivity : AppCompatActivity() {
                 val isShareMessage = snapshot.child("shareMessage").value.toString().toBoolean()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
                 val isProfanity = snapshot.child("profanity").value.toString().toBoolean()
-                Log.i("kim", "$message&&$isShareMessage")
+                //Log.i("kim", "$message&&$isShareMessage")
+
 
                 chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
                 adapter.notifyDataSetChanged()
@@ -178,8 +266,9 @@ class ChatActivity : AppCompatActivity() {
         mrf.addChildEventListener(childEventListener)
     }
 
+
     private fun getMyInfoFromServer(): Member{
-        val accessToken = SharedPreferences.getString("accessToken", "")
+        //val accessToken = SharedPreferences.getString("accessToken", "")
         //서버에서 내정보 가져오기
         val request = RetrofitClient.memberService.selectOne(
             "Bearer $accessToken")
@@ -194,81 +283,113 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    private fun exitChatRoomDialog(){
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.join_chatroom_dialog, null)
+        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
+        val text = dialogView.findViewById<TextView>(R.id.guide_text)
+        text.text = "퇴장하시겠습니까?"
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        yesButton.setOnClickListener{
+            exitChatRoom()
+            alertDialog.dismiss()
+        }
+
+        noButton.setOnClickListener{
+            alertDialog.dismiss()
+        }
+
+    }
+
+    private fun exitChatRoom() {
+        //방 퇴장
+        RetrofitClient.chatRoomService.getRoomIdLists("Bearer $accessToken", chatRoomInfo.roomId!!)
+            .enqueue(object: Callback<ChatRoom>{
+                override fun onResponse(
+                    call: Call<ChatRoom>,
+                    response: Response<ChatRoom>
+                ) {
+                    if(response.isSuccessful){
+                        val currentParticipantsNum = response.body()?.currentNum!!
+                        //if(currentParticipantsNum > 1) {
+                            //파이어베이스에서 자신의 정보 제거
+                            rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
+                                //서버에도 나가기api를 사용하여 참가자에서 자신을 제거
+                                //val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "")!!)
+                                val exitBody = AddChatRoomMember(chatRoomInfo.roomId, myInfo.uid)
+                                val request = RetrofitClient.chatRoomService.exitChatRoom("Bearer $accessToken", exitBody)
+                                request.enqueue(object : Callback<ServerBooleanResponse> {
+                                    override fun onResponse(
+                                        call: Call<ServerBooleanResponse>,
+                                        response: Response<ServerBooleanResponse>
+                                    ) {
+                                        if (response.isSuccessful) {
+                                            when (response.code()) {
+                                                200 -> {
+
+                                                    FirebaseMessaging.getInstance()
+                                                        .unsubscribeFromTopic(chatRoomInfo.roomId.toString())
+                                                        .addOnSuccessListener {
+                                                            Log.i("exittt", "퇴장완료")
+                                                            Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
+                                                            val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                                            startActivity(intent)
+                                                        }
+                                                }
+                                                else -> {
+                                                    Log.i("exittt", "퇴장에러")
+                                                    Toast.makeText(this@ChatActivity, "퇴장에러", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        } else {
+                                            Log.i("exittt", response.code().toString())
+                                        }
+                                    }
+
+                                    override fun onFailure(
+                                        call: Call<ServerBooleanResponse>,
+                                        t: Throwable
+                                    ) {
+                                        Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
+                                    }
+                                })
+                            }
+                       // }
+                    }
+                }
+
+                override fun onFailure(call: Call<ChatRoom>, t: Throwable) {
+                    Log.i("abcabc", t.message!!)
+                }
+            })
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
 
         binding.apply {
-            setBobAppointment.setOnClickListener {
 
-            }
+            //모집방정보를 토대로 TextView를 초기화
+            chatRoomName.text = chatRoomInfo.roomName
 
             //채팅방 퇴장 버튼
             exitBtn.setOnClickListener {
-                //먼저 현재 채팅방의 남은 인원이 2명 이상인지 확인
-                val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken","")!!)
-                RetrofitClient.chatRoomService.getRoomIdLists(accessToken, chatRoomInfo.roomId!!)
-                    .enqueue(object: Callback<ChatRoom>{
-                        override fun onResponse(
-                            call: Call<ChatRoom>,
-                            response: Response<ChatRoom>
-                        ) {
-                            if(response.isSuccessful){
-                                val currentParticipantsNum = response.body()?.currentNum!!
-                                if(currentParticipantsNum > 1) {
-                                    //파이어베이스에서 자신의 정보 제거
-                                    rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
-                                        //서버에도 나가기api를 사용하여 참가자에서 자신을 제거
-                                        val accessToken =
-                                            "Bearer ".plus(SharedPreferences.getString("accessToken", "")!!)
-                                        val exitBody = AddChatRoomMember(chatRoomInfo.roomId, myInfo.uid)
-                                        val request =
-                                            RetrofitClient.chatRoomService.exitChatRoom(accessToken, exitBody)
-                                        request.enqueue(object : Callback<ServerBooleanResponse> {
-                                            override fun onResponse(
-                                                call: Call<ServerBooleanResponse>,
-                                                response: Response<ServerBooleanResponse>
-                                            ) {
-                                                if (response.isSuccessful) {
-                                                    when (response.code()) {
-                                                        200 -> {
-                                                            Log.i("exittt", "퇴장완료")
-                                                            Toast.makeText(
-                                                                this@ChatActivity,
-                                                                "퇴장완료",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                        else -> {
-                                                            Log.i("exittt", "퇴장에러")
-                                                            Toast.makeText(
-                                                                this@ChatActivity,
-                                                                "퇴장완료",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                    }
-                                                } else {
-                                                    Log.i("exittt", response.code().toString())
-                                                }
-                                            }
+                exitChatRoomDialog()
+            }
 
-                                            override fun onFailure(
-                                                call: Call<ServerBooleanResponse>,
-                                                t: Throwable
-                                            ) {
-                                                Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
-                                            }
-                                        })
-                                    }
-                                }
-                            }
-                        }
-
-                        override fun onFailure(call: Call<ChatRoom>, t: Throwable) {
-                            Log.i("abcabc", t.message!!)
-                        }
-                    })
-
+            //메인화면으로 나가기 버튼
+            backBtn.setOnClickListener{
+                val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
             }
 
             //공지화면으로
@@ -286,7 +407,7 @@ class ChatActivity : AppCompatActivity() {
                 menuDrawer.openDrawer(Gravity.RIGHT)
             }
 
-                    //message전송
+            //message전송
             sendMsg.setOnClickListener {
 
                 //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
@@ -367,15 +488,75 @@ class ChatActivity : AppCompatActivity() {
         //메뉴recyclerView 초기화
         val layoutManager2 = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
         binding.menuRecyclerview.layoutManager = layoutManager2
-        participantsMenuList.add(WrapperInChatRoomMenu(1,Member(null,null, null, null, null, null, null)))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        adapter2 = ChatMenuParticipantsAdapter(participantsMenuList, this@ChatActivity)
-        binding.menuRecyclerview.adapter = adapter2
 
+        //메뉴창상단 표시용 add
+        participantsMenuList.add(WrapperInChatRoomMenu(1,Member(null,null, null, null, null, null, null), ""))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+        adapter2 = ChatMenuParticipantsAdapter(participantsMenuList, this@ChatActivity, chatRoomInfo)
+        adapter2.onParticipantsBtnClickListener = object:ChatMenuParticipantsAdapter.OnParticipantsBtnClickListener{
+            override fun onAddClick(position: Int, uid: Long?) {
+                //Toast.makeText(this@ChatActivity, position.toString(), Toast.LENGTH_SHORT).show()
+                if(uid != null){
+                    RetrofitClient.friendService.registerFriend("Bearer $accessToken", FriendUpdateDto(uid))
+                        .enqueue(object: Callback<Unit>{
+                            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                                when(response.code()){
+                                    200->{
+                                        //파이어베이스에도 반영
+                                        //updateFriendFirebase(uid)
+                                        Toast.makeText(this@ChatActivity, "친구등록성공", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else->{
+                                        Toast.makeText(this@ChatActivity, "친구등록실패", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+
+                            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                                TODO("Not yet implemented")
+                            }
+
+                        })
+                }
+            }
+
+            override fun onBlockClick(position: Int, uid: Long?) {
+                if(uid != null){
+                    RetrofitClient.friendService.blockFriend("Bearer $accessToken", FriendUpdateDto(uid))
+                        .enqueue(object: Callback<Unit>{
+                            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                                when(response.code()){
+                                    200->{
+                                        //파이어베이스에도 반영
+                                        //updateBlockFirebase(uid)
+                                        Toast.makeText(this@ChatActivity, "차단성공", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else->{
+                                        Toast.makeText(this@ChatActivity, "차단실패", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+
+                            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                                TODO("Not yet implemented")
+                            }
+                        })
+                }
+            }
+        }
+        binding.menuRecyclerview.adapter = adapter2
     }
+
+//    private fun updateFriendFirebase(friendUid: Long){
+//        rf.child("participants/$friendUid/friendOrBlock").setValue("friend")
+//    }
+
+//    private fun updateBlockFirebase(blockUid: Long){
+//        rf.child("participants/$blockUid/friendOrBlock").setValue("block")
+//    }
 }
 
 

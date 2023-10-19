@@ -58,6 +58,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/chatRoom_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="2023/08/06"
@@ -79,6 +80,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/chatRoom_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="12:00~13:00"
@@ -99,6 +101,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/food_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="한식"
@@ -120,6 +123,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/total_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="3"
@@ -152,6 +156,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/real_starttime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="오후 13:00"
@@ -176,6 +181,7 @@
                 android:layout_marginLeft="30dp"/>
 
             <TextView
+                android:id="@+id/real_place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="내가 찜한 닭 건대점"
