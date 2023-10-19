@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="내가 리뷰 한 음식점 총 "
+            android:text="내가 리뷰한 음식점 총 "
             android:textColor="@color/black"
             android:textSize="14dp"
             android:fontFamily="@font/notosans_semibold" />

@@ -1,5 +1,7 @@
 package com.example.bobmukjaku
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,18 +13,23 @@ import com.example.bobmukjaku.Model.ReviewResponse
 import com.example.bobmukjaku.Model.ScrapInfo
 import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ReviewListBinding
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 
 class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onReviewRemovedListener: OnReviewRemovedListener): RecyclerView.Adapter<ReviewListAdapter.ViewHolder>() {
 
-    lateinit var reviewAdapter: ScrapReviewListAdapter
     private val restaurantService = RetrofitClient.restaurantService
     private val accessToken = SharedPreferences.getString("accessToken", "")
     private val authorizationHeader = "Bearer $accessToken"
-
-    var reviewList = mutableListOf<ReviewResponse>()
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, reviewInfo: ReviewResponse)
@@ -50,46 +57,40 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val reviewInfo = items[position]
         holder.binding.name.text = reviewInfo.placeName
+        holder.binding.content.text = "→ " + reviewInfo.contents
+
+        // Firebase Storage에서 이미지 다운로드
+        val imagePath = reviewInfo.imageUrl
+        CoroutineScope(Dispatchers.IO).launch {
+            val bitmap = downloadImageFromFirebaseStorage(imagePath)
+            withContext(Dispatchers.Main) {
+                if (bitmap != null) {
+                    holder.binding.reviewImage.setImageBitmap(bitmap)
+                } else {
+                    // 이미지 다운로드 실패 처리
+                    Log.i("리뷰 이미지 로드", "실패")
+                }
+            }
+        }
 
         holder.binding.deleteBtn.setOnClickListener {
             deleteReview(reviewInfo, position)
         }
-
-        // 리뷰 목록 API
-        val call = RetrofitClient.restaurantService.getRestaurantReview(authorizationHeader, reviewInfo.placeId)
-        call.enqueue(object : Callback<List<ReviewResponse>> {
-            override fun onResponse(call: Call<List<ReviewResponse>>, response: Response<List<ReviewResponse>>) {
-                if (response.isSuccessful) {
-                    val reviewListResponse = response.body() // 서버에서 받은 리뷰 목록
-                    if (reviewListResponse != null) {
-                        reviewList.clear()
-                        reviewList.addAll(reviewListResponse) // reviewList에 업데이트된 리뷰 목록 저장
-                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
-
-                        holder.binding.totalReview.text = reviewList.size.toString()
-                    }
-                    val successCode = response.code()
-                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드. 성공 $successCode $reviewInfo.placeId", Toast.LENGTH_SHORT).show()
-                } else {
-                    val errorCode = response.code()
-                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<ReviewResponse>>, t: Throwable) {
-                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[음식점 리뷰 목록 로드 에러: ]", it1) }
-            }
-        })
-
-        holder.binding.reviewList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.VERTICAL, false)
-        reviewAdapter = ScrapReviewListAdapter(reviewList)
-        reviewAdapter.onItemClickListener = object : ScrapReviewListAdapter.OnItemClickListener {
-            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
-            }
-        }
-        holder.binding.reviewList.adapter = reviewAdapter
     }
+
+    private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
+        val storageReference = Firebase.storage.reference.child(imagePath)
+        return try {
+            val maxBufferSize = 10 * 1024 * 1024 // 최대 허용 버퍼 크기를 설정 (10MB로 설정)
+            val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.e("ImageDownload", "Image download failed: ${e.message}")
+            null
+        }
+    }
+
 
     override fun getItemCount(): Int {
         return items.size
