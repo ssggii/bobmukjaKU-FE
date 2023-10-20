@@ -7,16 +7,30 @@
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp">
 
-
-    <ImageButton
-        android:id="@+id/profile_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
+    <FrameLayout
+        android:id="@+id/img_framelayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ku_3"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp">
+
+        <ImageButton
+            android:id="@+id/profild_bg"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/ku_bg"/>
+
+        <ImageButton
+            android:id="@+id/profile_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/ku_3"/>
+
+    </FrameLayout>
+
+
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
@@ -25,9 +39,9 @@
         android:textSize="16dp"
         android:layout_marginBottom="5dp"
         android:fontFamily="@font/notosans_semibold"
-        app:layout_constraintBottom_toTopOf="@+id/profile_image"
-        app:layout_constraintStart_toEndOf="@+id/profile_image"
-        app:layout_constraintTop_toTopOf="@+id/profile_image"
+        app:layout_constraintBottom_toTopOf="@+id/img_framelayout"
+        app:layout_constraintStart_toEndOf="@+id/img_framelayout"
+        app:layout_constraintTop_toTopOf="@+id/img_framelayout"
         app:layout_constraintVertical_bias="0.0" />
 
 <!--    <androidx.appcompat.widget.AppCompatTextView
