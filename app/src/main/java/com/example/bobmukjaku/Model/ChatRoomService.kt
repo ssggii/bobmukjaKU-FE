@@ -52,7 +52,7 @@ interface ChatRoomService {
     fun filteredLists(
         @Header("Authorization") authorization: String,
         @Body filters: List<FilterInfo>
-    ): Call<List<ChatRoom>>
+    ): Call<List<ChatRoomFilter>>
 
     // 필터링 리스트 조회
     @GET("/filter/info")
