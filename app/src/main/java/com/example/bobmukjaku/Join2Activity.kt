@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import com.example.bobmukjaku.Hash.Sha256
 import com.example.bobmukjaku.Model.HashedAuthCode
 import com.example.bobmukjaku.Model.RetrofitClient
-import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +23,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import java.time.LocalDate
 
 class Join2Activity : AppCompatActivity() {
     lateinit var binding: ActivityJoin2Binding
@@ -138,7 +136,14 @@ class Join2Activity : AppCompatActivity() {
                 when{
                     (hashedAuthCodeFromUser == hashedAuthCodeFromServer)->{
                         //Log.i("kim", "일치합니다.")
-                        if(intent.getBooleanExtra("alreadyJoin", false)) {//로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
+
+                        if(intent.getStringExtra("mode") == "changePassword"){
+                            Log.i("changePassword", "yes")
+                            val intent = Intent(this@Join2Activity, ChangePasswordActivity2::class.java)
+                            intent.putExtra("email", email)
+                            startActivity(intent)
+                        }
+                        else if(intent.getBooleanExtra("alreadyJoin", false)) {//로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
                             val intent = Intent(this@Join2Activity, MainActivity::class.java)
                             startActivity(intent)
                         }else{//회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import com.example.bobmukjaku.Dto.ContentTypeInterceptor
 import com.example.bobmukjaku.Dto.LoginDto
 import com.example.bobmukjaku.Dto.RateUpdateDto
+import com.example.bobmukjaku.Dto.UpdatePasswordDto
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -32,6 +33,10 @@ interface MemberService {
         @Header("Authorization") authorization: String,
         @Body requestBody: Map<String, String>
     ): Call<Void>
+
+    //로그인 없는 사용자 수정
+    @PUT("/resetPassword")
+    fun updateMemberWithoutLogin(@Body passwordUpdateDto : UpdatePasswordDto) : Call<Void>
 
     // rate 업데이트
     @PUT("/member/info/rate")
@@ -95,7 +100,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://172.30.1.63:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.219.107:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {

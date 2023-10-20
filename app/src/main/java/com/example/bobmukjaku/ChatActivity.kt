@@ -308,7 +308,61 @@ class ChatActivity : AppCompatActivity() {
 
     }
 
-    private fun exitChatRoom() {
+    private fun exitChatRoom(){
+        rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener{
+            val exitBody = AddChatRoomMember(chatRoomInfo.roomId, myInfo.uid)
+            val request = RetrofitClient.chatRoomService.exitChatRoom("Bearer $accessToken", exitBody)
+            request.enqueue(object: Callback<ServerBooleanResponse>{
+                override fun onResponse(
+                    call: Call<ServerBooleanResponse>,
+                    response: Response<ServerBooleanResponse>
+                ) {
+                    if(response.isSuccessful){
+                        when(response.code()){
+                            200->{
+                                FirebaseMessaging.getInstance()
+                                    .unsubscribeFromTopic(chatRoomInfo.roomId.toString())
+                                    .addOnSuccessListener {
+                                        rf.child("participants").get().addOnSuccessListener {
+                                            //Log.i("participantsNum", it.childrenCount.toString())
+                                            if(it.childrenCount.toInt() == 0){
+                                                //Log.i("participants", it.childrenCount.toString())
+                                                rf.removeValue().addOnSuccessListener {
+                                                    Log.i("exittt", "퇴장완료")
+                                                    Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
+                                                    val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                                    startActivity(intent)
+                                                }
+                                            }else{
+                                                Log.i("exittt", "퇴장완료")
+                                                Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
+                                                val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                                startActivity(intent)
+                                            }
+                                        }
+                                    }
+                            }
+                            else -> {
+                                Log.i("exittt", "퇴장에러")
+                                Toast.makeText(this@ChatActivity, "퇴장에러", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }else {
+                        Log.i("exittt", response.code().toString())
+                    }
+                }
+
+                override fun onFailure(call: Call<ServerBooleanResponse>, t: Throwable) {
+                    Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
+                }
+
+            })
+        }
+    }
+
+    /*private fun exitChatRoom() {
         //방 퇴장
         RetrofitClient.chatRoomService.getRoomIdLists("Bearer $accessToken", chatRoomInfo.roomId!!)
             .enqueue(object: Callback<ChatRoom>{
@@ -370,7 +424,7 @@ class ChatActivity : AppCompatActivity() {
                     Log.i("abcabc", t.message!!)
                 }
             })
-    }
+    }*/
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
