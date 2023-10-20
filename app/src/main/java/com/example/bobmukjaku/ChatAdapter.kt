@@ -195,8 +195,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                     val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
                     Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
                     val reviewImagelayoutparams = reviewImg.layoutParams
-                    reviewImagelayoutparams.width = bitmap.width * 60 / 100
-                    reviewImagelayoutparams.height = bitmap.height * 60 / 100
+                    reviewImagelayoutparams.width = bitmap.width * 30 / 100
+                    reviewImagelayoutparams.height = bitmap.height * 30 / 100
                     reviewImg.layoutParams = reviewImagelayoutparams
                     reviewImg.setImageBitmap(bitmap)
                 }
@@ -225,8 +225,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
                     val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
                     Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
                     val reviewImagelayoutparams = reviewImg.layoutParams
-                    reviewImagelayoutparams.width = bitmap.width * 60 / 100
-                    reviewImagelayoutparams.height = bitmap.height * 60 / 100
+                    reviewImagelayoutparams.width = bitmap.width * 30 / 100
+                    reviewImagelayoutparams.height = bitmap.height * 30 / 100
                     reviewImg.layoutParams = reviewImagelayoutparams
                     reviewImg.setImageBitmap(bitmap)
                 }

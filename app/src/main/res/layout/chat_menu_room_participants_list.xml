@@ -43,12 +43,24 @@
 
     </LinearLayout>
 
-    <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/add_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@android:drawable/ic_input_add" />
 
-    <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/block_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@android:drawable/presence_busy" />
+
+    <TextView
+        android:id="@+id/friendOrBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="친구"
+        android:textSize="30sp"
+        android:visibility="gone"/>
 
 </LinearLayout>

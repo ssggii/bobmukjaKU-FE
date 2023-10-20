@@ -185,6 +185,8 @@ class LoginActivity : AppCompatActivity() {
                                             Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
                                         }
                                     }
+                                }else{
+                                    Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
                                 }
                             }
 
@@ -212,7 +214,9 @@ class LoginActivity : AppCompatActivity() {
 
             // 비밀번호 재설정 버튼 클릭
             resetPasswdBtn.setOnClickListener {
-                val intent = Intent(this@LoginActivity, ChangePasswordActivity::class.java)
+                //val intent = Intent(this@LoginActivity, ChangePasswordActivity::class.java)
+                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
+                intent.putExtra("mode", "changePassword")
                 startActivity(intent)
             }
         }
