@@ -8,6 +8,8 @@
         android:id="@+id/participant_profile"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:src="@drawable/ku_3"
         android:scaleType="fitXY"
         android:layout_marginLeft="30dp"/>
@@ -16,28 +18,37 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_weight="1">
 
         <TextView
             android:id="@+id/participant_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="20dp"
+            android:fontFamily="@font/notosans_bold"
+            android:textSize="35px"
             android:text="밥도둑은 간장게장"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LV : "/>
+                android:textSize="30px"
+                android:fontFamily="@font/notosans_semibold"
+                android:text="Level "/>
 
             <TextView
                 android:id="@+id/participant_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="30px"
+                android:fontFamily="@font/notosans_semibold"
                 android:text="5"/>
         </LinearLayout>
 
@@ -45,15 +56,22 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/add_btn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@android:drawable/ic_input_add" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/add_green" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/block_btn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@android:drawable/presence_busy" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="20dp"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/block_red" />
 
     <TextView
         android:id="@+id/friendOrBlock"

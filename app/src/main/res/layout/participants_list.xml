@@ -2,13 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:orientation="horizontal">
 
     <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/ku_3"
-        android:layout_marginLeft="30dp"/>
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="20dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -20,6 +23,8 @@
             android:id="@+id/participant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/notosans_bold"
+            android:textSize="30px"
             android:text="밥도둑은 간장게장"/>
 
         <LinearLayout
@@ -30,12 +35,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LV : "/>
+                android:textSize="30px"
+                android:fontFamily="@font/notosans_semibold"
+                android:text="Level "/>
 
             <TextView
                 android:id="@+id/participant_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="30px"
+                android:fontFamily="@font/notosans_semibold"
                 android:text="5"/>
         </LinearLayout>
 
@@ -43,10 +52,11 @@
 
     <ImageButton
         android:layout_width="40dp"
-        android:layout_height="40dp"/>
+        android:layout_height="40dp" />
 
     <ImageButton
         android:layout_width="40dp"
-        android:layout_height="40dp"/>
+        android:layout_height="40dp"
+        android:layout_marginRight="40dp"/>
 
 </LinearLayout>
