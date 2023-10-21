@@ -24,6 +24,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 @Suppress("DEPRECATION")
 class ReviewActivity : AppCompatActivity() {
@@ -83,6 +84,7 @@ class ReviewActivity : AppCompatActivity() {
             }
 
             register.setOnClickListener {
+
                 //리뷰를 등록
                 uploadImageToFirebaseStorage()
             }
@@ -124,7 +126,10 @@ class ReviewActivity : AppCompatActivity() {
             request.enqueue(object: Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.i("review", "리뷰 등록 성공")
+
                     val intent = Intent(this@ReviewActivity, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 

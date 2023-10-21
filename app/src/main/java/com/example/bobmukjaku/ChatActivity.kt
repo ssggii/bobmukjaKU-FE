@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -224,7 +225,13 @@ class ChatActivity : AppCompatActivity() {
                 participantsMenuList.removeIf {
                     Log.i("kim", snapshot.key?:"null")
                     it.member.uid.toString() == snapshot.key
+
                 }
+                val currentTimeMillis = System.currentTimeMillis()
+                val date = Date(currentTimeMillis)
+                val sdf = SimpleDateFormat("HH:mm:ss.SSSSSS")
+                val formattedTime = sdf.format(date)
+                Log.i("전체 필터링 reflect", formattedTime)
                 adapter2.notifyDataSetChanged()
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -255,6 +262,7 @@ class ChatActivity : AppCompatActivity() {
                 chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
+
 
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -298,6 +306,7 @@ class ChatActivity : AppCompatActivity() {
         alertDialog.show()
 
         yesButton.setOnClickListener{
+
             exitChatRoom()
             alertDialog.dismiss()
         }
@@ -441,7 +450,8 @@ class ChatActivity : AppCompatActivity() {
 
             //메인화면으로 나가기 버튼
             backBtn.setOnClickListener{
-                val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                //val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                val intent = Intent(this@ChatActivity, GiveScoreActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
             }
@@ -463,7 +473,6 @@ class ChatActivity : AppCompatActivity() {
 
             //message전송
             sendMsg.setOnClickListener {
-
                 //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
                 //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
                 Log.i("kimsend", "send")
