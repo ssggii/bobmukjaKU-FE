@@ -5,7 +5,6 @@
     android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp">
 
     <FrameLayout
@@ -14,7 +13,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp">
 
         <ImageButton
@@ -37,6 +36,7 @@
         android:layout_height="wrap_content"
         android:text="name"
         android:textSize="16dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginBottom="5dp"
         android:fontFamily="@font/notosans_semibold"
         app:layout_constraintBottom_toTopOf="@+id/tv_message"

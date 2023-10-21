@@ -10,7 +10,7 @@
         android:id="@+id/profile"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="50dp"
         android:src="@drawable/ku_3"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,26 +30,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="참가자 이름"
-            android:textSize="20sp"
+            android:textSize="45px"
+            android:fontFamily="@font/notosans_bold"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="15dp"/>
+            android:layout_marginTop="25dp"/>
 
         <TextView
             android:id="@+id/participant_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lv 5"
-            android:textSize="20sp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="15dp"/>
+            android:textSize="40px"
+            android:fontFamily="@font/notosans_semibold"
+            android:layout_marginLeft="20dp" />
 
     </LinearLayout>
 
     <ImageButton
         android:id="@+id/thumbdown"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginRight="20dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -57,8 +58,8 @@
 
     <ImageButton
         android:id="@+id/thumbup"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/thumbdown"

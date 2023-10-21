@@ -156,14 +156,19 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member): RecyclerV
             calendar.timeInMillis = milliseconds
             val hour = calendar[Calendar.HOUR_OF_DAY]
             val minutes = calendar[Calendar.MINUTE]
-            when{
+            when {
                 (hour > 12) -> {
-                    return "오후 ".plus(hour.minus(12).toString().plus(":").plus(minutes.toString()))
+                    val hourString = if (hour < 10) "0$hour" else hour.toString()
+                    val minutesString = if (minutes < 10) "0$minutes" else minutes.toString()
+                    return "$hourString:$minutesString"
                 }
-                else->{
-                    return "오전 ".plus(hour.toString().plus(":").plus(minutes.toString()))
+                else -> {
+                    val hourString = if (hour < 10) "0$hour" else hour.toString()
+                    val minutesString = if (minutes < 10) "0$minutes" else minutes.toString()
+                    return "$hourString:$minutesString"
                 }
             }
+
         }else{
             return null
         }
