@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ReviewResponse
-import com.example.bobmukjaku.databinding.ReviewAllListBinding
 import com.example.bobmukjaku.databinding.ReviewImgListBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -20,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Adapter<ScrapReviewImageAdapter.ViewHolder>() {
+class RestaurantDetailImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Adapter<RestaurantDetailImageAdapter.ViewHolder>() {
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, reviewInfo: ReviewResponse)
@@ -43,6 +42,10 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val reviewInfo = items[position]
+
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.onItemClick(position, reviewInfo)
+        }
 
         if (items.isEmpty()) {
             holder.binding.image.visibility = View.GONE

@@ -1,15 +1,13 @@
 package com.example.bobmukjaku
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ReviewResponse
 import com.example.bobmukjaku.databinding.ReviewAllListBinding
-import com.google.firebase.ktx.Firebase
 
-class ScrapReviewListAdapter(var items: List<ReviewResponse>) : RecyclerView.Adapter<ScrapReviewListAdapter.ViewHolder>() {
+class RestaurantDetailAdapter(var items: List<ReviewResponse>) : RecyclerView.Adapter<RestaurantDetailAdapter.ViewHolder>(){
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, reviewInfo: ReviewResponse)
@@ -32,6 +30,10 @@ class ScrapReviewListAdapter(var items: List<ReviewResponse>) : RecyclerView.Ada
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val reviewInfo = items[position]
+
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.onItemClick(position, reviewInfo)
+        }
 
         if (items.isEmpty()) {
             holder.binding.content.visibility = View.GONE
