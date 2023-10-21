@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentRestaurantInfoDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -17,10 +19,14 @@ import retrofit2.Response
 class RestaurantInfoDialog(private val restaurant: RestaurantList, private val uid: Long) : BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentRestaurantInfoDialogBinding
+    lateinit var reviewAdapter: RestaurantDetailAdapter
+    lateinit var reviewImageAdapter: RestaurantDetailImageAdapter
 
     private val restaurantService = RetrofitClient.restaurantService
     private val accessToken = SharedPreferences.getString("accessToken", "")
     private val authorizationHeader = "Bearer $accessToken"
+
+    var reviewList = mutableListOf<ReviewResponse>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +45,8 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
         binding.categorySub.text = restaurant.indsSclsNm
         binding.restaurantAdd.text = restaurant.lnoAdr
 
-        init()
+        getRestaurantScrap()
+        getRestaurantReview()
 
         // 하트 버튼
         countHeart()
@@ -54,7 +61,69 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
         }
     }
 
-    private fun init() {
+    private fun getRestaurantReview() {
+        // 리뷰 목록 API
+        val call = RetrofitClient.restaurantService.getRestaurantReview(authorizationHeader, restaurant.bizesId)
+        call.enqueue(object : Callback<List<ReviewResponse>> {
+            override fun onResponse(call: Call<List<ReviewResponse>>, response: Response<List<ReviewResponse>>) {
+                if (response.isSuccessful) {
+                    val reviewListResponse = response.body() // 서버에서 받은 리뷰 목록
+                    if (reviewListResponse != null) {
+                        reviewList.clear()
+                        reviewList.addAll(reviewListResponse) // reviewList에 업데이트된 리뷰 목록 저장
+                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
+                        reviewImageAdapter.updateItems((reviewList))
+
+                        binding.totalReview.text = reviewList.size.toString()
+                    }
+                    val successCode = response.code()
+                    Log.i("음식점 리뷰 목록 로드", "성공 $successCode $restaurant.placeId")
+                } else {
+                    val errorCode = response.code()
+                    Log.i("음식점 리뷰 목록 로드", "실패. 에러 $errorCode")
+                }
+            }
+
+            override fun onFailure(call: Call<List<ReviewResponse>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[음식점 리뷰 목록 로드 에러: ]", it1) }
+            }
+        })
+
+        binding.reviewList.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+        reviewAdapter = RestaurantDetailAdapter(reviewList)
+        reviewAdapter.onItemClickListener = object : RestaurantDetailAdapter.OnItemClickListener {
+            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
+                val intent = Intent(requireContext(), RestaurantDetailActivity::class.java)
+                intent.putExtra("bizesId", restaurant.bizesId)
+                intent.putExtra("bizesNm", restaurant.bizesNm)
+                intent.putExtra("lnoAdr", restaurant.lnoAdr)
+                intent.putExtra("indsMclsNm", restaurant.indsMclsNm)
+                intent.putExtra("indsSclsNm", restaurant.indsSclsNm)
+                intent.putExtra("uid", uid)
+                startActivity(intent)
+            }
+        }
+        binding.reviewList.adapter = reviewAdapter
+
+        binding.reviewImageList.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
+        reviewImageAdapter = RestaurantDetailImageAdapter(reviewList)
+        reviewImageAdapter.onItemClickListener = object : RestaurantDetailImageAdapter.OnItemClickListener {
+            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
+                val intent = Intent(requireContext(), RestaurantDetailActivity::class.java)
+                intent.putExtra("bizesId", restaurant.bizesId)
+                intent.putExtra("bizesNm", restaurant.bizesNm)
+                intent.putExtra("lnoAdr", restaurant.lnoAdr)
+                intent.putExtra("indsMclsNm", restaurant.indsMclsNm)
+                intent.putExtra("indsSclsNm", restaurant.indsSclsNm)
+                intent.putExtra("uid", uid)
+                startActivity(intent)
+            }
+        }
+        binding.reviewImageList.adapter = reviewImageAdapter
+    }
+
+    private fun getRestaurantScrap() {
         val call = restaurantService.getRestaurantScrap(authorizationHeader, placeId = restaurant.bizesId)
         call.enqueue(object : Callback<List<ScrapPost>> {
             override fun onResponse(call: Call<List<ScrapPost>>, response: Response<List<ScrapPost>>) {

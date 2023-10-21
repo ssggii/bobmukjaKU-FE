@@ -9,8 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ReviewResponse
-import com.example.bobmukjaku.databinding.ReviewAllListBinding
-import com.example.bobmukjaku.databinding.ReviewImgListBinding
+import com.example.bobmukjaku.databinding.ReviewDetailListBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Adapter<ScrapReviewImageAdapter.ViewHolder>() {
+class RestaurantDetailAdapter2(var items: List<ReviewResponse>) : RecyclerView.Adapter<RestaurantDetailAdapter2.ViewHolder>(){
 
     interface OnItemClickListener{
         fun onItemClick(pos: Int, reviewInfo: ReviewResponse)
@@ -28,7 +27,7 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
 
     var onItemClickListener:OnItemClickListener? = null
 
-    inner class ViewHolder(var binding: ReviewImgListBinding): RecyclerView.ViewHolder(binding.root){
+    inner class ViewHolder(var binding: ReviewDetailListBinding): RecyclerView.ViewHolder(binding.root){
     }
 
     fun updateItems(newItems: List<ReviewResponse>) {
@@ -37,7 +36,7 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = ReviewImgListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = ReviewDetailListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(view)
     }
 
@@ -45,15 +44,12 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
         val reviewInfo = items[position]
 
         if (items.isEmpty()) {
+            holder.binding.content.visibility = View.GONE
             holder.binding.image.visibility = View.GONE
         }
 
-        if (position < 3) {
-            // 상위 3개 항목에 대해서만 리뷰 이미지 출력
-            setImageToImageView(holder.binding.image, reviewInfo)
-        } else {
-            holder.binding.image.visibility = View.GONE
-        }
+        holder.binding.content.text = "→ " + reviewInfo.contents
+        setImageToImageView(holder.binding.image, reviewInfo)
     }
 
     private fun setImageToImageView(imageView: ImageView, reviewInfo: ReviewResponse) {
