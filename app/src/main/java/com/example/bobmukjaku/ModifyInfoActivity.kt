@@ -85,8 +85,7 @@ class ModifyInfoActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                updateNickname(nick)
-                updatePassword(passwd)
+                updateNickAndPassword(nick, passwd)
                 Toast.makeText(
                     this@ModifyInfoActivity,
                     "닉네임과 비밀번호가 업데이트되었습니다.",
@@ -181,6 +180,46 @@ class ModifyInfoActivity : AppCompatActivity() {
                 // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
                 t.message?.let { Log.i("회원가입[닉네임중복확인]: ", it) }
                 onSuccess(false)
+            }
+        })
+    }
+
+    private fun updateNickAndPassword(nick: String, passwd: String) {
+        val memberService = RetrofitClient.memberService
+        val accessToken = SharedPreferences.getString("accessToken", "")
+
+        val authorizationHeader = "Bearer $accessToken"
+
+        val requestBody = mapOf("nickName" to nick, "toBePassword" to passwd)
+
+        val call = accessToken?.let {
+            memberService.updateMember(
+                authorizationHeader,
+                requestBody
+            )
+        }
+        call?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // 성공적으로 업데이트됨
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "닉네임과 비밀번호가 업데이트되었습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val errorCode = response.code()
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "닉네임&비밀번호 업데이트 실패. 에러 코드: $errorCode",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // 네트워크 오류 처리
+                Toast.makeText(this@ModifyInfoActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             }
         })
     }
