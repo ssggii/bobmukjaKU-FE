@@ -70,6 +70,11 @@ class ModifyInfoActivity : AppCompatActivity() {
                     "변경된 사항이 없습니다.",
                     Toast.LENGTH_SHORT
                 ).show()
+
+                val intent = Intent()
+                intent.putExtra("selectedItemId", R.id.forth)
+                setResult(RESULT_OK, intent)
+                finish()
             } else if (nick.isEmpty()) {
                 if (binding.pwInfo.text == "해당 비밀번호는 사용 가능합니다.") {
                     if (binding.pwConfirm.text == "비밀번호가 일치합니다.") {
@@ -79,6 +84,11 @@ class ModifyInfoActivity : AppCompatActivity() {
                             "비밀번호가 업데이트되었습니다.",
                             Toast.LENGTH_SHORT
                         ).show()
+
+                        val intent = Intent()
+                        intent.putExtra("selectedItemId", R.id.forth)
+                        setResult(RESULT_OK, intent)
+                        finish()
                     } else {
                         Toast.makeText(
                             this@ModifyInfoActivity,
@@ -101,6 +111,11 @@ class ModifyInfoActivity : AppCompatActivity() {
                         "닉네임이 업데이트되었습니다.",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    val intent = Intent()
+                    intent.putExtra("selectedItemId", R.id.forth)
+                    setResult(RESULT_OK, intent)
+                    finish()
                 } else {
                     Toast.makeText(
                         this@ModifyInfoActivity,
@@ -118,6 +133,11 @@ class ModifyInfoActivity : AppCompatActivity() {
                                 "닉네임과 비밀번호가 업데이트되었습니다.",
                                 Toast.LENGTH_SHORT
                             ).show()
+
+                            val intent = Intent()
+                            intent.putExtra("selectedItemId", R.id.forth)
+                            setResult(RESULT_OK, intent)
+                            finish()
                         } else {
                             Toast.makeText(
                                 this@ModifyInfoActivity,
@@ -125,12 +145,6 @@ class ModifyInfoActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
-                        Toast.makeText(
-                            this@ModifyInfoActivity,
-                            "비밀번호가 업데이트되었습니다.",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     } else {
                         Toast.makeText(
                             this@ModifyInfoActivity,
@@ -146,11 +160,6 @@ class ModifyInfoActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-
-            val intent = Intent()
-            intent.putExtra("selectedItemId", R.id.forth)
-            setResult(RESULT_OK, intent)
-            finish()
         }
     }
 
