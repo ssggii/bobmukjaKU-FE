@@ -6,13 +6,13 @@
     android:layout_height="100dp"
     android:background="#F9FFE2">
 
-    <ImageButton
+    <ImageView
         android:id="@+id/profile"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginLeft="50dp"
         android:src="@drawable/ku_3"
         android:scaleType="fitXY"
+        android:layout_marginLeft="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
