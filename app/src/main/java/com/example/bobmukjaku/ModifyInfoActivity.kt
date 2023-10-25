@@ -71,26 +71,80 @@ class ModifyInfoActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else if (nick.isEmpty()) {
-                updatePassword(passwd)
-                Toast.makeText(
-                    this@ModifyInfoActivity,
-                    "[최종] 비밀번호가 업데이트되었습니다.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (binding.pwInfo.text == "해당 비밀번호는 사용 가능합니다.") {
+                    if (binding.pwConfirm.text == "비밀번호가 일치합니다.") {
+                        updatePassword(passwd)
+                        Toast.makeText(
+                            this@ModifyInfoActivity,
+                            "비밀번호가 업데이트되었습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@ModifyInfoActivity,
+                            "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "비밀번호를 조건에 맞춰 설정해주세요.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else if (passwd.isEmpty()) {
-                updateNickname(nick)
-                Toast.makeText(
-                    this@ModifyInfoActivity,
-                    "닉네임이 업데이트되었습니다.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (binding.nickConfirm.text == "사용가능한 닉네임입니다.") {
+                    updateNickname(nick)
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "닉네임이 업데이트되었습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "닉네임 중복 여부를 확인해주세요.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
-                updateNickAndPassword(nick, passwd)
-                Toast.makeText(
-                    this@ModifyInfoActivity,
-                    "닉네임과 비밀번호가 업데이트되었습니다.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (binding.pwInfo.text == "해당 비밀번호는 사용 가능합니다.") {
+                    if (binding.pwConfirm.text == "비밀번호가 일치합니다.") {
+                        if (binding.nickConfirm.text == "사용가능한 닉네임입니다.") {
+                            updateNickAndPassword(nick, passwd)
+                            Toast.makeText(
+                                this@ModifyInfoActivity,
+                                "닉네임과 비밀번호가 업데이트되었습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                this@ModifyInfoActivity,
+                                "닉네임 중복 여부를 확인해주세요.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        Toast.makeText(
+                            this@ModifyInfoActivity,
+                            "비밀번호가 업데이트되었습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@ModifyInfoActivity,
+                            "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(
+                        this@ModifyInfoActivity,
+                        "비밀번호를 조건에 맞춰 설정해주세요.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             val intent = Intent()
@@ -202,18 +256,10 @@ class ModifyInfoActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "닉네임과 비밀번호가 업데이트되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "닉네임&비밀번호 업데이트 성공")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "닉네임&비밀번호 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "닉네임&비밀번호 업데이트 실패. 에러 코드: $errorCode")
                 }
             }
 
@@ -242,24 +288,16 @@ class ModifyInfoActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "닉네임이 업데이트되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "닉네임 업데이트 성공")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "닉네임 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "닉네임 업데이트 실패. 에러 코드: $errorCode")
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // 네트워크 오류 처리
-                Toast.makeText(this@ModifyInfoActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                Log.i("[정보수정]", "네트워크 오류가 발생했습니다.")
             }
         })
     }
@@ -282,18 +320,10 @@ class ModifyInfoActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "비밀번호가 업데이트되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "비밀번호 업데이트 성공")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        this@ModifyInfoActivity,
-                        "비밀번호 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("[정보수정]", "비밀번호 업데이트 실패. 에러 코드: $errorCode")
                 }
             }
 
