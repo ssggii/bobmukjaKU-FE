@@ -19,9 +19,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="55dp"
             android:layout_marginBottom="20dp"
             android:text="채팅방 서랍"
+            android:fontFamily="@font/notosans_semibold"
             android:textColor="@color/main"
             android:textSize="20sp" />
 
@@ -39,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="채팅방 정보"
+            android:fontFamily="@font/notosans_semibold"
             android:textSize="15sp"
             android:textColor="@color/black"
             android:layout_marginTop="20dp"
@@ -54,6 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="날짜 : "
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="30dp"/>
 
@@ -62,6 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="2023/08/06"
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="5dp"/>
 
@@ -76,6 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="시간 : "
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="30dp"/>
 
@@ -84,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="12:00~13:00"
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="5dp"/>
 
@@ -97,6 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="음식 종류 : "
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="30dp"/>
 
@@ -105,6 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="한식"
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="5dp"/>
 
@@ -119,6 +127,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="인원 수 : "
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="30dp"/>
 
@@ -127,6 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="3"
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:layout_marginLeft="5dp"/>
 
@@ -136,6 +146,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="밥약속 정보"
+            android:fontFamily="@font/notosans_semibold"
             android:textSize="15sp"
             android:textColor="@color/black"
             android:layout_marginTop="15dp"
@@ -151,8 +162,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="시간 : "
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
-                android:textColor="@color/black"
                 android:layout_marginLeft="30dp"/>
 
             <TextView
@@ -160,6 +171,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="오후 13:00"
+                android:fontFamily="@font/notosans_medium"
                 android:textSize="13sp"
                 android:textColor="@color/black"
                 android:layout_marginLeft="5dp"/>
@@ -177,7 +189,7 @@
                 android:layout_height="wrap_content"
                 android:text="장소 : "
                 android:textSize="13sp"
-                android:textColor="@color/black"
+                android:fontFamily="@font/notosans_medium"
                 android:layout_marginLeft="30dp"/>
 
             <TextView
@@ -197,6 +209,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="대화 상대"
+        android:fontFamily="@font/notosans_semibold"
         android:textSize="15sp"
         android:textColor="@color/black"
         android:layout_marginTop="15dp"
