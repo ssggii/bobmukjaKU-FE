@@ -30,7 +30,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="12dp"
                 android:layout_marginBottom="12dp"
-                android:text="광진구"
+                android:text="화양동"
                 android:fontFamily="@font/notosans_semibold"
                 android:background="@drawable/btn_circle_gray" />
 
