@@ -11,6 +11,8 @@ import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.Model.SharedPreferences
 import com.example.bobmukjaku.Model.UpdateScoreInfo
 import com.example.bobmukjaku.databinding.ActivityGiveScoreBinding
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -28,6 +30,9 @@ class GiveScoreActivity : AppCompatActivity() {
     val memberService = RetrofitClient.memberService
     lateinit var myInfo: Member
     var roomId = 0L
+
+    private lateinit var restaurantId:String
+    private lateinit var restaurantName:String
 
 
 
@@ -64,9 +69,28 @@ class GiveScoreActivity : AppCompatActivity() {
             }
             getAllParticipantsInRoomJob.await()
             initRecyclerView()
-            initLayout()
+            getRestaurantInfo()
+            //initLayout()
         }
 
+    }
+
+    private fun getRestaurantInfo() {
+        //파이어베이스에 저장되어있는 공지로부터 음식점정보를 가져온다.
+        val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
+        rf.get().addOnCompleteListener {
+            if(it.isSuccessful){
+
+                restaurantId = it.result.child("restaurantId").value.toString()
+                restaurantName = it.result.child("restaurantName").value.toString()
+                //val starttime = it.result.child("starttime").value.toString().toLong()
+                Log.i("kim", restaurantName)
+                Log.i("kim", restaurantId)
+                //Log.i("kim", starttime.toString())
+
+                initLayout()
+            }
+        }
     }
 
     private fun getMyInfoFromServer(): Member{
@@ -147,10 +171,24 @@ class GiveScoreActivity : AppCompatActivity() {
             }
 
             //리뷰 화면으로 이동
-            val intent = Intent(this, ReviewActivity::class.java)
+           /* val intent = Intent(this, ReviewActivity::class.java)
             intent.putExtra("myInfo", myInfo)
             intent.putExtra("roomId", roomId)
-            startActivity(intent)
+            startActivity(intent)*/
+            Log.i("yyy", "restaurantName: $restaurantName, restaurantId $restaurantId")
+            if((restaurantName=="null")&&(restaurantId=="null")){
+                val intent = Intent(this, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                //intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+            }else{
+                val intent = Intent(this, ReviewActivity::class.java)
+                intent.putExtra("myInfo", myInfo)
+                intent.putExtra("roomId", roomId)
+                intent.putExtra("restaurantName", restaurantName)
+                intent.putExtra("restaurantId", restaurantId)
+                startActivity(intent)
+            }
         }
     }
 }

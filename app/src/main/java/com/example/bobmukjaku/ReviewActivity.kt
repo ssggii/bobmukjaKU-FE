@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityReviewBinding
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import retrofit2.Call
@@ -34,12 +33,16 @@ class ReviewActivity : AppCompatActivity() {
     val myInfo by lazy {
         intent.getSerializableExtra("myInfo") as Member
     }
-    lateinit var restaurantId:String
-    lateinit var restaurantName:String
-//    val roomId by lazy{
-//        intent.getLongExtra("roomId", -1)
-//    }
-    val roomId = 1
+    val restaurantId by lazy {
+        intent.getStringExtra("restaurantId")
+    }
+    val restaurantName by lazy {
+        intent.getStringExtra("restaurantName")
+    }
+    val roomId by lazy{
+        intent.getLongExtra("roomId", -1)
+    }
+    //val roomId = 1
     val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "") ?: null)
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -47,12 +50,13 @@ class ReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        Log.i("yyy", restaurantName.toString() + "/" + restaurantId.toString())
         Log.i("myInfo", myInfo.toString())//내정보 잘 전달받았는지 확인용
-        getRestaurantInfo()
+        //getRestaurantInfo()
+        initLayout()
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+    /*@RequiresApi(Build.VERSION_CODES.Q)
     private fun getRestaurantInfo() {
         //파이어베이스에 저장되어있는 공지로부터 음식점정보를 가져온다.
         val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
@@ -69,7 +73,7 @@ class ReviewActivity : AppCompatActivity() {
                 initLayout()
             }
         }
-    }
+    }*/
 
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -122,7 +126,7 @@ class ReviewActivity : AppCompatActivity() {
     private fun registerReviewIntoServer(path: String) {//리뷰를 등록
         val reviewText = binding.reviewText.text.toString()
         if(reviewText != ""){
-            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, restaurantId,path,reviewText,restaurantName))
+            val request = RetrofitClient.restaurantService.addReview(accessToken, ReviewInfo(myInfo.uid!!, restaurantId!!,path,reviewText,restaurantName!!))
             request.enqueue(object: Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.i("review", "리뷰 등록 성공")
