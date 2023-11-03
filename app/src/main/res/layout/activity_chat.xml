@@ -171,16 +171,18 @@
         app:layout_constraintStart_toStartOf="parent">
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
+    <ImageButton
         android:id="@+id/send_msg"
         android:layout_width="70dp"
         android:layout_height="40dp"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
-        android:text="#"
         android:textSize="13sp"
         android:fontFamily="@font/notosans_semibold"
-        android:background="@drawable/btn_black"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_green"
+        android:src="@drawable/restaurantmap"
+        android:paddingVertical="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/message" />

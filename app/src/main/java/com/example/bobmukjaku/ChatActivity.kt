@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -67,6 +69,12 @@ class ChatActivity : AppCompatActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        Log.i("iii", intent?.getStringExtra("place")?:"null")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -137,15 +145,18 @@ class ChatActivity : AppCompatActivity() {
                 }
 
             }
-
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
-
-
         }
-
         mrf.addValueEventListener(childEventListener)
+
+
+        //채팅메뉴창의 밥약속 정보를 파이어베이스의 notice경로와 연동
+        val starttimeView = findViewById<TextView>(R.id.real_starttime)
+        val realPlaceView = findViewById<TextView>(R.id.real_place)
+
+
     }
 
     private fun initFirebaseMenuParticipants() {
@@ -438,6 +449,29 @@ class ChatActivity : AppCompatActivity() {
             chatroomMenu.setOnClickListener {
                 menuDrawer.openDrawer(Gravity.RIGHT)
             }
+
+            message.addTextChangedListener(object:TextWatcher{
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                    if(s?.isEmpty() == true){
+                        binding.sendMsg.setImageDrawable(getDrawable(R.drawable.restaurantmap))
+                    }else{
+                        binding.sendMsg.setImageDrawable(getDrawable(R.drawable.msg_send))
+                    }
+                }
+            })
 
             //message전송
             sendMsg.setOnClickListener {

@@ -92,6 +92,7 @@ class BobAppointmentActivity : AppCompatActivity() {
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
         binding.apply {
@@ -129,6 +130,7 @@ class BobAppointmentActivity : AppCompatActivity() {
                             //공지사항에서 채팅방목록으로 전환했을때, 뒤로가기를 누르면 다시 공지화면으로 가는 것을 방지하기 위하여 flag설정
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            intent.putExtra("place", restaurantName)
                             startActivity(intent)
                         }else{
                             Toast.makeText(this@BobAppointmentActivity, "공지등록실패", Toast.LENGTH_SHORT).show()
