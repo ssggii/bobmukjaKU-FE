@@ -141,22 +141,27 @@ class ChatActivity : AppCompatActivity() {
                 if(noticeValue != null){
                     val restaurantName = snapshot.child("restaurantName").value.toString()
                     val startTime = snapshot.child("starttime").value.toString()
-                    binding.noticeContent.text = "$restaurantName\n$startTime"
-                }
+                    binding.noticeContent.text = "${chatRoomInfo.meetingDate} $startTime\n$restaurantName"
 
+                    //채팅방 서랍의 약속정보도 동기화
+                    val restaurantTextView = findViewById<TextView>(R.id.real_place)
+                    val startTimeTextView = findViewById<TextView>(R.id.real_starttime)
+                    restaurantTextView.text = restaurantName
+                    startTimeTextView.text = startTime
+                }else{
+                    binding.noticeContent.text = "밥약속 설정"
+
+                    val restaurantTextView = findViewById<TextView>(R.id.real_place)
+                    val startTimeTextView = findViewById<TextView>(R.id.real_starttime)
+                    restaurantTextView.text = "-"
+                    startTimeTextView.text = "-"
+                }
             }
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
         }
         mrf.addValueEventListener(childEventListener)
-
-
-        //채팅메뉴창의 밥약속 정보를 파이어베이스의 notice경로와 연동
-        val starttimeView = findViewById<TextView>(R.id.real_starttime)
-        val realPlaceView = findViewById<TextView>(R.id.real_place)
-
-
     }
 
     private fun initFirebaseMenuParticipants() {
@@ -439,6 +444,11 @@ class ChatActivity : AppCompatActivity() {
                 val intent = Intent(this@ChatActivity, BobAppointmentActivity::class.java)
                 intent.putExtra("roomId", chatRoomInfo.roomId)
                 intent.putExtra("meetingDate", chatRoomInfo.meetingDate)
+                intent.putExtra("starttime", chatRoomInfo.startTime)
+                /*val startTimeView = findViewById<TextView>(R.id.real_starttime)
+                if(startTimeView.text != "-"){
+                    intent.putExtra("noticeStartTime", startTimeView.text)
+                }*/
                 startActivity(intent)
             }
 

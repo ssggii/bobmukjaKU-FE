@@ -19,7 +19,6 @@ import com.example.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.example.bobmukjaku.Dto.NoticeDto
 import com.example.bobmukjaku.Model.RestaurantList
 import com.example.bobmukjaku.databinding.ActivityBobAppointmentBinding
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -29,11 +28,9 @@ import java.util.*
 class BobAppointmentActivity : AppCompatActivity() {
     lateinit var binding: ActivityBobAppointmentBinding
     private lateinit var viewModel: MapListViewModel
-    var rf:DatabaseReference? = null
+
     private val roomId : Long by lazy {
-        val roomId = intent.getLongExtra("roomId", -1)
-        rf =  Firebase.database.getReference("chatRoom/$roomId/notice")
-        roomId
+        intent.getLongExtra("roomId", -1)
     }
 
 
@@ -97,9 +94,26 @@ class BobAppointmentActivity : AppCompatActivity() {
     private fun initLayout() {
         binding.apply {
 
-            if(rf?.get()?.result?.value == null){
-                meetingdate.text = intent.getStringExtra("meetingDate")
+
+           // val startTimeInNotice = intent.getStringExtra("noticeStartTime")
+            Firebase.database.getReference("chatRoom/$roomId/notice/starttime").get().addOnCompleteListener {
+                if(it.isSuccessful){
+                    var startTime = ""
+                    var result = it.result.value.toString()
+                    if(result == "null"){
+                        meetingdate.text = intent.getStringExtra("meetingDate")
+                        startTime = intent.getStringExtra("starttime")?:"오후 00:00"
+                    }else{
+                        startTime = result
+                    }
+                    dateTime.text = startTime
+                }
             }
+
+
+
+
+
             dateTime.setOnClickListener {
                 showStartTimePickerDialog()
             }
@@ -183,24 +197,29 @@ class BobAppointmentActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun showStartTimePickerDialog() {
         showTimePickerDialog { hour, minute ->
-            var selectedTime = String.format("%02d:%02d", hour, minute)
-            var hour = selectedTime.substring(0,2).toInt()
-            val minute = selectedTime.substring(3,5).toInt()
-            when{
-                (hour in 0..11)->{
-                    if(hour == 0){
-                        hour=12
-                    }
-                    selectedTime = "오전 $hour:$minute"
-                }
-                (hour in 12..23)->{
-                    if(hour != 12){
-                        hour -= 12
-                    }
-                    selectedTime = "오후 $hour:$minute"
-                }
+            //var selectedTime = String.format("%02d:%02d", hour, minute)
+            //var hour = selectedTime.substring(0,2).toInt()
+            //val minute = selectedTime.substring(3,5).toInt()
+
+            Log.i("starttime", "$hour/$minute")
+            val timeFormat = "%02d:%02d"
+            var dateTime = ""
+
+            if(hour == 0){
+                dateTime += "오전 "
+                dateTime += timeFormat.format(12, minute)
+            }else if(hour == 12){
+                dateTime += "오후 "
+                dateTime += timeFormat.format(12, minute)
             }
-            binding.dateTime.text = selectedTime
+            else if(hour > 11){
+                dateTime += "오후 "
+                dateTime += timeFormat.format(hour - 12, minute)
+            }else{
+                dateTime += "오전 "
+                dateTime += timeFormat.format(hour, minute)
+            }
+            binding.dateTime.text = dateTime
         }
     }
 
