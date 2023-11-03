@@ -88,7 +88,6 @@ class ReviewActivity : AppCompatActivity() {
             }
 
             register.setOnClickListener {
-
                 //리뷰를 등록
                 uploadImageToFirebaseStorage()
             }

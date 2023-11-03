@@ -21,16 +21,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/image_btn"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/image_upload_icon"
-        android:text="사진"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_green"
+        android:text="이미지첨부"
         android:textColor="@color/white"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="@+id/review_text"
-        app:layout_constraintTop_toBottomOf="@+id/review_text" />
+        app:layout_constraintTop_toBottomOf="@+id/review_text"
+        />
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/register"
@@ -47,8 +49,8 @@
 
     <ImageView
         android:id="@+id/review_img"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="28dp"
 
         android:scaleType="fitXY"
