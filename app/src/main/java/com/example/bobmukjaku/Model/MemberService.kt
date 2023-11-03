@@ -1,12 +1,9 @@
 package com.example.bobmukjaku.Model
 
+//import android.os.Build.VERSION_CODES.R
 import android.content.Context
 import android.content.SharedPreferences
-//import android.os.Build.VERSION_CODES.R
-import com.example.bobmukjaku.Dto.ContentTypeInterceptor
-import com.example.bobmukjaku.Dto.LoginDto
-import com.example.bobmukjaku.Dto.RateUpdateDto
-import com.example.bobmukjaku.Dto.UpdatePasswordDto
+import com.example.bobmukjaku.Dto.*
 import com.example.bobmukjaku.R
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -94,13 +91,17 @@ interface MemberService {
         @Path("roomId") roomId: Long
     ): Call<List<Member>>
 
+    //로그인없이 사용자의 rate와 배경색 get
+    @GET("/member/rate_bg/{uid}")
+    fun getRateAndBg(@Path("uid") uid: Long): Call<RateAndBgDto>
+
     // 필요한 다른 API 구현
 
 }
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://192.168.219.107:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.0.76:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {

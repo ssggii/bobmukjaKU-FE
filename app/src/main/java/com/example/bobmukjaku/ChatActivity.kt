@@ -27,14 +27,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -66,7 +62,12 @@ class ChatActivity : AppCompatActivity() {
     var participantsMenuList = arrayListOf<WrapperInChatRoomMenu>()//참가자 목록 저장 배열
     private val rf by lazy {Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}")}
 
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,17 +75,52 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.i("onCreateCheck", "create!!")
+
+        Log.i("roomId", chatRoomInfo.roomId.toString())
+
+
         CoroutineScope(Dispatchers.Main).launch {
-            val job = CoroutineScope(Dispatchers.IO).async {
-                myInfo = getMyInfoFromServer()
-            }.await()
+            val job =
+                CoroutineScope(Dispatchers.IO).async {
+                    myInfo = getMyInfoFromServer()
+                }.await()
+
+            val job2 =
+                CoroutineScope(Dispatchers.IO).async {
+                    getParticipantsListFromServer()
+                    initFirebaseMenuParticipants()
+                }.await()
+
             initRecyclerView()
             initFirebase()
             initNotice()
-            registerMyInfoIntoFirebase()
             initLayout()
         }
+    }
+
+    private fun getParticipantsListFromServer(){
+        RetrofitClient.memberService.getParticipantsInRoom("Bearer $accessToken", chatRoomInfo.roomId!! )
+            .enqueue(object: Callback<List<Member>>{
+                override fun onResponse(
+                    call: Call<List<Member>>,
+                    response: Response<List<Member>>
+                ) {
+                    //서버에서 모든 참여자 정보를 가져와서 파이어베이스에 등록
+                    if(response.isSuccessful){
+                        val participants = response.body()!!
+
+                        for( participant in participants){
+                            val uid = participant.uid
+                            rf.child("participants/$uid").setValue(participant)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Member>>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
     }
 
     fun initNotice(){
@@ -112,11 +148,11 @@ class ChatActivity : AppCompatActivity() {
         mrf.addValueEventListener(childEventListener)
     }
 
-    private fun registerMyInfoIntoFirebase() {
+    private fun initFirebaseMenuParticipants() {
         val mrf = rf.child("participants")
 
         //나를 참가자로 등록
-        mrf.child(myInfo.uid.toString()).setValue(myInfo)
+        //mrf.child(myInfo.uid.toString()).setValue(myInfo)
 
         val childEventListener = object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -126,6 +162,7 @@ class ChatActivity : AppCompatActivity() {
                 val participantName = snapshot.child("memberNickName").value.toString()
                 val participantRate = snapshot.child("rate").value.toString().toInt()
                 val paricipantProfileColor = snapshot.child("profileColor").value.toString()
+                //Log.i("kim", "childAdded $participantName")
                 //var friendOrBlock = snapshot.child("friendOrBlock").value.toString()
                 //나머지 정보는 필요없을 듯
 
@@ -192,12 +229,9 @@ class ChatActivity : AppCompatActivity() {
                                                         )
 
                                                         participantsMenuList.add(
-                                                            WrapperInChatRoomMenu(
-                                                                2,
-                                                                participantInfo,
-                                                                friendOrBlock
-                                                            )
+                                                            WrapperInChatRoomMenu(2,participantInfo,friendOrBlock)
                                                         )
+                                                        Log.i("participant", "참여자추가")
                                                         adapter2.notifyDataSetChanged()
                                                     }
                                                 }
@@ -227,11 +261,6 @@ class ChatActivity : AppCompatActivity() {
                     it.member.uid.toString() == snapshot.key
 
                 }
-                val currentTimeMillis = System.currentTimeMillis()
-                val date = Date(currentTimeMillis)
-                val sdf = SimpleDateFormat("HH:mm:ss.SSSSSS")
-                val formattedTime = sdf.format(date)
-                Log.i("전체 필터링 reflect", formattedTime)
                 adapter2.notifyDataSetChanged()
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -371,69 +400,6 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    /*private fun exitChatRoom() {
-        //방 퇴장
-        RetrofitClient.chatRoomService.getRoomIdLists("Bearer $accessToken", chatRoomInfo.roomId!!)
-            .enqueue(object: Callback<ChatRoom>{
-                override fun onResponse(
-                    call: Call<ChatRoom>,
-                    response: Response<ChatRoom>
-                ) {
-                    if(response.isSuccessful){
-                        val currentParticipantsNum = response.body()?.currentNum!!
-                        //if(currentParticipantsNum > 1) {
-                            //파이어베이스에서 자신의 정보 제거
-                            rf.child("participants/${myInfo.uid}").removeValue().addOnSuccessListener {
-                                //서버에도 나가기api를 사용하여 참가자에서 자신을 제거
-                                //val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "")!!)
-                                val exitBody = AddChatRoomMember(chatRoomInfo.roomId, myInfo.uid)
-                                val request = RetrofitClient.chatRoomService.exitChatRoom("Bearer $accessToken", exitBody)
-                                request.enqueue(object : Callback<ServerBooleanResponse> {
-                                    override fun onResponse(
-                                        call: Call<ServerBooleanResponse>,
-                                        response: Response<ServerBooleanResponse>
-                                    ) {
-                                        if (response.isSuccessful) {
-                                            when (response.code()) {
-                                                200 -> {
-
-                                                    FirebaseMessaging.getInstance()
-                                                        .unsubscribeFromTopic(chatRoomInfo.roomId.toString())
-                                                        .addOnSuccessListener {
-                                                            Log.i("exittt", "퇴장완료")
-                                                            Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
-                                                            val intent = Intent(this@ChatActivity, MainActivity::class.java)
-                                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                                            startActivity(intent)
-                                                        }
-                                                }
-                                                else -> {
-                                                    Log.i("exittt", "퇴장에러")
-                                                    Toast.makeText(this@ChatActivity, "퇴장에러", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        } else {
-                                            Log.i("exittt", response.code().toString())
-                                        }
-                                    }
-
-                                    override fun onFailure(
-                                        call: Call<ServerBooleanResponse>,
-                                        t: Throwable
-                                    ) {
-                                        Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
-                                    }
-                                })
-                            }
-                       // }
-                    }
-                }
-
-                override fun onFailure(call: Call<ChatRoom>, t: Throwable) {
-                    Log.i("abcabc", t.message!!)
-                }
-            })
-    }*/
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
@@ -452,6 +418,7 @@ class ChatActivity : AppCompatActivity() {
             backBtn.setOnClickListener{
                 //val intent = Intent(this@ChatActivity, MainActivity::class.java)
                 val intent = Intent(this@ChatActivity, GiveScoreActivity::class.java)
+                intent.putExtra("roomId", 1L)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
             }
@@ -460,6 +427,7 @@ class ChatActivity : AppCompatActivity() {
             setBobAppointment.setOnClickListener {
                 val intent = Intent(this@ChatActivity, BobAppointmentActivity::class.java)
                 intent.putExtra("roomId", chatRoomInfo.roomId)
+                intent.putExtra("meetingDate", chatRoomInfo.meetingDate)
                 startActivity(intent)
             }
 
@@ -539,14 +507,17 @@ class ChatActivity : AppCompatActivity() {
 
 
     private fun initRecyclerView() {
-        Log.i("kim", "BBB")
+
         //채팅 RecyclerView초기화
         val layoutManager = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
         //layoutManager.stackFromEnd = true
         binding.chatRecyclerView.layoutManager = layoutManager
-        adapter = ChatAdapter(chatItem, myInfo)
+
+
+        adapter = ChatAdapter(chatItem, myInfo, participantsMenuList)
         binding.chatRecyclerView.adapter = adapter
         binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
+        Log.i("aaaa", "chatActivity : $participantsMenuList")
 
         //메뉴recyclerView 초기화
         val layoutManager2 = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
@@ -558,6 +529,7 @@ class ChatActivity : AppCompatActivity() {
 //        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
 //        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
 //        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
+        //Log.i("participant", participantsMenuList.toString())
         adapter2 = ChatMenuParticipantsAdapter(participantsMenuList, this@ChatActivity, chatRoomInfo)
         adapter2.onParticipantsBtnClickListener = object:ChatMenuParticipantsAdapter.OnParticipantsBtnClickListener{
             override fun onAddClick(position: Int, uid: Long?) {

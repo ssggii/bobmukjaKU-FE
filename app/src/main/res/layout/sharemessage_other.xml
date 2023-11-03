@@ -72,6 +72,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxWidth="200dp"
         android:background="@drawable/msg_talk_others"
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="@+id/tv_name"
@@ -83,9 +84,9 @@
             android:id="@+id/restaurant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/notosans_medium"
             android:text="음식점 이름"
             android:textColor="@color/black"
-            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -96,7 +97,6 @@
             android:layout_height="wrap_content"
             android:text="음식점 주소"
             android:textColor="@color/black"
-            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/restaurant_name" />
 

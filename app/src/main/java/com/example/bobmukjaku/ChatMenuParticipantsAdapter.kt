@@ -9,9 +9,12 @@ import com.example.bobmukjaku.Model.ChatRoom
 import com.example.bobmukjaku.Model.WrapperInChatRoomMenu
 import com.example.bobmukjaku.databinding.ChatMenuRoomInfoBinding
 import com.example.bobmukjaku.databinding.ChatMenuRoomParticipantsListBinding
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomMenu>, val context: Context, var chatRoomInfo: ChatRoom): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo.roomId}/notice")
     inner class MenuInfoViewHolder(itemView: ChatMenuRoomInfoBinding)
         : RecyclerView.ViewHolder(itemView.root){
         private val chatRoomDateView = itemView.chatRoomDate
@@ -25,8 +28,19 @@ class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomM
             chatRoomTimeView.text = "${chatRoomInfo.startTime}~${chatRoomInfo.endTime}"
             foodTypeView.text = chatRoomInfo.kindOfFood
             totalNumView.text = chatRoomInfo.total.toString()
-            realStartTime.text = chatRoomInfo.startTime
-            realPlace.text = "???"
+
+            rf.get().addOnSuccessListener {
+                if(it.value != null){
+                    realStartTime.text = it.child("starttime").value.toString()
+                    realPlace.text = it.child("restaurantName").value.toString()
+                }else{
+                    realStartTime.text = "-"
+                    realPlace.text = "-"
+                }
+            }.addOnFailureListener {
+                realStartTime.text = "-"
+                realPlace.text = "-"
+            }
         }
     }
 

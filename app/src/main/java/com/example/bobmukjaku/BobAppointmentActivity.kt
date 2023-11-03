@@ -19,6 +19,7 @@ import com.example.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.example.bobmukjaku.Dto.NoticeDto
 import com.example.bobmukjaku.Model.RestaurantList
 import com.example.bobmukjaku.databinding.ActivityBobAppointmentBinding
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -28,9 +29,13 @@ import java.util.*
 class BobAppointmentActivity : AppCompatActivity() {
     lateinit var binding: ActivityBobAppointmentBinding
     private lateinit var viewModel: MapListViewModel
+    var rf:DatabaseReference? = null
     private val roomId : Long by lazy {
-        intent.getLongExtra("roomId", -1)
+        val roomId = intent.getLongExtra("roomId", -1)
+        rf =  Firebase.database.getReference("chatRoom/$roomId/notice")
+        roomId
     }
+
 
     private var restaurants = listOf<RestaurantList>()
 
@@ -90,6 +95,10 @@ class BobAppointmentActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
         binding.apply {
+
+            if(rf?.get()?.result?.value == null){
+                meetingdate.text = intent.getStringExtra("meetingDate")
+            }
             dateTime.setOnClickListener {
                 showStartTimePickerDialog()
             }

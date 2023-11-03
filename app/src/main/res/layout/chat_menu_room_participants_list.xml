@@ -8,15 +8,16 @@
         android:id="@+id/participant_profile"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         android:src="@drawable/ku_3"
         android:scaleType="fitXY"
-        android:layout_marginLeft="30dp"/>
+        android:layout_marginLeft="15dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
@@ -26,7 +27,7 @@
         <TextView
             android:id="@+id/participant_name"
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/notosans_bold"
             android:textSize="35px"
             android:text="밥도둑은 간장게장"/>
@@ -58,8 +59,7 @@
         android:id="@+id/add_btn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_gravity="center_vertical"
         android:backgroundTint="@color/white"
         android:src="@drawable/add_green" />
 
@@ -67,8 +67,7 @@
         android:id="@+id/block_btn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="20dp"
         android:backgroundTint="@color/white"
         android:src="@drawable/block_red" />
@@ -78,7 +77,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="친구"
-        android:textSize="30sp"
-        android:visibility="gone"/>
+        android:layout_gravity="center_vertical"
+        android:textColor="#B0B0B0"
+        android:textSize="13sp"
+        android:layout_marginEnd="30dp"
+        />
 
 </LinearLayout>
