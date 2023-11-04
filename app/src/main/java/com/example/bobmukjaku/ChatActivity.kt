@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Dto.BlockInfoDto
 import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Dto.FriendUpdateDto
+import com.example.bobmukjaku.Dto.NameRateBgDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityChatBinding
 import com.google.firebase.database.ChildEventListener
@@ -41,6 +42,7 @@ class ChatActivity : AppCompatActivity() {
     lateinit var adapter:ChatAdapter
     lateinit var adapter2: ChatMenuParticipantsAdapter
     val accessToken by lazy{ SharedPreferences.getString("accessToken", "") }
+    val participantListForChatAdapter = arrayListOf<Member>()
 
     lateinit var myInfo: Member//내정보
     private val chatRoomInfo by lazy{//현재 방 정보
@@ -98,29 +100,46 @@ class ChatActivity : AppCompatActivity() {
                     getParticipantsListFromServer()
                     initFirebaseMenuParticipants()
                 }.await()
-
-            initRecyclerView()
             initFirebase()
             initNotice()
             initLayout()
+            initRecyclerView()
         }
     }
 
     private fun getParticipantsListFromServer(){
-        RetrofitClient.memberService.getParticipantsInRoom("Bearer $accessToken", chatRoomInfo.roomId!! )
-            .enqueue(object: Callback<List<Member>>{
+        val request = RetrofitClient.memberService.getParticipantsInRoom("Bearer $accessToken", chatRoomInfo.roomId!! )
+        val response = request.execute()
+        if(response.isSuccessful){
+            val participants = response.body()!!
+
+            //참여자 정보 가져온 후 recyclerView초기화
+            participantListForChatAdapter.clear()
+            for( member in participants){
+                participantListForChatAdapter.add(member)
+                val uid = member.uid
+                rf.child("participants/$uid").setValue("")
+            }
+        }
+            /*.enqueue(object: Callback<List<Member>>{
                 override fun onResponse(
                     call: Call<List<Member>>,
                     response: Response<List<Member>>
                 ) {
                     //서버에서 모든 참여자 정보를 가져와서 파이어베이스에 등록
-                    if(response.isSuccessful){
+                    if(response.isSuccessful)
+                    {
                         val participants = response.body()!!
 
-                        for( participant in participants){
-                            val uid = participant.uid
-                            rf.child("participants/$uid").setValue(participant)
+                        //참여자 정보 가져온 후 recyclerView초기화
+                        participantListForChatAdapter.clear()
+                        for( member in participants){
+                            //participantListForChatAdapter.add(member)
+                            val uid = member.uid
+                            rf.child("participants/$uid").setValue("")
                         }
+
+
                     }
                 }
 
@@ -128,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
                     TODO("Not yet implemented")
                 }
 
-            })
+            })*/
     }
 
     fun initNotice(){
@@ -146,15 +165,19 @@ class ChatActivity : AppCompatActivity() {
                     //채팅방 서랍의 약속정보도 동기화
                     val restaurantTextView = findViewById<TextView>(R.id.real_place)
                     val startTimeTextView = findViewById<TextView>(R.id.real_starttime)
-                    restaurantTextView.text = restaurantName
-                    startTimeTextView.text = startTime
+                    if(restaurantTextView != null && startTimeTextView != null){
+                        restaurantTextView.text = restaurantName
+                        startTimeTextView.text = startTime
+                    }
                 }else{
                     binding.noticeContent.text = "밥약속 설정"
 
                     val restaurantTextView = findViewById<TextView>(R.id.real_place)
                     val startTimeTextView = findViewById<TextView>(R.id.real_starttime)
-                    restaurantTextView.text = "-"
-                    startTimeTextView.text = "-"
+                    if(restaurantTextView != null && startTimeTextView != null){
+                        restaurantTextView.text = "-"
+                        startTimeTextView.text = "-"
+                    }
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -174,100 +197,123 @@ class ChatActivity : AppCompatActivity() {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
                 //다른 누군가가 채팅방에 입장
-                val participantUid = snapshot.child("uid").value.toString().toLong()
-                val participantName = snapshot.child("memberNickName").value.toString()
-                val participantRate = snapshot.child("rate").value.toString().toInt()
-                val paricipantProfileColor = snapshot.child("profileColor").value.toString()
+                val participantUid = snapshot.key.toString().toLong()
+                //val participantName = snapshot.child("memberNickName").value.toString()
+                //val participantRate = snapshot.child("rate").value.toString().toInt()
+                //val paricipantProfileColor = snapshot.child("profileColor").value.toString()
                 //Log.i("kim", "childAdded $participantName")
                 //var friendOrBlock = snapshot.child("friendOrBlock").value.toString()
                 //나머지 정보는 필요없을 듯
 
-                var blockList : List<BlockInfoDto>
-                var friendList : List<FriendInfoDto>
-                var friendOrBlock = "na"
-                //if(friendOrBlock.isNullOrBlank()) friendOrBlock="na"//na -> 친구도 차단하지도 않음(해당사항 없음)
-                RetrofitClient.friendService.getFriendList("Bearer $accessToken")
-                    .enqueue(object: Callback<List<FriendInfoDto>>{
-                        override fun onResponse(
-                            call: Call<List<FriendInfoDto>>,
-                            response: Response<List<FriendInfoDto>>
-                        ) {
-                            //Log.i("kkkkkk", "여기까지")
-                            if(response.code() == 200 || response.code() == 204){
-                                when(response.code()){
-                                    200->{
-                                        friendList = response.body()!!
-                                        for (item in friendList) {
-                                            if (item.friendUid == participantUid){
-                                                friendOrBlock = "friend"
-                                                break
-                                            }
-                                        }
-                                    }
-                                    204->{
-                                        Log.i("aaaaaa", "친구0명")
-                                    }
-                                }
-                                //Log.i("kkkkkk", "여기까지")
-                                //if (friendOrBlock != "friend"){
-                                    RetrofitClient.friendService.getBlockList("Bearer $accessToken")
-                                        .enqueue(object : Callback<List<BlockInfoDto>> {
-                                            override fun onResponse(
-                                                call: Call<List<BlockInfoDto>>,
-                                                response: Response<List<BlockInfoDto>>
-                                            ) {
-                                                if(response.code() == 200 || response.code() == 204){
-                                                    when(response.code()){
-                                                        200->{
-                                                            blockList = response.body()!!
-                                                            //Log.i("kkkkkk", "여기까지")
-                                                            for(item in blockList){
-                                                                if(item.blockUid == participantUid) {
-                                                                    friendOrBlock = "block"
-                                                                    break
-                                                                }
-                                                            }
-                                                        }
-                                                        204->{
-                                                            Log.i("aaaaaa", "차단0명")
-                                                        }
-                                                    }
-                                                    Log.i("kkkkkk", "여기까지")
-                                                    if(participantUid != myInfo.uid) {
-                                                        val participantInfo = Member(
-                                                            participantUid,
-                                                            null,
-                                                            null,
-                                                            participantName,
-                                                            null,
-                                                            participantRate,
-                                                            paricipantProfileColor
-                                                        )
+                RetrofitClient.memberService.getNameRateBg(participantUid).enqueue(object:Callback<NameRateBgDto>{
+                    override fun onResponse(
+                        call: Call<NameRateBgDto>,
+                        response: Response<NameRateBgDto>
+                    ) {
+                        Log.i("ttt", "$participantUid/${response.code()}")
+                        val result = response.body()!!
+                        if(participantListForChatAdapter.find { it.uid == participantUid } == null)
+                            participantListForChatAdapter.add(Member(participantUid,null, null, result.name,null, result.rate, result.bg))
+                        Log.i("hhh", participantListForChatAdapter.toString())
 
-                                                        participantsMenuList.add(
-                                                            WrapperInChatRoomMenu(2,participantInfo,friendOrBlock)
-                                                        )
-                                                        Log.i("participant", "참여자추가")
-                                                        adapter2.notifyDataSetChanged()
+
+
+                        var blockList : List<BlockInfoDto>
+                        var friendList : List<FriendInfoDto>
+                        var friendOrBlock = "na"
+                        //if(friendOrBlock.isNullOrBlank()) friendOrBlock="na"//na -> 친구도 차단하지도 않음(해당사항 없음)
+                        RetrofitClient.friendService.getFriendList("Bearer $accessToken")
+                            .enqueue(object: Callback<List<FriendInfoDto>>{
+                                override fun onResponse(
+                                    call: Call<List<FriendInfoDto>>,
+                                    response: Response<List<FriendInfoDto>>
+                                ) {
+                                    //Log.i("kkkkkk", "여기까지")
+                                    if(response.code() == 200 || response.code() == 204){
+                                        when(response.code()){
+                                            200->{
+                                                friendList = response.body()!!
+                                                for (item in friendList) {
+                                                    if (item.friendUid == participantUid){
+                                                        friendOrBlock = "friend"
+                                                        break
                                                     }
                                                 }
                                             }
-
-                                            override fun onFailure(
-                                                call: Call<List<BlockInfoDto>>,
-                                                t: Throwable
-                                            ) {
-                                                Log.i("aaaaaa", t.message.toString())
+                                            204->{
+                                                Log.i("aaaaaa", "친구0명")
                                             }
-                                        })
-                                //}
-                            }
-                        }
+                                        }
+                                        //Log.i("kkkkkk", "여기까지")
+                                        //if (friendOrBlock != "friend"){
+                                        RetrofitClient.friendService.getBlockList("Bearer $accessToken")
+                                            .enqueue(object : Callback<List<BlockInfoDto>> {
+                                                override fun onResponse(
+                                                    call: Call<List<BlockInfoDto>>,
+                                                    response: Response<List<BlockInfoDto>>
+                                                ) {
+                                                    if(response.code() == 200 || response.code() == 204){
+                                                        when(response.code()){
+                                                            200->{
+                                                                blockList = response.body()!!
+                                                                //Log.i("kkkkkk", "여기까지")
+                                                                for(item in blockList){
+                                                                    if(item.blockUid == participantUid) {
+                                                                        friendOrBlock = "block"
+                                                                        break
+                                                                    }
+                                                                }
+                                                            }
+                                                            204->{
+                                                                Log.i("aaaaaa", "차단0명")
+                                                            }
+                                                        }
+                                                        Log.i("kkkkkk", "여기까지")
+                                                        if(participantUid != myInfo.uid) {
+                                                            val participantInfo = Member(
+                                                                participantUid,
+                                                                null,
+                                                                null,
+                                                                result.name,
+                                                                null,
+                                                                result.rate,
+                                                                result.bg
+                                                            )
 
-                        override fun onFailure(call: Call<List<FriendInfoDto>>, t: Throwable) {
-                            Log.i("aaaaaa", t.message.toString())
-                        }
-                    })
+                                                            participantsMenuList.add(
+                                                                WrapperInChatRoomMenu(2,participantInfo,friendOrBlock)
+                                                            )
+                                                            Log.i("participant", participantsMenuList.toString())
+                                                            adapter2.notifyDataSetChanged()
+                                                        }
+                                                    }
+                                                }
+
+                                                override fun onFailure(
+                                                    call: Call<List<BlockInfoDto>>,
+                                                    t: Throwable
+                                                ) {
+                                                    Log.i("aaaaaa", t.message.toString())
+                                                }
+                                            })
+                                        //}
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<List<FriendInfoDto>>, t: Throwable) {
+                                    Log.i("aaaaaa", t.message.toString())
+                                }
+                            })
+                    }
+
+                    override fun onFailure(call: Call<NameRateBgDto>, t: Throwable) {
+                        TODO("Not yet implemented")
+                    }
+
+                })
+
+
+
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -278,6 +324,9 @@ class ChatActivity : AppCompatActivity() {
 
                 }
                 adapter2.notifyDataSetChanged()
+
+                participantListForChatAdapter.removeIf { it.uid == snapshot.key?:-1 }
+
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
@@ -445,10 +494,6 @@ class ChatActivity : AppCompatActivity() {
                 intent.putExtra("roomId", chatRoomInfo.roomId)
                 intent.putExtra("meetingDate", chatRoomInfo.meetingDate)
                 intent.putExtra("starttime", chatRoomInfo.startTime)
-                /*val startTimeView = findViewById<TextView>(R.id.real_starttime)
-                if(startTimeView.text != "-"){
-                    intent.putExtra("noticeStartTime", startTimeView.text)
-                }*/
                 startActivity(intent)
             }
 
@@ -495,8 +540,8 @@ class ChatActivity : AppCompatActivity() {
                    sendMessage(message, false)//일반 메시지 전송
                 }else{
                     //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-                    val intent = Intent(this@ChatActivity, TestActivity::class.java)
-                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+                    /*val intent = Intent(this@ChatActivity, TestActivity::class.java)
+                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행*/
                 }
             }
         }
@@ -558,7 +603,7 @@ class ChatActivity : AppCompatActivity() {
         binding.chatRecyclerView.layoutManager = layoutManager
 
 
-        adapter = ChatAdapter(chatItem, myInfo, participantsMenuList)
+        adapter = ChatAdapter(chatItem, myInfo, participantListForChatAdapter)
         binding.chatRecyclerView.adapter = adapter
         binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
         Log.i("aaaa", "chatActivity : $participantsMenuList")

@@ -373,6 +373,6 @@ class MakeRoomActivity : AppCompatActivity() {
         val rf = Firebase.database.getReference("chatRoom/$chatRoomId/participants")
 
         //나를 참가자로 등록
-        rf.child(myInfo.uid.toString()).setValue(myInfo)
+        rf.child(myInfo.uid.toString()).setValue("")
     }
 }

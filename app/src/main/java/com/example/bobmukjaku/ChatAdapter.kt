@@ -6,22 +6,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bobmukjaku.Dto.RateAndBgDto
 import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
-import com.example.bobmukjaku.Model.RetrofitClient
-import com.example.bobmukjaku.Model.WrapperInChatRoomMenu
 import com.example.bobmukjaku.databinding.MessageListMineBinding
 import com.example.bobmukjaku.databinding.MessageListOthersBinding
 import com.example.bobmukjaku.databinding.SharemessageMineBinding
 import com.example.bobmukjaku.databinding.SharemessageOtherBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import retrofit2.Call
-import retrofit2.Response
 import java.util.*
 
-class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var participantsMenuList: List<WrapperInChatRoomMenu>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var participants: List<Member>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var initCount = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.i("kim", "create!!!")
@@ -61,11 +56,57 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
     }
 
     fun updateProfile(profileImg: ImageButton, profileBg: ImageButton, position: Int){
-        RetrofitClient.memberService.getRateAndBg(items[position].senderUid!!)
-            .enqueue(object:retrofit2.Callback<RateAndBgDto>{
+
+        val senderUid = items[position].senderUid
+        val sender = participants.find { it.uid == senderUid }
+
+        Log.i("vvv", participants.toString())
+        Log.i("sender", sender.toString())
+        if(sender != null){
+            Log.i("www", sender?.profileColor.toString())
+            val bgResourceId = when (sender.profileColor) {
+                "bg1" -> R.drawable.bg1
+                "bg2" -> R.drawable.bg2
+                "bg3" -> R.drawable.bg3
+                "bg4" -> R.drawable.bg4
+                "bg5" -> R.drawable.bg5
+                "bg6" -> R.drawable.bg6
+                "bg7" -> R.drawable.bg7
+                "bg8" -> R.drawable.bg8
+                "bg9" -> R.drawable.bg9
+                "bg10" -> R.drawable.bg10
+                "bg11" -> R.drawable.bg11
+                "bg12" -> R.drawable.bg12
+                "bg13" -> R.drawable.bg13
+                "bg14" -> R.drawable.bg14
+                "bg15" -> R.drawable.bg15
+                "bg16" -> R.drawable.bg16
+                "bg17" -> R.drawable.bg17
+                "bg18" -> R.drawable.bg18
+                // 다른 리소스에 대한 처리 추가
+                else -> R.drawable.bg1 // 디폴트 리소스 ID 또는 오류 처리 리소스 사용
+            }
+            profileBg.setBackgroundResource(bgResourceId)
+
+            val level = sender.rate?:45
+
+            if ( level <= 20) {
+                profileImg.setBackgroundResource(R.drawable.ku_1)
+            } else if (level <= 40) {
+                profileImg.setBackgroundResource(R.drawable.ku_2)
+            } else if (level <= 60) {
+                profileImg.setBackgroundResource(R.drawable.ku_3)
+            } else if (level <= 80) {
+                profileImg.setBackgroundResource(R.drawable.ku_4)
+            } else {
+                profileImg.setBackgroundResource(R.drawable.ku_5)
+            }
+        }
+        /*RetrofitClient.memberService.getNameRateBg(items[position].senderUid!!)
+            .enqueue(object:retrofit2.Callback<NameRateBgDto>{
                 override fun onResponse(
-                    call: Call<RateAndBgDto>,
-                    response: Response<RateAndBgDto>
+                    call: Call<NameRateBgDto>,
+                    response: Response<NameRateBgDto>
                 ) {
                     if(response.isSuccessful){
                         val data = response.body()
@@ -110,11 +151,11 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                     }
                 }
 
-                override fun onFailure(call: Call<RateAndBgDto>, t: Throwable) {
+                override fun onFailure(call: Call<NameRateBgDto>, t: Throwable) {
                     Log.i("www", t.message.toString())
                 }
 
-            })
+            })*/
     }
 
     override fun getItemCount(): Int {
