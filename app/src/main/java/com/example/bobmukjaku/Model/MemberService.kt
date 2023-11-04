@@ -57,7 +57,8 @@ interface MemberService {
 
     // 로그인
     @POST("/login")
-    fun login(@Body loginDto: LoginDto, @Header("registrationKey") registrationKey: String): Call<Void>
+    //fun login(@Body loginDto: LoginDto, @Header("registrationKey") registrationKey: String): Call<Void>
+    fun login(@Body loginDto: LoginDto): Call<Void>
 
     // 시간표 저장
     @POST("/member/info/timeTable")

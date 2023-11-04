@@ -131,7 +131,8 @@ class LoginActivity : AppCompatActivity() {
                     //로그인 실패(그외) 시 "로그인 실패"메시지 출력
 
 
-                    val request = RetrofitClient.memberService.login(LoginDto(passwd,id), SharedPreferences.getString("registrationKey", "")?:"")
+                    //val request = RetrofitClient.memberService.login(LoginDto(passwd,id), SharedPreferences.getString("registrationKey", "")?:"")
+                    val request = RetrofitClient.memberService.login(LoginDto(passwd,id))
                     //CoroutineScope(Dispatchers.IO).launch {
                         request.enqueue(object: Callback<Void> {
                             override fun onResponse(

@@ -532,7 +532,7 @@ class ChatActivity : AppCompatActivity() {
             sendMsg.setOnClickListener {
                 //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
                 //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
-                Log.i("kimsend", "send")
+
 
                 val message = this.message.text.toString()
 
@@ -540,8 +540,9 @@ class ChatActivity : AppCompatActivity() {
                    sendMessage(message, false)//일반 메시지 전송
                 }else{
                     //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-                    /*val intent = Intent(this@ChatActivity, TestActivity::class.java)
-                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행*/
+                    val intent = Intent(this@ChatActivity, TestActivity::class.java)
+                    Log.i("kimsend", "send")
+                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
                 }
             }
         }
@@ -583,7 +584,7 @@ class ChatActivity : AppCompatActivity() {
             val placeName = it.data?.getStringExtra("placeName")
             val placeAddress = it.data?.getStringExtra("placeAddress")
             val imageUrl = it.data?.getStringExtra("imageUrl")
-            //Log.i("testActivity", "$placeName | $placeAddress | $imageUrl")
+            Log.i("kimsend", "$placeName | $placeAddress | $imageUrl")
 
             //음식점 공유메시지 전송
             //sendMessage("", true, RestaurantInfoForShareMessage(placeName, placeAddress, imageUrl))
