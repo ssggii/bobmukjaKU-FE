@@ -57,7 +57,7 @@ interface MemberService {
 
     // 로그인
     @POST("/login")
-    fun login(@Body loginDto: LoginDto): Call<Void>
+    fun login(@Body loginDto: LoginDto, @Header("registrationKey") registrationKey: String): Call<Void>
 
     // 시간표 저장
     @POST("/member/info/timeTable")
@@ -92,8 +92,8 @@ interface MemberService {
     ): Call<List<Member>>
 
     //로그인없이 사용자의 rate와 배경색 get
-    @GET("/member/rate_bg/{uid}")
-    fun getRateAndBg(@Path("uid") uid: Long): Call<RateAndBgDto>
+    @GET("/member/name_rate_bg/{uid}")
+    fun getNameRateBg(@Path("uid") uid: Long): Call<NameRateBgDto>
 
     // 필요한 다른 API 구현
 
@@ -101,7 +101,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://192.168.219.106:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.219.111:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
