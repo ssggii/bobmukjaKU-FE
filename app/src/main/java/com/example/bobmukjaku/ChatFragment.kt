@@ -21,10 +21,9 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bobmukjaku.Dto.BlockInfoDto
-import com.example.bobmukjaku.Dto.FriendInfoDto
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentChatBinding
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -803,19 +802,23 @@ class ChatFragment : Fragment() {
                 override fun onResponse(call: Call<ServerBooleanResponse>, response: Response<ServerBooleanResponse>) {
                     if (response.isSuccessful) {
                         val serverResponse = response.body()
-                        if (serverResponse != null && serverResponse.success) {
-                            // 서버 응답이 true일 경우 처리
-                            val intent = Intent(requireContext(), ChatActivity::class.java)
-                            intent.putExtra("uid", uid)
-                            intent.putExtra("roomId", roomInfo.roomId)
-                            intent.putExtra("roomName", roomInfo.roomName)
-                            intent.putExtra("meetingDate", roomInfo.meetingDate)
-                            intent.putExtra("startTime", roomInfo.startTime)
-                            intent.putExtra("endTime", roomInfo.endTime)
-                            intent.putExtra("kindOfFood", roomInfo.kindOfFood)
-                            intent.putExtra("total", roomInfo.total)
-                            intent.putExtra("currentNum", roomInfo.currentNum?.plus(1))
-                            startActivity(intent)
+                        if (serverResponse != null && serverResponse.success) {// 서버 응답이 true일 경우 처리
+
+                            //입장하기전 FCM구독
+                            FirebaseMessaging.getInstance().subscribeToTopic(roomInfo.roomId.toString()).addOnSuccessListener {
+
+                                val intent = Intent(requireContext(), ChatActivity::class.java)
+                                intent.putExtra("uid", uid)
+                                intent.putExtra("roomId", roomInfo.roomId)
+                                intent.putExtra("roomName", roomInfo.roomName)
+                                intent.putExtra("meetingDate", roomInfo.meetingDate)
+                                intent.putExtra("startTime", roomInfo.startTime)
+                                intent.putExtra("endTime", roomInfo.endTime)
+                                intent.putExtra("kindOfFood", roomInfo.kindOfFood)
+                                intent.putExtra("total", roomInfo.total)
+                                intent.putExtra("currentNum", roomInfo.currentNum?.plus(1))
+                                startActivity(intent)
+                            }
                         } else {
                             // 서버 응답이 false일 경우 처리
                             val errorCode = response.code()
