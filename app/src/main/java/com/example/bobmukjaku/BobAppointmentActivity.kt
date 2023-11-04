@@ -102,7 +102,17 @@ class BobAppointmentActivity : AppCompatActivity() {
                     var result = it.result.value.toString()
                     if(result == "null"){
                         meetingdate.text = intent.getStringExtra("meetingDate")
-                        startTime = intent.getStringExtra("starttime")?:"오후 00:00"
+                        val data = intent.getStringExtra("starttime")?:"00:00:00"
+                        val hour = data.substring(0,2)
+                        val minute = data.substring(3,5)
+                        val timeFormat = "%02d:%02d"
+                        if(hour.toInt() > 11){
+                            startTime += "오후 "
+                            startTime += timeFormat.format(hour.toInt() - 12, minute.toInt())
+                        }else{
+                            startTime += "오전 "
+                            startTime += timeFormat.format(hour.toInt(), minute.toInt())
+                        }
                     }else{
                         startTime = result
                     }

@@ -23,9 +23,31 @@ class ChatMenuParticipantsAdapter(var participants: ArrayList<WrapperInChatRoomM
         private val totalNumView = itemView.totalNum
         private val realStartTime = itemView.realStarttime
         private val realPlace = itemView.realPlace
+        val timeFormat = "%02d:%02d"
         fun bind(position: Int){
             chatRoomDateView.text = chatRoomInfo.meetingDate
-            chatRoomTimeView.text = "${chatRoomInfo.startTime}~${chatRoomInfo.endTime}"
+            val startHour = chatRoomInfo.startTime?.substring(0,2)?:"0"
+            val startMinute = chatRoomInfo.startTime?.substring(3,5)?:"0"
+            val endHour = chatRoomInfo.endTime?.substring(0,2)?:"0"
+            val endMinute = chatRoomInfo.endTime?.substring(3,5)?:"0"
+            var startTime = ""
+            var endTime = ""
+            if(startHour.toInt() > 11){
+                startTime += "오후 "
+                startTime += timeFormat.format(startHour.toInt() - 12, startMinute.toInt())
+            }else{
+                startTime += "오전 "
+                startTime += timeFormat.format(startHour.toInt(), startMinute.toInt())
+            }
+
+            if(endHour.toInt() > 11){
+                endTime += "오후 "
+                endTime += timeFormat.format(endHour.toInt() - 12, endMinute.toInt())
+            }else{
+                endTime += "오전 "
+                endTime += timeFormat.format(endHour.toInt(), endMinute.toInt())
+            }
+            chatRoomTimeView.text = "${startTime}~${endTime}"
             foodTypeView.text = chatRoomInfo.kindOfFood
             totalNumView.text = chatRoomInfo.total.toString()
 
