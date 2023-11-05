@@ -8,10 +8,7 @@ import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
-import com.example.bobmukjaku.databinding.MessageListMineBinding
-import com.example.bobmukjaku.databinding.MessageListOthersBinding
-import com.example.bobmukjaku.databinding.SharemessageMineBinding
-import com.example.bobmukjaku.databinding.SharemessageOtherBinding
+import com.example.bobmukjaku.databinding.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.util.*
@@ -43,7 +40,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
 
                OtherMessageViewHolder(MessageListOthersBinding.bind(view))
             }
-            else ->{
+            4 ->{
                 //미완성
                 val view =
                     LayoutInflater.from(parent.context)
@@ -51,6 +48,12 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
 
                 OtherShareMessageViewHolder(SharemessageOtherBinding.bind(view)
                 )
+            }
+            else->{
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.date_msg, parent, false)
+                DatePrintViewHolder(DateMsgBinding.bind(view))
             }
         }
     }
@@ -170,7 +173,10 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
 
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
         //return if (items[position].senderUid.equals(myUid)) 1 else 0
-        return if ((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == false)){
+        return if(items[position].senderUid == -100L){
+            5
+        }
+        else if ((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == false)){
             1
         }else if((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == true)){
             2
@@ -186,7 +192,10 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
 //        holder.binding.tvName.text = items[position].senderName
 //        holder.binding.tvMessage.text = items[position].message
 
-        if ((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == false)) { //레이아웃 항목 초기화
+        if(items[position].senderUid == -100L){
+            (holder as DatePrintViewHolder).bind(position)
+        }
+        else if((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == false)) { //레이아웃 항목 초기화
             (holder as MyMessageViewHolder).bind(position)
         }else if((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == true)){
             (holder as MyShareMessageViewHolder).bind(position)
@@ -196,6 +205,31 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             (holder as OtherShareMessageViewHolder).bind(position)
         }
     }
+
+    val calendar: Calendar = Calendar.getInstance()
+    inner class DatePrintViewHolder(itemView: DateMsgBinding) :
+        RecyclerView.ViewHolder(itemView.root){
+            private val dateTextView = itemView.dateMsg
+            fun bind(position: Int){
+                calendar.timeInMillis = items[position].time?:0L
+                val year = calendar[Calendar.YEAR]
+                val month = calendar[Calendar.MONTH] + 1
+                val day = calendar[Calendar.DAY_OF_MONTH]
+                val dayOfWeek = when(calendar[Calendar.DAY_OF_WEEK]){
+                    1->"일요일"
+                    2->"월요일"
+                    3->"화요일"
+                    4->"수요일"
+                    5->"목요일"
+                    6->"금요일"
+                    7->"토요일"
+                    else->"유효하지 않은 날짜값"
+                }
+
+                val dateText = "${year}년 ${month}월 ${day}일 ${dayOfWeek}"
+                dateTextView.text = dateText
+            }
+        }
 
     inner class OtherMessageViewHolder(itemView: MessageListOthersBinding) :         //상대 메시지 뷰홀더
         RecyclerView.ViewHolder(itemView.root) {

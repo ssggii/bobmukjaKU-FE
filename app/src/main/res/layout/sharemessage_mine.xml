@@ -22,9 +22,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="음식점 이름"
+            android:fontFamily="@font/notosans_medium"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,16 +33,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="음식점 주소"
+            android:fontFamily="@font/notosans_medium"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/restaurant_name" />
 
         <ImageView
             android:id="@+id/review_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/restaurant_address" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

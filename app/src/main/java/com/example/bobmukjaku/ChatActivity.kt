@@ -528,21 +528,62 @@ class ChatActivity : AppCompatActivity() {
                 }
             })
 
+            val calendar = Calendar.getInstance()
             //message전송
             sendMsg.setOnClickListener {
                 //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
                 //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
 
+                calendar.timeInMillis = System.currentTimeMillis()
+                val year = calendar[Calendar.YEAR]
+                val month = calendar[Calendar.MONTH]
+                val day = calendar[Calendar.DAY_OF_MONTH]
 
-                val message = this.message.text.toString()
+                val result = chatItem.find{
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = it.time?:0
+                    val yearInArray = calendar[Calendar.YEAR]
+                    val monthInArray = calendar[Calendar.MONTH]
+                    val dayInArray = calendar[Calendar.DAY_OF_MONTH]
+                    (year==yearInArray)&&(month==monthInArray)&&(day==dayInArray)
+                }
 
-                if (message.isNotEmpty()){
-                   sendMessage(message, false)//일반 메시지 전송
+                if(result == null){//현재날짜에 보내는 최초의 메시지이므로 날짜를 표시하는 메시지를 먼저 전송
+                    val accessToken = SharedPreferences.getString("accessToken", "")!!
+                    RetrofitClient.memberService.sendMessage("Bearer $accessToken",
+                        ChatModel("", -100, myInfo.memberNickName,
+                            System.currentTimeMillis(), false,chatRoomInfo.roomId,false)
+                    ).enqueue(object:Callback<Unit>{
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            Log.i("dateMsg", "first")
+                            val message = binding.message.text.toString()
+
+                            if (message.isNotEmpty()){
+                                sendMessage(message, false)//일반 메시지 전송
+                            }else{
+                                //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
+                                val intent = Intent(this@ChatActivity, TestActivity::class.java)
+                                Log.i("kimsend", "send")
+                                shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
                 }else{
-                    //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-                    val intent = Intent(this@ChatActivity, TestActivity::class.java)
-                    Log.i("kimsend", "send")
-                    shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+                    val message = binding.message.text.toString()
+
+                    if (message.isNotEmpty()){
+                        sendMessage(message, false)//일반 메시지 전송
+                    }else{
+                        //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
+                        val intent = Intent(this@ChatActivity, TestActivity::class.java)
+                        Log.i("kimsend", "send")
+                        shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+                    }
                 }
             }
         }
