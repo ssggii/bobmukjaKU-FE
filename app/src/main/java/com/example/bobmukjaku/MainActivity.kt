@@ -2,6 +2,7 @@ package com.example.bobmukjaku
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bobmukjaku.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -34,9 +35,21 @@ class MainActivity : AppCompatActivity() {
                             .replace(R.id.fl_container, chatFragment).commit()
                     }
                     R.id.second -> {
-                        val myplaceFragment = MapFragment()
+                        val data = Bundle()
+
+                        data.putLong("roomId", intent.getLongExtra("roomId", -1))
+                        data.putString("roomName", intent.getStringExtra("roomName"))
+                        data.putString("meetingDate", intent.getStringExtra("meetingDate"))
+                        data.putString("startTime", intent.getStringExtra("startTime"))
+                        data.putString("endTime", intent.getStringExtra("endTime"))
+                        data.putString("kindOfFood", intent.getStringExtra("kindOfFood"))
+                        data.putInt("total", intent.getIntExtra("total", -1))
+                        data.putInt("currentNum", intent.getIntExtra("currentNum", -1))
+
+                        val mapFragment = MapFragment()
+                        mapFragment.arguments = data
                         supportFragmentManager.beginTransaction()
-                            .replace(R.id.fl_container, myplaceFragment).commit()
+                            .replace(R.id.fl_container, mapFragment).commit()
                     }
                     R.id.third -> {
                         val friendFragment = FriendFragment()
@@ -65,6 +78,10 @@ class MainActivity : AppCompatActivity() {
             val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
             val mainBnv = findViewById<BottomNavigationView>(R.id.main_bnv)
             mainBnv.selectedItemId = selectedItemId ?: R.id.forth
+        } else if (resultCode == RESULT_OK) {
+            val selectedItemId = data?.getIntExtra("selectedItemId", R.id.second)
+            val mainBnv = findViewById<BottomNavigationView>(R.id.main_bnv)
+            mainBnv.selectedItemId = selectedItemId ?: R.id.second
         }
     }
 }
