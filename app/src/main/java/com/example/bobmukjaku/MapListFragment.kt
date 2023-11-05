@@ -274,6 +274,9 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                         marker.map = naverMap
 
                         val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
+                        val data = arguments
+                        restaurantInfoDialog.arguments = data
+
                         marker.setOnClickListener {
                             if (markerInfoWindowMap.containsKey(marker)) {
                                 markerInfoWindowMap[marker]?.dismiss()

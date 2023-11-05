@@ -1,5 +1,6 @@
 package com.example.bobmukjaku
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -59,6 +60,35 @@ class RestaurantDetailActivity : AppCompatActivity() {
                 deleteScrap()
             } else {
                 addScrap()
+            }
+        }
+
+        // 공유하기 버튼 클릭 리스너 설정
+        binding.shareBtn.setOnClickListener {
+            val roomId = intent.getLongExtra("roomId", -1)
+            if (roomId.toInt() != -1) {
+                val intent = Intent(this@RestaurantDetailActivity, ChatActivity::class.java)
+
+                intent.putExtra("placeName", bizesNm)
+                intent.putExtra("placeAddress", lnoAdr)
+                if (reviewList != null && reviewList.isNotEmpty()) {
+                    intent.putExtra("imageUrl", reviewList[0].imageUrl)
+                } else {
+                    intent.putExtra("imageUrl", "nodata")
+                }
+
+                intent.putExtra("roomId", intent.getLongExtra("roomId", -1))
+                intent.putExtra("roomName", intent.getStringExtra("roomName"))
+                intent.putExtra("meetingDate", intent.getStringExtra("meetingDate"))
+                intent.putExtra("startTime", intent.getStringExtra("startTime"))
+                intent.putExtra("endTime", intent.getStringExtra("endTime"))
+                intent.putExtra("kindOfFood", intent.getStringExtra("kindOfFood"))
+                intent.putExtra("total", intent.getIntExtra("total", -1))
+                intent.putExtra("currentNum", intent.getIntExtra("currentNum", -1))
+
+                startActivity(intent)
+            } else {
+                Toast.makeText(this@RestaurantDetailActivity, "음식점 정보를 공유할 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }
