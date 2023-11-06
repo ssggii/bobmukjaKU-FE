@@ -7,15 +7,13 @@ import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
+import androidx.fragment.app.Fragment
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.Model.RetrofitClient
 import com.example.bobmukjaku.Model.SharedPreferences
@@ -61,6 +59,9 @@ class ProfileFragment : Fragment() {
 
         // 정보 수정 버튼 이벤트
         modifyInfo()
+
+        //로그아웃 버튼 이벤트
+        logoutInfo()
 
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
@@ -452,6 +453,33 @@ class ProfileFragment : Fragment() {
         binding.modifyBtn.setOnClickListener {
             val intent = Intent(requireContext(), ModifyInfoActivity::class.java)
             startActivityForResult(intent, PROFILE_MODIFY_REQUEST_CODE)
+        }
+    }
+
+    private fun logoutInfo(){
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        val authorizationHeader = "Bearer $accessToken"
+        binding.logoutBtn.setOnClickListener {
+
+            RetrofitClient.memberService.logout(authorizationHeader)
+                .enqueue(object: Callback<Unit>{
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                        if(response.isSuccessful){
+                            //로그아웃 성공
+                            //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+                            val intent = Intent(requireContext(), LoginActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(intent)
+                        }else{
+                            Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        //로그아웃 실패
+                        Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
     }
 
