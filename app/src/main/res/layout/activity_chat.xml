@@ -180,7 +180,7 @@
         android:fontFamily="@font/notosans_semibold"
         android:scaleType="fitCenter"
         android:background="@drawable/btn_green"
-        android:src="@drawable/restaurantmap"
+        android:src="@drawable/map_restaurnt_marker"
         android:paddingVertical="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

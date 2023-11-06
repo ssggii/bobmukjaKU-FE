@@ -531,7 +531,7 @@ class ChatActivity : AppCompatActivity() {
 
                 override fun afterTextChanged(s: Editable?) {
                     if(s?.isEmpty() == true){
-                        binding.sendMsg.setImageDrawable(getDrawable(R.drawable.restaurantmap))
+                        binding.sendMsg.setImageDrawable(getDrawable(R.drawable.map_restaurnt_marker))
                     }else{
                         binding.sendMsg.setImageDrawable(getDrawable(R.drawable.msg_send))
                     }
