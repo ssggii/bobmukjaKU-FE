@@ -145,6 +145,7 @@ class MakeRoomActivity : AppCompatActivity() {
                                     val job = CoroutineScope(Dispatchers.IO).launch{
                                         registerMyInfoIntoFirebase(insertedChatRoom?.roomId!!)
                                         val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                         startActivity(intent)
                                     }
                                 }
