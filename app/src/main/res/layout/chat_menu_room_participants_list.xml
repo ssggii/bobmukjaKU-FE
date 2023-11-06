@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
     android:orientation="horizontal">
 
 
@@ -9,9 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
-        android:layout_marginLeft="15dp">
+        android:layout_marginLeft="30dp">
 
         <ImageView
             android:id="@+id/participant_profile_bg"
@@ -38,8 +38,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
         android:layout_weight="1">
 
         <TextView
@@ -47,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/notosans_bold"
-            android:textSize="35px"
+            android:textSize="15sp"
             android:text="밥도둑은 간장게장"/>
 
         <LinearLayout
@@ -58,15 +56,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="30px"
+                android:textSize="12sp"
                 android:fontFamily="@font/notosans_semibold"
-                android:text="LV "/>
+                android:text="Lv "/>
 
             <TextView
                 android:id="@+id/participant_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="30px"
+                android:textSize="12sp"
                 android:fontFamily="@font/notosans_semibold"
                 android:text="5"/>
         </LinearLayout>

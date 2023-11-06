@@ -267,12 +267,12 @@
 
             <ImageButton
                 android:id="@+id/exit_btn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:background="@drawable/room_exit"
-                android:layout_marginLeft="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginLeft="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>
