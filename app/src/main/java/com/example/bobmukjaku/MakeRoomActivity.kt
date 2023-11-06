@@ -15,6 +15,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import com.example.bobmukjaku.CustomTimePicker.Companion.getDisplayedMinute
+import com.example.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.ActivityMakeRoomBinding
 import com.google.firebase.database.ktx.database
@@ -192,7 +194,43 @@ class MakeRoomActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    private  fun showTimePickerDialog(onTimeSet: (hour: Int, minute: Int) -> Unit){
+
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.timepicker_alert_dialog, null)
+        val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker_alert_two)
+        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
+
+        timePicker.setTimeInterval(10)
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+
+        // 확인 버튼 클릭 이벤트 처리
+        yesButton.setOnClickListener {
+            val hour = timePicker.hour
+            //val minute = timePicker.minute
+            val minute = timePicker.getDisplayedMinute()
+
+            Log.i("currentHour", "$hour : $minute")
+            // 선택한 시간 정보를 콜백 함수를 통해 전달합니다.
+            onTimeSet(hour, minute)
+
+            alertDialog.dismiss()
+        }
+
+        // 취소 버튼 클릭 이벤트 처리
+        noButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+    }
+
+   /* @RequiresApi(Build.VERSION_CODES.O)
     private fun showTimePickerDialog(onTimeSet: (hour: Int, minute: Int) -> Unit) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.timepicker_alert_dialog, null)
         val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker_alert_two)
@@ -239,7 +277,7 @@ class MakeRoomActivity : AppCompatActivity() {
         noButton.setOnClickListener {
             alertDialog.dismiss()
         }
-    }
+    }*/
 
     // 현재 날짜를 가져오는 함수
     private fun getCurrentDate(): String {
