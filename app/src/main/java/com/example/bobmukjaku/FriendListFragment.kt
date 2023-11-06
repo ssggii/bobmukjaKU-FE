@@ -48,26 +48,6 @@ class FriendListFragment : Fragment(), FriendListAdapter.OnFriendRemovedListener
         getFriendList()
     }
 
-    // 친구 추가 테스트 코드
-    private fun addFriend() {
-        val friendInfo = FriendUpdateDto(friendUid = 2)
-        val call = friendService.registerFriend(authorizationHeader, friendInfo)
-        call.enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
-                    Log.i("RegisterFriend", "친구 등록 완료")
-                } else {
-                    val errorCode = response.code()
-                    Log.i("RegisterFriend", "친구 등록 실패 $errorCode")
-                }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                t.message?.let { it1 -> Log.i("[친구 등록 기타 에러: ]", it1) }
-            }
-        })
-    }
     private fun getFriendList() {
         val call = friendService.getFriendList(authorizationHeader)
 

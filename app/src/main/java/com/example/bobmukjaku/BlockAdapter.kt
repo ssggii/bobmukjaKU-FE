@@ -1,9 +1,11 @@
 package com.example.bobmukjaku
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Dto.BlockInfoDto
@@ -95,31 +97,51 @@ class BlockAdapter(var items: List<BlockInfoDto>, var onBlockRemovedListener: On
 
         // 차단 해제 버튼 이벤트
         holder.binding.blockBtn.setOnClickListener {
-            val blockInfo = FriendUpdateDto(friendUid = blockInfo.blockUid)
-            RetrofitClient.friendService.removeBlock(authorizationHeader, blockInfo).enqueue(object :
-                Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        // 성공적으로 차단 해제 완료
-                        Toast.makeText(holder.binding.root.context, "차단 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+            val dialogView = LayoutInflater.from(holder.binding.root.context).inflate(R.layout.block_delete_dialog, null)
+            val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+            val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
 
-                        // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
-                        onBlockRemovedListener.onBlockRemoved(position)
-                    } else {
-                        val errorCode = response.code()
-                        Toast.makeText(
-                            holder.binding.root.context,
-                            "차단 해제에 실패했습니다. 에러 코드: $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
+            val builder = AlertDialog.Builder(holder.binding.root.context)
+                .setView(dialogView)
+                .setCancelable(false)
+
+            val alertDialog = builder.create()
+            alertDialog.show()
+
+            // 확인 버튼 클릭 이벤트 처리
+            yesButton.setOnClickListener {
+                val blockInfo = FriendUpdateDto(friendUid = blockInfo.blockUid)
+                RetrofitClient.friendService.removeBlock(authorizationHeader, blockInfo).enqueue(object :
+                    Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            // 성공적으로 차단 해제 완료
+                            Toast.makeText(holder.binding.root.context, "차단 해제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                            // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
+                            onBlockRemovedListener.onBlockRemoved(position)
+                        } else {
+                            val errorCode = response.code()
+                            Toast.makeText(
+                                holder.binding.root.context,
+                                "차단 해제에 실패했습니다. 에러 코드: $errorCode",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
-                    t.message?.let { Log.i("[스크랩 해제 실패: ]", it) }
-                }
-            })
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                        t.message?.let { Log.i("[차단 해제 실패: ]", it) }
+                    }
+                })
+                alertDialog.dismiss()
+            }
+
+            // 취소 버튼 클릭 이벤트 처리
+            noButton.setOnClickListener {
+                alertDialog.dismiss()
+            }
         }
     }
 
