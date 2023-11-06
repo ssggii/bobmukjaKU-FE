@@ -1,33 +1,21 @@
 package com.example.bobmukjaku
 
-import MapListFragment
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Model.*
 import com.example.bobmukjaku.databinding.FragmentRestaurantInfoDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.IOException
 
 class RestaurantInfoDialog(private val restaurant: RestaurantList, private val uid: Long) : BottomSheetDialogFragment() {
 
@@ -75,7 +63,8 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
 
         // 공유하기 버튼 클릭 리스너 설정
         binding.shareBtn.setOnClickListener {
-            val intent = Intent(requireContext(), ChatActivity::class.java)
+            //val intent = Intent(requireContext(), ChatActivity::class.java)
+            val intent = requireActivity().intent
 
             intent.putExtra("placeName", restaurant.bizesNm)
             intent.putExtra("placeAddress", restaurant.lnoAdr)
@@ -105,7 +94,10 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 intent.putExtra("total", total)
                 intent.putExtra("currentNum", currentNum)
 
-                startActivity(intent)
+                //startActivity(intent)
+                requireActivity().setResult(Activity.RESULT_OK, intent)
+                requireActivity().finish()
+
                 dismiss()
             } else {
                 Toast.makeText(requireContext(), "음식점 정보를 공유할 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()

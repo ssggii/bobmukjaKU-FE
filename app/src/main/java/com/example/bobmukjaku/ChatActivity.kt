@@ -1,6 +1,5 @@
 package com.example.bobmukjaku
 
-import MapListFragment
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -572,38 +571,35 @@ class ChatActivity : AppCompatActivity() {
                     mapIntent.putExtra("currentNum", chatRoomInfo.currentNum)
 
                     // shareMessageLauncher를 사용하여 MapFragment로 전환
-                    shareMessageLauncher.launch(mapIntent)
+                    //shareMessageLauncher.launch(mapIntent)
 
-//                    val accessToken = SharedPreferences.getString("accessToken", "")!!
-//                    RetrofitClient.memberService.sendMessage("Bearer $accessToken",
-//                        ChatModel("", -100, myInfo.memberNickName,
-//                            System.currentTimeMillis(), false,chatRoomInfo.roomId,false)
-//                    ).enqueue(object:Callback<Unit>{
-//                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-//                            Log.i("dateMsg", "first")
-//                            val message = binding.message.text.toString()
-//
-//                            if (message.isNotEmpty()){
-//                                sendMessage(message, false)//일반 메시지 전송
-//                            }else{
-//                                //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-////                                val mapListFragment = MapListFragment()
-////                                supportFragmentManager.beginTransaction()
-////                                    .replace(R.id.map_container, mapListFragment)
-////                                    .addToBackStack(null) // 필요에 따라 back stack에 추가
-////                                    .commit()
-//
-//                                val intent = Intent(this@ChatActivity, TestActivity::class.java)
-//                                Log.i("kimsend", "send")
-//                                shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-//                            TODO("Not yet implemented")
-//                        }
-//
-//                    })
+                    val accessToken = SharedPreferences.getString("accessToken", "")!!
+                    RetrofitClient.memberService.sendMessage("Bearer $accessToken",
+                        ChatModel("", -100, myInfo.memberNickName,
+                            System.currentTimeMillis(), false,chatRoomInfo.roomId,false)
+                    ).enqueue(object:Callback<Unit>{
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            Log.i("dateMsg", "first")
+                            val message = binding.message.text.toString()
+
+                            if (message.isNotEmpty()){
+                                sendMessage(message, false)//일반 메시지 전송
+                            }else{
+                                //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
+//                                val mapListFragment = MapListFragment()
+//                                supportFragmentManager.beginTransaction()
+//                                    .replace(R.id.map_container, mapListFragment)
+//                                    .addToBackStack(null) // 필요에 따라 back stack에 추가
+//                                    .commit()
+                                shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
                 }else{
                     val message = binding.message.text.toString()
 
