@@ -12,7 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="참여자 평가"
-        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/notosans_semibold"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
         android:text="식사는 즐거우셨나요?\n참여자들의 매너를 평가해주세요!"
+        android:fontFamily="@font/notosans_medium"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -33,6 +37,7 @@
         android:id="@+id/participants_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintBottom_toTopOf="@+id/next_btn"
         app:layout_constraintTop_toBottomOf="@+id/textview2" />
 
