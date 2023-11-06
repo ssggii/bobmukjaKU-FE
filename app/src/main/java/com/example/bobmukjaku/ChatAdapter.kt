@@ -378,7 +378,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 restaurantAddressTxt.text = restaurantAddress
                 timeTxt.text = getDateText(items[position].time)
                 scrapCountTxt.text = scrapCount
-
+                reviewImg.setImageResource(0)
 
 
                 if(imageUrl != "nodata") {
@@ -408,6 +408,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                                 Log.i("imageLoad", it.message.toString())
                             }
                     }
+                }else{
+                    reviewImg.visibility = View.GONE
                 }
 
                 var reviewTxtList = arrayListOf<TextView>()

@@ -150,11 +150,13 @@
             />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@+id/review_img"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:background="@drawable/line_gray_top">
 
             <TextView
