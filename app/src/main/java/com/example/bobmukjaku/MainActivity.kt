@@ -2,7 +2,8 @@ package com.example.bobmukjaku
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bobmukjaku.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,6 +17,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         startFragment()
+    }
+
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if(doubleBackToExitPressedOnce){
+            super.onBackPressed()
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, 2000)
     }
 
     private fun startFragment() {

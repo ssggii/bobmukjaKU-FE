@@ -3,6 +3,7 @@ package com.example.bobmukjaku
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -42,6 +43,20 @@ class LoginActivity : AppCompatActivity() {
         autoLogin()
 
 
+    }
+
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if(doubleBackToExitPressedOnce){
+            super.onBackPressed()
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, 2000)
     }
 
     private fun autoLogin() {
