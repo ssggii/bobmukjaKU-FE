@@ -7,6 +7,8 @@
     android:background="#F9FFE2"
     tools:context=".ChatActivity"
     android:id="@+id/menu_drawer"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="right"
     >
 
 <!--    android:fitsSystemWindows="true"
@@ -254,19 +256,23 @@
             android:id="@+id/menu_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:background="@drawable/line_gray"/>
 
         <LinearLayout
             android:id="@+id/menu_bottom"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/exit_btn"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:srcCompat="?attr/actionModeCloseDrawable" />
+                android:background="@drawable/room_exit"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -38,6 +38,7 @@
         android:text="name"
         android:textSize="16dp"
         android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
         android:fontFamily="@font/notosans_semibold"
         app:layout_constraintBottom_toTopOf="@+id/img_framelayout"
         app:layout_constraintStart_toEndOf="@+id/img_framelayout"
