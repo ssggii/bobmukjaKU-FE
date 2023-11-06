@@ -13,12 +13,13 @@ import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.*
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
 
@@ -379,6 +380,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 scrapCountTxt.text = scrapCount
 
 
+
                 if(imageUrl != "nodata") {
                     /*val rf = Firebase.storage.reference.child(imageUrl)
                     val ONE_MEGABYTE: Long = 1024 * 1024 * 5
@@ -396,16 +398,15 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                     // Firebase Storage에서 이미지 다운로드
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        val bitmap = downloadImageFromFirebaseStorage(imageUrl)
-                        withContext(Dispatchers.Main) {
-                            if (bitmap != null) {
+                        val rf = FirebaseStorage.getInstance().reference.child(imageUrl)
+                            .downloadUrl.addOnSuccessListener {downloadUrl->
+                                Log.i("imageLoad", "Success $downloadUrl")
                                 reviewImg.visibility = View.VISIBLE
-                                reviewImg.setImageBitmap(bitmap)
-                            } else {
-                                // 이미지 다운로드 실패 처리
-                                Log.i("리뷰 이미지 로드", "실패")
+                                Picasso.get().load(downloadUrl).error(R.drawable.ku_1).into(reviewImg)
+                                //Glide.with(context).load(downloadUrl).error(R.drawable.ku_1).into(reviewImg)
+                            }.addOnFailureListener {
+                                Log.i("imageLoad", it.message.toString())
                             }
-                        }
                     }
                 }
 
@@ -413,6 +414,9 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 reviewTxtList.add(review1Txt)
                 reviewTxtList.add(review2Txt)
                 reviewTxtList.add(review3Txt)
+                reviewTxtList[0].visibility = View.GONE
+                reviewTxtList[1].visibility = View.GONE
+                reviewTxtList[2].visibility = View.GONE
 
                 if(reviewData != ""){
                     val reviewList = reviewData.split("/")
@@ -467,6 +471,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             var review2Txt = itemView.review2
             var review3Txt = itemView.review3
 
+
             private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
                 val storageReference = Firebase.storage.reference.child(imagePath)
                 return try {
@@ -491,6 +496,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
 
 
 
+
                 restaurantNameTxt.text = restaurantName
                 restaurantAddressTxt.text = restaurantAddress
                 timeTxt.text = getDateText(items[position].time)
@@ -511,7 +517,29 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                         reviewImg.visibility = View.VISIBLE
                         reviewImg.setImageBitmap(bitmap)
                     }*/
-                    // Firebase Storage에서 이미지 다운로드
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val rf = FirebaseStorage.getInstance().reference.child(imageUrl)
+                            .downloadUrl.addOnSuccessListener {downloadUrl->
+                                Log.i("imageLoad", "Success $downloadUrl")
+                                reviewImg.visibility = View.VISIBLE
+                                Picasso.get().load(downloadUrl).error(R.drawable.ku_1).into(reviewImg)
+                                //Glide.with(context).load(downloadUrl).error(R.drawable.ku_1).into(reviewImg)
+                            }.addOnFailureListener {
+                                Log.i("imageLoad", it.message.toString())
+                            }
+                        /*val bitmap = downloadImageFromFirebaseStorage(imageUrl)
+                        withContext(Dispatchers.Main) {
+                            if (bitmap != null) {
+                                reviewImg.visibility = View.VISIBLE
+                                reviewImg.setImageBitmap(bitmap)
+                            } else {
+                                // 이미지 다운로드 실패 처리
+                                Log.i("리뷰 이미지 로드", "실패")
+                            }
+                        }*/
+                    }
+                    /*// Firebase Storage에서 이미지 다운로드
                     CoroutineScope(Dispatchers.IO).launch {
                         val bitmap = downloadImageFromFirebaseStorage(imageUrl)
                         withContext(Dispatchers.Main) {
@@ -523,13 +551,18 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                                 Log.i("리뷰 이미지 로드", "실패")
                             }
                         }
-                    }
+                    }*/
+                }else{
+                    reviewImg.visibility = View.GONE
                 }
 
                 var reviewTxtList = arrayListOf<TextView>()
                 reviewTxtList.add(review1Txt)
                 reviewTxtList.add(review2Txt)
                 reviewTxtList.add(review3Txt)
+                reviewTxtList[0].visibility = View.GONE
+                reviewTxtList[1].visibility = View.GONE
+                reviewTxtList[2].visibility = View.GONE
 
                 if(reviewData != ""){
                     val reviewList = reviewData.split("/")
