@@ -73,6 +73,14 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
             } else {
                 intent.putExtra("imageUrl", "nodata")
             }
+            intent.putExtra("countScrap", binding.countScrap.text.toString())
+            var reviewListForward = ""
+            for((reviewCount, review) in reviewList.withIndex()){
+                reviewListForward += "${review.contents}/"
+                if(reviewCount == 2)
+                    break
+            }//리뷰 최대 3개를 가져온다.
+            intent.putExtra("reviewList", reviewListForward)
 
             val data = arguments
             if (data != null) {

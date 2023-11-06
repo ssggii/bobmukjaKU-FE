@@ -1,16 +1,25 @@
 package com.example.bobmukjaku
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bobmukjaku.Model.ChatModel
 import com.example.bobmukjaku.Model.Member
 import com.example.bobmukjaku.databinding.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.util.*
 
 class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var participants: List<Member>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -31,7 +40,11 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.sharemessage_mine, parent, false)   //내 메시지 레이아웃으로 초기화
 
-                MyShareMessageViewHolder(SharemessageMineBinding.bind(view))
+                MyShareMessageViewHolder(
+                    SharemessageMineBinding.bind(
+                        view
+                    )
+                )
             }
             3 -> {      //메시지가 상대 메시지인 경우
                 val view =
@@ -331,12 +344,31 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             var nameTxt = itemView.tvName
             var imgBtnProfileImg = itemView.profileImage
             var imgBtnProfileBg = itemView.profildBg
+            //var imgContainer = itemView.imgcontainer
+            var scrapCountTxt = itemView.shareCountScrap
+            var review1Txt = itemView.review1
+            var review2Txt = itemView.review2
+            var review3Txt = itemView.review3
 
+            private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
+                val storageReference = Firebase.storage.reference.child(imagePath)
+                return try {
+                    val maxBufferSize = 10 * 1024 * 1024 // 최대 허용 버퍼 크기를 설정 (10MB로 설정)
+                    val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Log.e("ImageDownload", "Image download failed: ${e.message}")
+                    null
+                }
+            }
             fun bind(position: Int){
                 var contentList = items[position].message!!.split("|")
                 var restaurantName = contentList[0]
                 var restaurantAddress = contentList[1]
                 var imageUrl = contentList[2]
+                var scrapCount = contentList[3]
+                var reviewData = contentList[4]
 
                 updateProfile(imgBtnProfileImg,imgBtnProfileBg, adapterPosition)
 
@@ -344,17 +376,59 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 restaurantNameTxt.text = restaurantName
                 restaurantAddressTxt.text = restaurantAddress
                 timeTxt.text = getDateText(items[position].time)
-                val rf = Firebase.storage.reference.child(imageUrl)
-                val ONE_MEGABYTE: Long = 1024 * 1024
-                rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
-                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                    Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
-                    val reviewImagelayoutparams = reviewImg.layoutParams
-                    reviewImagelayoutparams.width = bitmap.width * 30 / 100
-                    reviewImagelayoutparams.height = bitmap.height * 30 / 100
-                    reviewImg.layoutParams = reviewImagelayoutparams
-                    reviewImg.setImageBitmap(bitmap)
+                scrapCountTxt.text = scrapCount
+
+
+                if(imageUrl != "nodata") {
+                    /*val rf = Firebase.storage.reference.child(imageUrl)
+                    val ONE_MEGABYTE: Long = 1024 * 1024 * 5
+                    rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                        val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                        Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
+                        val reviewImagelayoutparams = reviewImg.layoutParams
+                        //reviewImagelayoutparams.width = bitmap.width * 30 / 100
+                        //reviewImagelayoutparams.height = bitmap.height * 30 / 100
+                        //reviewImg.layoutParams = reviewImagelayoutparams
+                        //imgContainer.visibility = View.VISIBLE
+                        reviewImg.visibility = View.VISIBLE
+                        reviewImg.setImageBitmap(bitmap)
+                    }*/
+                    // Firebase Storage에서 이미지 다운로드
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val bitmap = downloadImageFromFirebaseStorage(imageUrl)
+                        withContext(Dispatchers.Main) {
+                            if (bitmap != null) {
+                                reviewImg.visibility = View.VISIBLE
+                                reviewImg.setImageBitmap(bitmap)
+                            } else {
+                                // 이미지 다운로드 실패 처리
+                                Log.i("리뷰 이미지 로드", "실패")
+                            }
+                        }
+                    }
                 }
+
+                var reviewTxtList = arrayListOf<TextView>()
+                reviewTxtList.add(review1Txt)
+                reviewTxtList.add(review2Txt)
+                reviewTxtList.add(review3Txt)
+
+                if(reviewData != ""){
+                    val reviewList = reviewData.split("/")
+
+                    Log.i("rrrr", reviewList.toString())
+                    for((i, review) in reviewList.withIndex()){
+                        if(review == "")break
+                        reviewTxtList[i].visibility = View.VISIBLE
+                        var reviewText = review
+                        if(reviewText.length > 10){
+                            reviewText = reviewText.substring(0,10).plus("...")
+                        }
+                        reviewTxtList[i].text = "→ $reviewText"
+                    }
+                }
+
             }
 
             fun getDateText(sendDate: Long?): String {    //메시지 전송 시각 생성
@@ -386,28 +460,92 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             var restaurantNameTxt = itemView.restaurantName
             var restaurantAddressTxt = itemView.restaurantAddress
             var reviewImg = itemView.reviewImg
+            //var imgContainer = itemView.imgcontainer
             var timeTxt = itemView.txtDate
+            var scrapCountTxt = itemView.shareCountScrap
+            var review1Txt = itemView.review1
+            var review2Txt = itemView.review2
+            var review3Txt = itemView.review3
+
+            private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
+                val storageReference = Firebase.storage.reference.child(imagePath)
+                return try {
+                    val maxBufferSize = 10 * 1024 * 1024 // 최대 허용 버퍼 크기를 설정 (10MB로 설정)
+                    val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Log.e("ImageDownload", "Image download failed: ${e.message}")
+                    null
+                }
+            }
+
             fun bind(position: Int){
+                Log.i("rrrr", items[position].message!!)
                 var contentList = items[position].message!!.split("|")
                 var restaurantName = contentList[0]
                 var restaurantAddress = contentList[1]
                 var imageUrl = contentList[2]
+                var scrapCount = contentList[3]
+                var reviewData = contentList[4]
+
 
 
                 restaurantNameTxt.text = restaurantName
                 restaurantAddressTxt.text = restaurantAddress
                 timeTxt.text = getDateText(items[position].time)
-                val rf = Firebase.storage.reference.child(imageUrl)
-                val ONE_MEGABYTE: Long = 1024 * 1024
-                rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
-                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                    Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
-                    val reviewImagelayoutparams = reviewImg.layoutParams
-                    reviewImagelayoutparams.width = bitmap.width * 30 / 100
-                    reviewImagelayoutparams.height = bitmap.height * 30 / 100
-                    reviewImg.layoutParams = reviewImagelayoutparams
-                    reviewImg.setImageBitmap(bitmap)
+                scrapCountTxt.text = scrapCount
+                reviewImg.setImageResource(0)
+                if(imageUrl != "nodata") {
+                    /*val rf = Firebase.storage.reference.child(imageUrl)
+                    val ONE_MEGABYTE: Long = 1024 * 1024
+                    rf.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                        val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                        Log.i("sharebind", "${bitmap.width} * ${bitmap.height}")
+                        val reviewImagelayoutparams = reviewImg.layoutParams
+                        //reviewImagelayoutparams.width = bitmap.width * 30 / 100
+                        //reviewImagelayoutparams.height = bitmap.height * 30 / 100
+                        //reviewImg.layoutParams = reviewImagelayoutparams
+                        //reviewImg.visibility = View.VISIBLE
+                        //imgContainer.visibility = View.VISIBLE
+                        reviewImg.visibility = View.VISIBLE
+                        reviewImg.setImageBitmap(bitmap)
+                    }*/
+                    // Firebase Storage에서 이미지 다운로드
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val bitmap = downloadImageFromFirebaseStorage(imageUrl)
+                        withContext(Dispatchers.Main) {
+                            if (bitmap != null) {
+                                reviewImg.visibility = View.VISIBLE
+                                reviewImg.setImageBitmap(bitmap)
+                            } else {
+                                // 이미지 다운로드 실패 처리
+                                Log.i("리뷰 이미지 로드", "실패")
+                            }
+                        }
+                    }
                 }
+
+                var reviewTxtList = arrayListOf<TextView>()
+                reviewTxtList.add(review1Txt)
+                reviewTxtList.add(review2Txt)
+                reviewTxtList.add(review3Txt)
+
+                if(reviewData != ""){
+                    val reviewList = reviewData.split("/")
+
+                    Log.i("rrrr", reviewList.toString())
+                    for((i, review) in reviewList.withIndex()){
+                        if(review == "")break
+                        reviewTxtList[i].visibility = View.VISIBLE
+                        var reviewText = review
+                        if(reviewText.length > 10){
+                            reviewText = reviewText.substring(0,10).plus("...")
+                        }
+                        reviewTxtList[i].text = "→ $reviewText"
+                    }
+                }
+
             }
         fun getDateText(sendDate: Long?): String {    //메시지 전송 시각 생성
 

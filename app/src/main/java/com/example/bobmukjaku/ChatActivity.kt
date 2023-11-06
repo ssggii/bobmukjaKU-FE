@@ -579,7 +579,7 @@ class ChatActivity : AppCompatActivity() {
                             System.currentTimeMillis(), false,chatRoomInfo.roomId,false)
                     ).enqueue(object:Callback<Unit>{
                         override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                            Log.i("dateMsg", "first")
+
                             val message = binding.message.text.toString()
 
                             if (message.isNotEmpty()){
@@ -591,7 +591,8 @@ class ChatActivity : AppCompatActivity() {
 //                                    .replace(R.id.map_container, mapListFragment)
 //                                    .addToBackStack(null) // 필요에 따라 back stack에 추가
 //                                    .commit()
-                                shareMessageLauncher.launch(intent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
+
+                                shareMessageLauncher.launch(mapIntent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
                             }
                         }
 
@@ -662,11 +663,13 @@ class ChatActivity : AppCompatActivity() {
             val placeName = it.data?.getStringExtra("placeName")
             val placeAddress = it.data?.getStringExtra("placeAddress")
             val imageUrl = it.data?.getStringExtra("imageUrl")
-            Log.i("kimsend", "$placeName | $placeAddress | $imageUrl")
+            val countScrap = it.data?.getStringExtra("countScrap")?:"0"
+            val reviewList = it.data?.getStringExtra("reviewList")?:""
+            Log.i("kimsend", "$placeName| $placeAddress | $imageUrl | $countScrap | $reviewList")
 
             //음식점 공유메시지 전송
             //sendMessage("", true, RestaurantInfoForShareMessage(placeName, placeAddress, imageUrl))
-            val message = "$placeName|$placeAddress|$imageUrl"
+            val message = "$placeName|$placeAddress|$imageUrl|$countScrap|$reviewList"
             sendMessage(message, true)
         }
     }
