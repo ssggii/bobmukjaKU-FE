@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -45,6 +46,19 @@ class ReviewActivity : AppCompatActivity() {
     //val roomId = 1
     val accessToken = "Bearer ".plus(SharedPreferences.getString("accessToken", "") ?: null)
 
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if(doubleBackToExitPressedOnce){
+            super.onBackPressed()
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, 2000)
+    }
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,6 +181,7 @@ class ReviewActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.Q)
     private val captureActivityLauncher
     = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        Log.i("camera", "test")
         if(it.resultCode == RESULT_OK && it.data != null){
             when{
                 (it.data?.data != null)->{

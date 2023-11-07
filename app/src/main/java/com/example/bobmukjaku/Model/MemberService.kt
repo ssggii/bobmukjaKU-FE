@@ -96,13 +96,17 @@ interface MemberService {
     @GET("/member/name_rate_bg/{uid}")
     fun getNameRateBg(@Path("uid") uid: Long): Call<NameRateBgDto>
 
+    //로그아웃
+    @POST("/auth/logout")
+    fun logout(@Header("authorization") authorization: String): Call<Unit>
+
     // 필요한 다른 API 구현
 
 }
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://192.168.219.111:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.184.74:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {

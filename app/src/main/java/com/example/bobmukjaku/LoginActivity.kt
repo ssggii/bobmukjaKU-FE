@@ -190,6 +190,7 @@ class LoginActivity : AppCompatActivity() {
 
                                             //메인화면으로 전환
                                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                            finishAffinity()
                                             startActivity(intent)
 //                                            val intent = Intent(this@LoginActivity, GiveScoreActivity::class.java)
 //                                            startActivity(intent)
