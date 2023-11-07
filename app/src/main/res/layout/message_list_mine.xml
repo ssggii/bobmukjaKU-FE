@@ -23,7 +23,6 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:layout_marginBottom="5dp"
-        android:elevation="10dp"
         android:fontFamily="@font/notosans_medium"
         android:text="안녕하세요."
         android:textColor="@color/white"

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.bobmukjaku'
+    namespace 'com.bobmukja.bobmukjaku'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.bobmukjaku"
+        applicationId "com.bobmukja.bobmukjaku"
         minSdk 24
         targetSdk 33
         versionCode 1
