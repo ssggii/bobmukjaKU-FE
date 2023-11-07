@@ -2,7 +2,9 @@ package com.example.bobmukjaku
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bobmukjaku.Dto.RateUpdateDto
@@ -36,6 +38,21 @@ class GiveScoreActivity : AppCompatActivity() {
 
 
 
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if(doubleBackToExitPressedOnce){
+            super.onBackPressed()
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, 2000)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGiveScoreBinding.inflate(layoutInflater)
@@ -43,7 +60,9 @@ class GiveScoreActivity : AppCompatActivity() {
 
         try{
             roomId = intent.getLongExtra("roomId", -1)
+            //roomId = 3
             Log.i("roomroom", "$roomId")
+
         }catch (e: Exception){
             Log.i("errorMessage", "roomId문제 ${e.message}")
         }
@@ -57,6 +76,7 @@ class GiveScoreActivity : AppCompatActivity() {
         }
 
 
+
         val getMyInfoJob = CoroutineScope(Dispatchers.IO).async {
             getMyInfoFromServer()
         }
@@ -64,6 +84,7 @@ class GiveScoreActivity : AppCompatActivity() {
 //        Log.i("errorMessage", roomId.toString())
         CoroutineScope(Dispatchers.Main).launch {
             myInfo = getMyInfoJob.await()
+
             val getAllParticipantsInRoomJob = CoroutineScope(Dispatchers.IO).async {
                 getAllParticipants(roomId)
             }
@@ -71,6 +92,7 @@ class GiveScoreActivity : AppCompatActivity() {
             initRecyclerView()
             getRestaurantInfo()
             //initLayout()
+            //Toast.makeText(this@GiveScoreActivity, "$roomId | ${myInfo.uid} | $restaurantName | $restaurantId", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -87,6 +109,7 @@ class GiveScoreActivity : AppCompatActivity() {
                 Log.i("kim", restaurantName)
                 Log.i("kim", restaurantId)
                 //Log.i("kim", starttime.toString())
+
 
                 initLayout()
             }
@@ -190,5 +213,7 @@ class GiveScoreActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+
     }
 }

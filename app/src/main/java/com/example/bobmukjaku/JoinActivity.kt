@@ -182,6 +182,7 @@ class JoinActivity : AppCompatActivity() {
                                         Toast.makeText(this@JoinActivity, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
 
                                         val intent = Intent(this@JoinActivity, LoginActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                         intent.putExtra("email", email)
                                         startActivity(intent)
                                     } else if (response.code() == 400) { // 데이터 삽입 실패

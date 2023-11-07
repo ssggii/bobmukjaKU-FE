@@ -490,9 +490,9 @@ class ChatActivity : AppCompatActivity() {
 
             //메인화면으로 나가기 버튼
             backBtn.setOnClickListener{
-                //val intent = Intent(this@ChatActivity, MainActivity::class.java)
-                val intent = Intent(this@ChatActivity, GiveScoreActivity::class.java)
-                intent.putExtra("roomId", 1L)
+                val intent = Intent(this@ChatActivity, MainActivity::class.java)
+                //val intent = Intent(this@ChatActivity, GiveScoreActivity::class.java)
+                //intent.putExtra("roomId", 1L)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
             }
