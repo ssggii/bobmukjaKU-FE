@@ -43,7 +43,7 @@
             android:textAlignment="center"
             android:background="@drawable/heart"
             android:layout_marginVertical="0dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="3dp"
             app:layout_constraintStart_toEndOf="@+id/restaurant_name"
             app:layout_constraintTop_toTopOf="@+id/restaurant_name"
             app:layout_constraintBottom_toBottomOf="@+id/restaurant_name"/>
