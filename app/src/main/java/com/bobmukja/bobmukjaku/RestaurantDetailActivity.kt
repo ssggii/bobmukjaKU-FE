@@ -113,6 +113,9 @@ class RestaurantDetailActivity : AppCompatActivity() {
                         reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
 
                         binding.totalReview.text = reviewList.size.toString()
+                    } else {
+                        reviewList.clear()
+                        reviewAdapter.updateItems(reviewList)
                     }
                     val successCode = response.code()
                     Log.i("음식점 리뷰 목록 로드", "성공 $successCode $bizesId")
@@ -161,11 +164,7 @@ class RestaurantDetailActivity : AppCompatActivity() {
                     } else {
                         val errorCode = response.code()
                         if (errorCode != 404) {
-                            Toast.makeText(
-                                this@RestaurantDetailActivity,
-                                "스크랩 여부 확인 실패. 에러 $errorCode",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Log.i("스크랩 여부 확인 실패 ", "에러 $errorCode")
                         }
                     }
                 }
@@ -184,15 +183,9 @@ class RestaurantDetailActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val scrapTotal = response.body()
                         binding.countScrap.text = scrapTotal.toString()
-                        //                    val successCode = response.code()
-                        //                    Toast.makeText(requireContext(), "스크랩 개수 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
                     } else {
                         val errorCode = response.code()
-                        Toast.makeText(
-                            this@RestaurantDetailActivity,
-                            "스크랩 개수 로드 실패. 에러 $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.i("스크랩 개수 로드 실패 ", "에러 $errorCode")
                     }
                 }
 
@@ -220,7 +213,7 @@ class RestaurantDetailActivity : AppCompatActivity() {
                     val errorCode = response.code()
                     Toast.makeText(
                         this@RestaurantDetailActivity,
-                        "스크랩 등록에 실패했습니다. 에러 코드: $errorCode",
+                        "스크랩 등록에 실패했습니다. 다시 시도해주세요.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -249,7 +242,7 @@ class RestaurantDetailActivity : AppCompatActivity() {
                     val errorCode = response.code()
                     Toast.makeText(
                         this@RestaurantDetailActivity,
-                        "스크랩 해제에 실패했습니다. 에러 코드: $errorCode",
+                        "스크랩 해제에 실패했습니다. 다시 시도해주세요.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

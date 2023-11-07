@@ -125,7 +125,7 @@ class BlockAdapter(var items: List<BlockInfoDto>, var onBlockRemovedListener: On
                             val errorCode = response.code()
                             Toast.makeText(
                                 holder.binding.root.context,
-                                "차단 해제에 실패했습니다. 에러 코드: $errorCode",
+                                "차단 해제에 실패했습니다. 다시 시도해주세요.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

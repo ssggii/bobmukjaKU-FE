@@ -63,6 +63,9 @@ class BlockFragment : Fragment(), BlockAdapter.OnBlockRemovedListener {
                         adapter.updateItems(blockList) // 어댑터에 업데이트된 목록 전달
 
                         binding.totalBlock.text = blockList.size.toString()
+                    } else {
+                        blockList.clear()
+                        adapter.updateItems(blockList)
                     }
                     val successCode = response.code()
                     Log.i("내 차단 목록 로드", "성공 $successCode")

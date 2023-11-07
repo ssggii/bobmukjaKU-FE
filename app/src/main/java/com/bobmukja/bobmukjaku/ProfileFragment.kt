@@ -66,7 +66,6 @@ class ProfileFragment : Fragment() {
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
-            updateCertificatedAt() // 날짜 전송 테스트용
             startActivityForResult(intent, PROFILE_COLOR_REQUEST_CODE)
         }
 
@@ -94,11 +93,7 @@ class ProfileFragment : Fragment() {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "시간표 정보 조회 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("시간표 정보 조회 실패 ", "에러 코드: $errorCode")
                 }
             }
 
@@ -275,7 +270,7 @@ class ProfileFragment : Fragment() {
                     val errorCode = response.code()
                     Toast.makeText(
                         requireContext(),
-                        "시간표 정보 저장 실패. 에러 코드: $errorCode",
+                        "시간표 정보를 저장하지 못했습니다. 다시 시도해주세요.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -295,48 +290,6 @@ class ProfileFragment : Fragment() {
         val hour = startTime + (index * timeUnit) / 60
         val minute = (index * timeUnit) % 60
         return String.format("%02d:%02d", hour, minute)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updateCertificatedAt() {
-        val memberService = RetrofitClient.memberService
-        val accessToken = SharedPreferences.getString("accessToken", "")
-
-        val authorizationHeader = "Bearer $accessToken"
-
-        val updatedCertificatedAt = LocalDate.now().toString() // 현재 날짜를 가져옴
-        val requestBody = mapOf("certificatedAt" to updatedCertificatedAt)
-
-        val call = accessToken?.let {
-            memberService.updateMember(
-                authorizationHeader,
-                requestBody
-            )
-        }
-        call?.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        requireContext(),
-                        "현재 날짜가 업데이트되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "현재 날짜 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // 네트워크 오류 처리
-                Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
     private fun displayInfo() {
@@ -389,17 +342,13 @@ class ProfileFragment : Fragment() {
                     binding.studentCheck.text = certificatedDate
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "닉네임을 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("사용자 정보 로드 ", "실패 $errorCode")
                 }
             }
 
             override fun onFailure(call: Call<Member>, t: Throwable) {
                 // 네트워크 오류 처리
-                t.message?.let { it1 -> Log.i("닉네임 가져오기 실패. 기타 에러", it1) }
+                t.message?.let { it1 -> Log.i("사용자 정보 로드 실패. 기타 에러", it1) }
             }
         })
     }
@@ -434,11 +383,7 @@ class ProfileFragment : Fragment() {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "프로필 배경색을 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("프로필 배경색 로드 ", "실패 $errorCode")
                 }
             }
 

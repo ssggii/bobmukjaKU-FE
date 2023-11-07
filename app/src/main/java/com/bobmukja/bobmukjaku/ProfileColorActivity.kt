@@ -86,18 +86,10 @@ class ProfileColorActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     // 성공적으로 업데이트됨
-                    Toast.makeText(
-                        this@ProfileColorActivity,
-                        "프로필 배경색 업데이트",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("프로필 배경색 업데이트 ", "성공")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        this@ProfileColorActivity,
-                        "프로필 배경색 업데이트 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("프로필 배경색 업데이트 ", "실패 $errorCode")
                 }
             }
 

@@ -513,7 +513,7 @@ class ChatFragment : Fragment() {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "전체 필터링 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("전체 필터링 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -573,11 +573,7 @@ class ChatFragment : Fragment() {
                     getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "필터 정보 로드 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("필터 정보 로드 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -609,11 +605,7 @@ class ChatFragment : Fragment() {
                     getFilteredLists(finalFilters, chatMyList)
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "필터 제거 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("필터 제거 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -720,11 +712,7 @@ class ChatFragment : Fragment() {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "필터 정보 첫 로드 실패. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("필터 정보 첫 로드 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -746,11 +734,11 @@ class ChatFragment : Fragment() {
                         adapter.updateItems(chatroomList)
 
                         val successCode = response.code()
-                        Toast.makeText(requireContext(), "내 모집방 목록 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
+                        Log.i("내 모집방 목록 로드 실패 ", "성공 $successCode")
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "내 모집방 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("내 모집방 목록 로드 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -829,11 +817,7 @@ class ChatFragment : Fragment() {
                     } else {
                         // 서버 응답이 실패일 경우 처리
                         val errorCode = response.code()
-                        Toast.makeText(
-                            requireContext(),
-                            "모집방 입장 실패. 에러 코드: $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.i("모집방 입장 실패 ", "에러 $errorCode")
                     }
                 }
 
@@ -866,11 +850,7 @@ class ChatFragment : Fragment() {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("uid 가져오기 ", "실패 $errorCode")
                 }
             }
 

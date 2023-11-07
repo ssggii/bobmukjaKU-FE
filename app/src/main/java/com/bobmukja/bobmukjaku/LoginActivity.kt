@@ -85,18 +85,12 @@ class LoginActivity : AppCompatActivity() {
                 @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(call: Call<Member>, response: Response<Member>) {
                     //서버에서 인증날짜 값을 받아왔으므로, 인증날짜로부터 1년이 지났는지 체크하여 인증 만료 여부 결정
-
-                    Log.i("kim", "test")
-
                     if(response.isSuccessful) {
                         val certificatedAtFromServerString =
                             response.body()?.certificatedAt ?: return//인증날짜가 null -> 재학생 인증 한 적이 없다.
                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                         val certificatedAtFromServer =
                             LocalDate.parse(certificatedAtFromServerString, formatter)
-                        //Log.i("kim", certificatedAtFromServer.toString())
-                        //Log.i("kim", LocalDate.now().toString())
-
                         val daysUntilCertificatedAt = certificatedAtFromServer.toEpochDay()
                         val daysUntilNow = LocalDate.now().toEpochDay()
 
@@ -192,18 +186,15 @@ class LoginActivity : AppCompatActivity() {
                                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                                             //finishAffinity()
                                             startActivity(intent)
-//                                            val intent = Intent(this@LoginActivity, GiveScoreActivity::class.java)
-//                                            startActivity(intent)
-
-                                            Toast.makeText(this@LoginActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
+                                            Log.i("로그인", "성공")
                                         }
                                         else->{
                                             //200 이외의 상태코드는 모두 로그인 실패
-                                            Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
+                                            Log.i("로그인", "실패")
                                         }
                                     }
                                 }else{
-                                    Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
+                                    Log.i("로그인", "실패")
                                 }
                             }
 

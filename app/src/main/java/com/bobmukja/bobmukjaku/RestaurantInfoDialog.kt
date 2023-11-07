@@ -102,7 +102,6 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 intent.putExtra("total", total)
                 intent.putExtra("currentNum", currentNum)
 
-                //startActivity(intent)
                 requireActivity().setResult(Activity.RESULT_OK, intent)
                 requireActivity().finish()
 
@@ -213,7 +212,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 } else {
                     val errorCode = response.code()
                     if (errorCode != 404) {
-                        Toast.makeText(requireContext(), "스크랩 여부 확인 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                        Log.i("스크랩 여부 확인 실패 ", "에러 $errorCode")
                     }
                 }
             }
@@ -232,11 +231,9 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 if (response.isSuccessful) {
                     val scrapTotal = response.body()
                     binding.countScrap.text = scrapTotal.toString()
-//                    val successCode = response.code()
-//                    Toast.makeText(requireContext(), "스크랩 개수 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "스크랩 개수 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("스크랩 개수 로드 실패 ", "에러 $errorCode")
                 }
             }
 
@@ -261,12 +258,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                     // 업데이트된 하트 수를 가져옴
                     countHeart()
                 } else {
-                    val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "스크랩 등록에 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(), "스크랩 등록에 실패했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -289,12 +281,7 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                     // 업데이트된 하트 수를 가져옴
                     countHeart()
                 } else {
-                    val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "스크랩 해제에 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(), "스크랩 해제에 실패했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
 

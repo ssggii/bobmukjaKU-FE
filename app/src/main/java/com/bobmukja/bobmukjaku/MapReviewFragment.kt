@@ -57,12 +57,15 @@ class MapReviewFragment : Fragment(), ReviewListAdapter.OnReviewRemovedListener 
                         adapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
 
                         binding.totalReview.text = reviewList.size.toString()
+                    } else {
+                        reviewList.clear()
+                        adapter.updateItems(reviewList)
                     }
                     val successCode = response.code()
-                    Toast.makeText(requireContext(), "내 리뷰 목록 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
+                    Log.i("내 리뷰 목록 로드 ", "성공 $successCode")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "내 리뷰 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("내 리뷰 목록 로드 ", "실패 $errorCode")
                 }
             }
 
@@ -96,11 +99,7 @@ class MapReviewFragment : Fragment(), ReviewListAdapter.OnReviewRemovedListener 
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("uid 가져오기 ", "실패 $errorCode")
                 }
             }
 

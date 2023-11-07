@@ -123,7 +123,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         markerList.clear()
 
         lifecycleScope.launch {
-            val dong = listOf("11215710", "30110590", "11215850", "11215860", "11215870", "41390581")
+            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
             val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
 
             viewModel.fetchRestaurantList(category)
@@ -236,7 +236,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
 
     private fun getFoodList(naverMap: NaverMap, category: String) {
         lifecycleScope.launch {
-            val dong = listOf("11215710", "30110590", "11215850", "11215860", "11215870", "41390581") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
+            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
             val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
 
             viewModel.fetchRestaurantList(category)
@@ -293,69 +293,6 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             naverMap.addOnCameraIdleListener(onCameraIdleListener)
-        }
-    }
-
-    private fun getFoodLists(naverMap: NaverMap) {
-        lifecycleScope.launch {
-            val dong = listOf("11215710", "30110590", "11215850", "11215860", "11215870", "41390581") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
-            val indsMclsCdList = listOf("I205", "I206", "I211")
-
-            for (category in indsMclsCdList) {
-                viewModel.fetchRestaurantList(category)
-                val restaurantList = viewModel.restaurantList.value ?: emptyList()
-
-                val markerList = mutableListOf<Marker>()
-
-                val onCameraIdleListener = NaverMap.OnCameraIdleListener {
-                    // 네이버 맵의 가시 영역에 해당하는 좌표 값 계산
-                    val visibleRegion = naverMap.projection.toScreenLocation(naverMap.cameraPosition.target)
-                    val leftTop = naverMap.projection.fromScreenLocation(
-                        PointF(visibleRegion.x - mapView.width / 2, visibleRegion.y - mapView.height / 2)
-                    )
-                    val rightBottom = naverMap.projection.fromScreenLocation(
-                        PointF(visibleRegion.x + mapView.width / 2, visibleRegion.y + mapView.height / 2)
-                    )
-
-                    // 가시 영역 좌표 값 출력
-                    val minx = leftTop.longitude // 서쪽 경도
-                    val miny = rightBottom.latitude // 남쪽 위도
-                    val maxx = rightBottom.longitude // 동쪽 경도
-                    val maxy = leftTop.latitude // 북쪽 위도
-
-                    Log.d("MapListFragment", "minx: $minx, miny: $miny, maxx: $maxx, maxy: $maxy")
-
-                    // 이전에 표시된 마커들 삭제
-                    markerList.forEach { it.map = null }
-                    markerList.clear()
-
-                    for (restaurant in restaurantList) {
-                        if (restaurant.lat in miny..maxy && restaurant.lon in minx..maxx) {
-                            val marker = Marker() // 마커 추가
-                            marker.position = LatLng(restaurant.lat, restaurant.lon)
-                            marker.width = 45 // 마커 가로 크기
-                            marker.height = 60 // 마커 세로 크기
-//                        marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.kor) // 한식
-                            marker.map = naverMap
-
-                            val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                            marker.setOnClickListener {
-                                if (markerInfoWindowMap.containsKey(marker)) {
-                                    markerInfoWindowMap[marker]?.dismiss()
-                                    markerInfoWindowMap.remove(marker)
-                                } else {
-                                    markerInfoWindowMap[marker] = restaurantInfoDialog
-                                    restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                }
-                                true
-                            }
-
-                            markerList.add(marker)
-                        }
-                    }
-                }
-                naverMap.addOnCameraIdleListener(onCameraIdleListener)
-            }
         }
     }
 
@@ -439,11 +376,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("uid 가져오기 ", "실패 $errorCode")
                 }
             }
 
