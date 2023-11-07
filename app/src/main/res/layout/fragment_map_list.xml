@@ -44,13 +44,6 @@
                 android:text="한식"
                 android:fontFamily="@font/notosans_semibold"
                 android:background="@drawable/btn_circle_gray" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:text="ex"
-                android:textColor="@color/white"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -142,6 +135,13 @@
                 android:fontFamily="@font/notosans_bold"
                 android:backgroundTint="@color/gray"
                 android:background="@drawable/btn_circle_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="ex"
+                android:textColor="@color/white"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -220,17 +220,24 @@
                 android:fontFamily="@font/notosans_bold"
                 android:backgroundTint="@color/gray"
                 android:background="@drawable/btn_circle_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="ex"
+                android:textColor="@color/white"/>
         </LinearLayout>
     </HorizontalScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="#EDF4F1"
-        android:clickable="true"
-        android:src="@drawable/round_menu" />
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/floatingActionButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom|right"-->
+<!--        android:layout_marginRight="20dp"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:backgroundTint="#EDF4F1"-->
+<!--        android:clickable="true"-->
+<!--        android:src="@drawable/round_menu" />-->
 </FrameLayout>
