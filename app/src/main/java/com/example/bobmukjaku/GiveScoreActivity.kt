@@ -167,7 +167,7 @@ class GiveScoreActivity : AppCompatActivity() {
                 val originalScore = result.participant.rate
 
                 if(result.thumbUp){
-                    val request = memberService.rateUpdate(accessToken, RateUpdateDto(result.participant.uid, 20))
+                    val request = memberService.rateUpdate(accessToken, RateUpdateDto(result.participant.uid, 2))
                     request.enqueue(object: Callback<Void> {
                         override fun onResponse(call: Call<Void>, response: Response<Void>) {
 
@@ -176,11 +176,10 @@ class GiveScoreActivity : AppCompatActivity() {
                         override fun onFailure(call: Call<Void>, t: Throwable) {
 
                         }
-
                     })
                 }
                 else if(result.thumbDown){
-                    val request = memberService.rateUpdate(accessToken, RateUpdateDto(result.participant.uid, -20))
+                    val request = memberService.rateUpdate(accessToken, RateUpdateDto(result.participant.uid, -2))
                     request.enqueue(object: Callback<Void>{
                         override fun onResponse(call: Call<Void>, response: Response<Void>) {
 

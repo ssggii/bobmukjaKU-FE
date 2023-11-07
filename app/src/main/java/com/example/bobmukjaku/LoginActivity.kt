@@ -190,7 +190,7 @@ class LoginActivity : AppCompatActivity() {
 
                                             //메인화면으로 전환
                                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                                            finishAffinity()
+                                            //finishAffinity()
                                             startActivity(intent)
 //                                            val intent = Intent(this@LoginActivity, GiveScoreActivity::class.java)
 //                                            startActivity(intent)
@@ -225,7 +225,7 @@ class LoginActivity : AppCompatActivity() {
 
             // 회원가입 버튼 클릭
             joinBtn.setOnClickListener {
-                val intent = Intent(this@LoginActivity, JoinActivity::class.java)
+                val intent = Intent(this@LoginActivity, Join2Activity::class.java)
                 startActivity(intent)
             }
 
