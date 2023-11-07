@@ -507,15 +507,13 @@ class ChatFragment : Fragment() {
 
                         val successCode = response.code()
                         Log.i("전체 필터링 성공", "$successCode $chatroomList")
+                    } else {
+                        chatAllList.clear()
+                        adapter4.updateItems(chatAllList)
                     }
                 } else {
                     val errorCode = response.code()
-                    if (errorCode == 404) {
-                        chatAllList.clear()
-                        adapter4.updateItems(chatAllList)
-                    }else {
-                        Toast.makeText(requireContext(), "전체 필터링 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(requireContext(), "전체 필터링 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
                 }
             }
 
