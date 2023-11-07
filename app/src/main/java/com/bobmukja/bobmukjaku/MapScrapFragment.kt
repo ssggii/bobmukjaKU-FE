@@ -58,12 +58,15 @@ class MapScrapFragment : Fragment(), ScrapListAdapter.OnScrapRemovedListener {
                         adapter.updateItems(scrapList) // 어댑터에 업데이트된 목록 전달
 
                         binding.totalScrap.text = scrapList.size.toString()
+                    } else {
+                        scrapList.clear()
+                        adapter.updateItems(scrapList)
                     }
                     val successCode = response.code()
-                    Toast.makeText(requireContext(), "내 스크랩 목록 로드. 성공 $successCode $uid", Toast.LENGTH_SHORT).show()
+                    Log.i("내 스크랩 목록 로드 ", "성공 $successCode")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(requireContext(), "내 스크랩 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("내 스크랩 목록 로드 ", "실패 $errorCode")
                 }
             }
 
@@ -104,11 +107,7 @@ class MapScrapFragment : Fragment(), ScrapListAdapter.OnScrapRemovedListener {
                     }
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(
-                        requireContext(),
-                        "uid를 가져오는데 실패했습니다. 에러 코드: $errorCode",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.i("uid 가져오기 ", "실패 $errorCode")
                 }
             }
 

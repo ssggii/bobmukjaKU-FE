@@ -129,7 +129,7 @@ class MakeRoomActivity : AppCompatActivity() {
                         val insertedChatRoom = response.body()
                         Log.i("success", insertedChatRoom.toString())
                         // 데이터 삽입 성공
-                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 성공", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MakeRoomActivity, "모집방이 개설되었습니다.", Toast.LENGTH_SHORT).show()
 
                         val topic = insertedChatRoom?.roomId.toString()
                         //모집방id를 주제로 구독 -> 이후 서버에서 알림을 받을 수 있도록
@@ -138,7 +138,6 @@ class MakeRoomActivity : AppCompatActivity() {
                         if(topic.isNotEmpty()) {
                             FirebaseMessaging.getInstance().subscribeToTopic(topic)
                                 .addOnSuccessListener {
-                                    Toast.makeText(this@MakeRoomActivity, "구독성공", Toast.LENGTH_SHORT).show()
                                     Log.i("fcmmessage", "구독성공")
 
                                     //파이어베이스에도 자신을 참가자로 등록
@@ -150,20 +149,12 @@ class MakeRoomActivity : AppCompatActivity() {
                                     }
                                 }
                                 .addOnFailureListener {
-                                    Toast.makeText(this@MakeRoomActivity, "구독실패", Toast.LENGTH_SHORT).show()
                                     Log.i("fcmmessage", "구독실패")
                                 }
                         }
-
-//                        val intent = Intent(this@MakeRoomActivity, MainActivity::class.java)
-//                        startActivity(intent)
-                    } else if (response.code() == 400) { // 데이터 삽입 실패
-                        // 400 error code (Bad Request)
-                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 실패. 에러 400", Toast.LENGTH_SHORT).show()
                     } else {
                         val errorCode = response.code()
-                        // 400 error code 아닐 때
-                        Toast.makeText(this@MakeRoomActivity, "모집방 개설 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                        Log.i("모집방 개설 실패 ", "에러 $errorCode")
                     }
                 }
 
@@ -174,9 +165,6 @@ class MakeRoomActivity : AppCompatActivity() {
             })
         }
     }
-
-
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -230,55 +218,6 @@ class MakeRoomActivity : AppCompatActivity() {
             alertDialog.dismiss()
         }
     }
-
-   /* @RequiresApi(Build.VERSION_CODES.O)
-    private fun showTimePickerDialog(onTimeSet: (hour: Int, minute: Int) -> Unit) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.timepicker_alert_dialog, null)
-        val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker_alert_two)
-        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
-        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
-
-        // 현재 시간 정보 가져오기
-        val currentHour = timePicker.hour
-        val currentMinute = timePicker.minute
-        Log.i("currentHour", currentHour.toString())
-
-        // 분을 10분 단위로 설정
-        val adjustedMinute = (currentMinute / 10) * 10
-
-        // 시간과 분 설정
-        timePicker.hour = currentHour
-        timePicker.minute = adjustedMinute
-
-        // 분을 10분 단위로 변경하기 위한 리스너 설정
-        timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
-            val adjustedMinute = (minute / 10) * 10
-            timePicker.minute = adjustedMinute
-        }
-
-        val builder = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(false)
-
-        val alertDialog = builder.create()
-        alertDialog.show()
-
-        // 확인 버튼 클릭 이벤트 처리
-        yesButton.setOnClickListener {
-            val hour = timePicker.hour
-            val minute = timePicker.minute
-
-            // 선택한 시간 정보를 콜백 함수를 통해 전달합니다.
-            onTimeSet(hour, minute)
-
-            alertDialog.dismiss()
-        }
-
-        // 취소 버튼 클릭 이벤트 처리
-        noButton.setOnClickListener {
-            alertDialog.dismiss()
-        }
-    }*/
 
     // 현재 날짜를 가져오는 함수
     private fun getCurrentDate(): String {

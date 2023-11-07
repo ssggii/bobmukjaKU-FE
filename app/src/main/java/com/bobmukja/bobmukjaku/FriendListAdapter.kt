@@ -126,10 +126,9 @@ class FriendListAdapter(var items: List<FriendInfoDto>, var onFriendRemovedListe
                                 // 밥친구 해제한 아이템의 위치를 리스너를 통해 알림
                                 onFriendRemovedListener.onFriendRemoved(position)
                             } else {
-                                val errorCode = response.code()
                                 Toast.makeText(
                                     holder.binding.root.context,
-                                    "밥친구 해제에 실패했습니다. 에러 코드: $errorCode",
+                                    "밥친구 해제에 실패했습니다. 다시 시도해주세요.",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

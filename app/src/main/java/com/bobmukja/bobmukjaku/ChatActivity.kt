@@ -696,11 +696,6 @@ class ChatActivity : AppCompatActivity() {
 
         //메뉴창상단 표시용 add
         participantsMenuList.add(WrapperInChatRoomMenu(1,Member(null,null, null, null, null, null, null), ""))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-//        participants.add(WrapperInChatRoomMenu(2,Member(1,"aaaa", "aaaa", "밥묵자쿠1", "2020-02-02", 3, "#141")))
-        //Log.i("participant", participantsMenuList.toString())
         adapter2 = ChatMenuParticipantsAdapter(participantsMenuList, this@ChatActivity, chatRoomInfo)
         adapter2.onParticipantsBtnClickListener = object:ChatMenuParticipantsAdapter.OnParticipantsBtnClickListener{
             override fun onAddClick(position: Int, uid: Long?) {
@@ -713,10 +708,10 @@ class ChatActivity : AppCompatActivity() {
                                     200->{
                                         //파이어베이스에도 반영
                                         //updateFriendFirebase(uid)
-                                        Toast.makeText(this@ChatActivity, "친구등록성공", Toast.LENGTH_SHORT).show()
+                                        Log.i("밥친구 등록 ", "성공")
                                     }
                                     else->{
-                                        Toast.makeText(this@ChatActivity, "친구등록실패", Toast.LENGTH_SHORT).show()
+                                        Log.i("밥친구 등록 ", "실패")
                                     }
                                 }
                             }
@@ -738,10 +733,10 @@ class ChatActivity : AppCompatActivity() {
                                     200->{
                                         //파이어베이스에도 반영
                                         //updateBlockFirebase(uid)
-                                        Toast.makeText(this@ChatActivity, "차단성공", Toast.LENGTH_SHORT).show()
+                                        Log.i("차단  ", "성공")
                                     }
                                     else->{
-                                        Toast.makeText(this@ChatActivity, "차단실패", Toast.LENGTH_SHORT).show()
+                                        Log.i("차단 ", "실패")
                                     }
                                 }
                             }

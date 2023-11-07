@@ -68,10 +68,10 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
                         holder.binding.totalReview.text = reviewList.size.toString()
                     }
                     val successCode = response.code()
-                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드. 성공 $successCode $scrapInfo.placeId", Toast.LENGTH_SHORT).show()
+                    Log.i("음식점 리뷰 목록 로드 ", "성공 $successCode")
                 } else {
                     val errorCode = response.code()
-                    Toast.makeText(holder.binding.root.context, "음식점 리뷰 목록 로드 실패. 에러 $errorCode", Toast.LENGTH_SHORT).show()
+                    Log.i("음식점 리뷰 목록 로드 ", "에러 $errorCode")
                 }
             }
 
@@ -110,12 +110,7 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
                         // 스크랩 해제한 아이템의 위치를 리스너를 통해 알림
                         onScrapRemovedListener.onScrapRemoved(position)
                     } else {
-                        val errorCode = response.code()
-                        Toast.makeText(
-                            holder.binding.root.context,
-                            "스크랩 해제에 실패했습니다. 에러 코드: $errorCode",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(holder.binding.root.context, "스크랩 해제에 실패했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
 

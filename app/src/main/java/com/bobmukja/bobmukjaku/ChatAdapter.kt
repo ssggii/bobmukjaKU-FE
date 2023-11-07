@@ -179,12 +179,6 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
         return items.size
     }
 
-    // 여기 아래 부분 새로 추가 (실제 실행 시 반영 X) 07/31
-//    override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
-//        //return if (items[position].senderUid.equals(myUid)) 1 else 0
-//        return if (items[position].senderUid == myInfo.uid) 1 else 0
-//    }
-
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
         //return if (items[position].senderUid.equals(myUid)) 1 else 0
         return if(items[position].senderUid == -100L){

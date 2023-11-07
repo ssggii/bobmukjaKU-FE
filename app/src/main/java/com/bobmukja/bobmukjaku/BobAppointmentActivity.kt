@@ -93,8 +93,6 @@ class BobAppointmentActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLayout() {
         binding.apply {
-
-
            // val startTimeInNotice = intent.getStringExtra("noticeStartTime")
             Firebase.database.getReference("chatRoom/$roomId/notice/starttime").get().addOnCompleteListener {
                 if(it.isSuccessful){
@@ -121,9 +119,6 @@ class BobAppointmentActivity : AppCompatActivity() {
             }
 
 
-
-
-
             dateTime.setOnClickListener {
                 showStartTimePickerDialog()
             }
@@ -148,7 +143,7 @@ class BobAppointmentActivity : AppCompatActivity() {
                     val rf = Firebase.database.getReference("chatRoom/$roomId/notice")
                     rf.setValue(NoticeDto(restaurantId,restaurantName, newStartTime)).addOnCompleteListener {
                         if(it.isSuccessful){
-                            Toast.makeText(this@BobAppointmentActivity, "공지등록완료", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@BobAppointmentActivity, "밥공지가 등록되었습니다.", Toast.LENGTH_SHORT).show()
 
                             val intent = Intent(this@BobAppointmentActivity, ChatActivity::class.java)
                             //공지사항에서 채팅방목록으로 전환했을때, 뒤로가기를 누르면 다시 공지화면으로 가는 것을 방지하기 위하여 flag설정
@@ -157,49 +152,13 @@ class BobAppointmentActivity : AppCompatActivity() {
                             intent.putExtra("place", restaurantName)
                             startActivity(intent)
                         }else{
-                            Toast.makeText(this@BobAppointmentActivity, "공지등록실패", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@BobAppointmentActivity, "밥공지가 등록에 실패했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }else{//실제 음식점이름을 입력한 것이 아니라면 공지등록 실패
                     Toast.makeText(this@BobAppointmentActivity, "공지를 등록하려면 실제 음식점명을 입력해야합니다.", Toast.LENGTH_SHORT).show()
                 }
             }
-
-//            editText.addTextChangedListener(object : TextWatcher {
-//                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                    // 사용하지 않음
-//                }
-//
-//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    lifecycleScope.launch {
-//                        val dong = listOf(
-//                            "11215710",
-//                            "30110590",
-//                            "11215850",
-//                            "11215860",
-//                            "11215870",
-//                            "41390581"
-//                        )
-//                        val indsMclsCdList =
-//                            listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
-//
-//                        for (lists in indsMclsCdList) {
-//                            viewModel.fetchRestaurantList(lists)
-//                            val restaurantList = viewModel.restaurantList.value ?: emptyList()
-//
-//                            for (restaurant in restaurantList) {
-//                                if (restaurant.bizesNm.contains(s.toString())) {
-//                                    Log.i("kkk", restaurant.bizesNm)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                override fun afterTextChanged(s: Editable?) {
-//                    // 사용하지 않음
-//                }
-//            })
         }
     }
 
