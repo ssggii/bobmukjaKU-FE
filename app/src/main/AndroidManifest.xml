@@ -30,6 +30,7 @@
         <activity
             android:name=".GiveScoreActivity"
             android:exported="true"
+            android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="FCM_EXE_ACTIVITY" />
@@ -94,7 +95,6 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SplashActivity"
