@@ -67,7 +67,7 @@ class JoinActivity : AppCompatActivity() {
 
             // 받아온 이메일 넣기
             emailArea.setText(email)
-            //emailArea.isEnabled = false
+            emailArea.isEnabled = false
             //emailArea.setText("example@konkuk.ac.kr") // test
 
             // 닉네임 중복확인 버튼
