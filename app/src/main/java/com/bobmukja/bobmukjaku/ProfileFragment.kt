@@ -367,8 +367,8 @@ class ProfileFragment : Fragment() {
                     val colorResName = member?.profileColor
 
                     // 리소스 식별자 가져오기
-                    val resourceId = resources.getIdentifier(
-                        colorResName, "drawable", requireContext().packageName
+                    val resourceId = mContext.resources.getIdentifier(
+                        colorResName, "drawable", mContext.packageName
                     )
 
                     if (resourceId != 0) {
@@ -376,7 +376,7 @@ class ProfileFragment : Fragment() {
                         binding.profileBG.setBackgroundResource(resourceId)
                     } else {
                         Toast.makeText(
-                            requireContext(),
+                            mContext,
                             "프로필 배경색 리소스를 찾을 수 없습니다.",
                             Toast.LENGTH_SHORT
                         ).show()
