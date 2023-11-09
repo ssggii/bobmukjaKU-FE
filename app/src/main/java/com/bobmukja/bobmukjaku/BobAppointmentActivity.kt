@@ -64,13 +64,17 @@ class BobAppointmentActivity : AppCompatActivity() {
     private fun initRestaurantList(){
         lifecycleScope.launch {
             val indsMclsCdList =
-                listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
+                listOf("I201", "I202", "I203", "I204", "I205") // "I206", "I207"
+            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
 
-            for (lists in indsMclsCdList) {
-                viewModel.fetchRestaurantList(lists)
-                val restaurantList = viewModel.restaurantList.value ?: emptyList()
-                restaurants = restaurants + restaurantList
+            for (dongs in dong) {
+                for (lists in indsMclsCdList) {
+                    viewModel.fetchRestaurantList(lists, dongs)
+                    val restaurantList = viewModel.restaurantList.value ?: emptyList()
+                    restaurants = restaurants + restaurantList
+                }
             }
+
             Log.i("kkk", restaurants.toString())
 
             //autoCompleteTextView를 초기화
