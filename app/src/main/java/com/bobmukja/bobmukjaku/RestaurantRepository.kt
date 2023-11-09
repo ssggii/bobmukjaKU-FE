@@ -11,17 +11,18 @@ import java.net.URL
 class RestaurantRepository {
     private val restaurantCache = mutableMapOf<String, List<RestaurantList>>()
 
-    suspend fun getRestaurantList(categoryList: String): List<RestaurantList> {
-        if (restaurantCache.containsKey(categoryList)) {
-            return restaurantCache[categoryList] ?: emptyList()
+    suspend fun getRestaurantList(categoryList: String, dongList: String): List<RestaurantList> {
+        val cacheKey = "$categoryList-$dongList"
+        if (restaurantCache.containsKey(cacheKey)) {
+            return restaurantCache[cacheKey] ?: emptyList()
         }
 
-        val restaurantList = restaurantApi(categoryList)
-        restaurantCache[categoryList] = restaurantList
+        val restaurantList = restaurantApi(categoryList, dongList)
+        restaurantCache[cacheKey] = restaurantList
         return restaurantList
     }
 
-    private suspend fun restaurantApi(categoryList: String): List<RestaurantList> =
+    private suspend fun restaurantApi(categoryList: String, dongList: String): List<RestaurantList> =
         withContext(Dispatchers.IO) {
         val restaurantList = mutableListOf<RestaurantList>()
 
@@ -29,7 +30,7 @@ class RestaurantRepository {
         val pageNo = "&pageNo=1"
         val numOfRows = "&numOfRows=300"
         val dong = "&divId=adongCd"
-        val key = "&key=11215710" // 동단위 key(화양동) // (화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
+        val key = "&key=$dongList" // 동단위 key(화양동) // (화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
         val indsLclsCd = "&indsLclsCd=I2" // 대분류
         val indsMclsCd = "&indsMclsCd=$categoryList" // 중분류
         val type = "&type=xml"

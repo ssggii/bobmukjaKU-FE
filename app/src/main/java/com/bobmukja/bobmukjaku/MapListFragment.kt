@@ -73,7 +73,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         var selected = ""
         var category = "I201"
         var dong = "11215710"
-        getFoodList(naverMap, category)
+        getFoodList(naverMap, category, dong)
 
         // 위치 필터
         binding.hyDong.setOnClickListener {
@@ -81,48 +81,48 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             dong = "11215710"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
         binding.jyDong.setOnClickListener {
             selected = "자양동"
             dong = "11215820"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
         binding.GE1Dong.setOnClickListener {
             selected = "구의1동"
             dong = "11215850"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
         binding.GE2Dong.setOnClickListener {
             selected = "구의2동"
             dong = "11215860"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
         binding.GE3Dong.setOnClickListener {
             selected = "구의3동"
             dong = "11215870"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
         binding.GJDong.setOnClickListener {
             selected = "군자동"
             dong = "11215730"
             unselectedColor()
             selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            getFoodList(naverMap, dong)
+            binding.townBtn.text = selected
+            getFoodList(naverMap, category, dong)
         }
 
         // 음식 필터
@@ -132,7 +132,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.KoreaF)
             binding.foodBtn.text = selected
-            getFoodList(naverMap, category)
+            getFoodList(naverMap, category, dong)
 //            updateMarkers(naverMap, category)
         }
         binding.JapanF.setOnClickListener {
@@ -141,7 +141,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.JapanF)
             binding.foodBtn.text = selected
-            getFoodList(naverMap, category)
+            getFoodList(naverMap, category, dong)
 //            updateMarkers(naverMap, category)
         }
         binding.ForeignF.setOnClickListener {
@@ -150,7 +150,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ForeignF)
             binding.foodBtn.text = selected
-            getFoodList(naverMap, category)
+            getFoodList(naverMap, category, dong)
 //            updateMarkers(naverMap, category)
         }
         binding.ChinaF.setOnClickListener {
@@ -159,7 +159,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ChinaF)
             binding.foodBtn.text = selected
-            getFoodList(naverMap, category)
+            getFoodList(naverMap, category, dong)
 //            updateMarkers(naverMap, category)
         }
         binding.ectF.setOnClickListener {
@@ -168,21 +168,21 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ectF)
             binding.foodBtn.text = selected
-            getFoodList(naverMap, category)
+            getFoodList(naverMap, category, dong)
 //            updateEtcMarkers(naverMap)
         }
     }
 
-    private fun updateMarkers(naverMap: NaverMap, category: String) {
+    private fun updateMarkers(naverMap: NaverMap, category: String, dong: String) {
         // 기존의 마커 리스트 삭제
         markerList.forEach { it.map = null }
         markerList.clear()
 
         lifecycleScope.launch {
-            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
+//            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
             val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
 
-            viewModel.fetchRestaurantList(category)
+            viewModel.fetchRestaurantList(category, dong)
             val restaurantList = viewModel.restaurantList.value ?: emptyList()
 
             val onCameraIdleListener = NaverMap.OnCameraIdleListener {
@@ -231,7 +231,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun updateEtcMarkers(naverMap: NaverMap) {
+    private fun updateEtcMarkers(naverMap: NaverMap, dong: String) {
         // 기존의 마커 리스트 삭제
         markerList.forEach { it.map = null }
         markerList.clear()
@@ -240,7 +240,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             val indsMclsCdList = listOf("I205", "I206", "I211")
 
             for (category in indsMclsCdList) {
-                viewModel.fetchRestaurantList(category)
+                viewModel.fetchRestaurantList(category, dong)
                 val restaurantList = viewModel.restaurantList.value ?: emptyList()
 
                 val onCameraIdleListener = NaverMap.OnCameraIdleListener {
@@ -290,12 +290,12 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getFoodList(naverMap: NaverMap, category: String) {
+    private fun getFoodList(naverMap: NaverMap, category: String, dong: String) {
         lifecycleScope.launch {
-            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
+//            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
             val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
 
-            viewModel.fetchRestaurantList(category)
+            viewModel.fetchRestaurantList(category, dong)
             val restaurantList = viewModel.restaurantList.value ?: emptyList()
 
             val onCameraIdleListener = NaverMap.OnCameraIdleListener {

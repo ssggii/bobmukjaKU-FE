@@ -11,7 +11,7 @@ class MapListViewModel(private val repository: RestaurantRepository) : ViewModel
     val restaurantList: LiveData<List<RestaurantList>> get() = _restaurantList
 
     // UI에서 호출하는 함수로 음식점 정보를 가져옴
-    suspend fun fetchRestaurantList(categoryList: String) {
-        _restaurantList.value = repository.getRestaurantList(categoryList)
+    suspend fun fetchRestaurantList(categoryList: String, dongList: String) {
+        _restaurantList.value = repository.getRestaurantList(categoryList, dongList)
     }
 }
