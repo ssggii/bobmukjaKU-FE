@@ -72,7 +72,58 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         // default 설정
         var selected = ""
         var category = "I201"
+        var dong = "11215710"
         getFoodList(naverMap, category)
+
+        // 위치 필터
+        binding.hyDong.setOnClickListener {
+            selected = "화양동"
+            dong = "11215710"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
+        binding.jyDong.setOnClickListener {
+            selected = "자양동"
+            dong = "11215820"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
+        binding.GE1Dong.setOnClickListener {
+            selected = "구의1동"
+            dong = "11215850"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
+        binding.GE2Dong.setOnClickListener {
+            selected = "구의2동"
+            dong = "11215860"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
+        binding.GE3Dong.setOnClickListener {
+            selected = "구의3동"
+            dong = "11215870"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
+        binding.GJDong.setOnClickListener {
+            selected = "군자동"
+            dong = "11215730"
+            unselectedColor()
+            selectedColor(binding.hyDong)
+//            binding.townBtn.text = selected
+//            getFoodList(naverMap, dong)
+        }
 
         // 음식 필터
         binding.KoreaF.setOnClickListener {
@@ -89,7 +140,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.JapanF)
             binding.foodBtn.text = selected
-            updateMarkers(naverMap, category)
+            getFoodList(naverMap, category)
+//            updateMarkers(naverMap, category)
         }
         binding.ForeignF.setOnClickListener {
             selected = "양식"
@@ -97,7 +149,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ForeignF)
             binding.foodBtn.text = selected
-            updateMarkers(naverMap, category)
+            getFoodList(naverMap, category)
+//            updateMarkers(naverMap, category)
         }
         binding.ChinaF.setOnClickListener {
             selected = "중식"
@@ -105,7 +158,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ChinaF)
             binding.foodBtn.text = selected
-            updateMarkers(naverMap, category)
+            getFoodList(naverMap, category)
+//            updateMarkers(naverMap, category)
         }
         binding.ectF.setOnClickListener {
             selected = "기타"
@@ -113,7 +167,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.ectF)
             binding.foodBtn.text = selected
-            updateEtcMarkers(naverMap)
+            getFoodList(naverMap, category)
+//            updateEtcMarkers(naverMap)
         }
     }
 
@@ -402,14 +457,31 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             binding.ChinaF,
             binding.ectF
         )
+        val dongList = listOf(
+            binding.hyDong,
+            binding.jyDong,
+            binding.GE1Dong,
+            binding.GE2Dong,
+            binding.GE3Dong,
+            binding.GJDong
+        )
+
         val textColor = ContextCompat.getColor(requireContext(), R.color.white)
         val originalTextColor = ContextCompat.getColor(requireContext(), R.color.black)
         val color = ContextCompat.getColor(requireContext(), R.color.gray)
+
         for (food in foodList) {
             if (food.currentTextColor == textColor) {
                 food.setTextColor(originalTextColor)
                 food.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
         }
+        for (dong in dongList) {
+            if (dong.currentTextColor == textColor) {
+                dong.setTextColor(originalTextColor)
+                dong.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
+        }
+
     }
 }
