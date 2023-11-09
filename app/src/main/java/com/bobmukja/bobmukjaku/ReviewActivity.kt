@@ -103,7 +103,11 @@ class ReviewActivity : AppCompatActivity() {
 
             register.setOnClickListener {
                 //리뷰를 등록
-                uploadImageToFirebaseStorage()
+                if(placeName.text != "") {
+                    uploadImageToFirebaseStorage()
+                }else{
+                    Toast.makeText(this@ReviewActivity,"리뷰를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
