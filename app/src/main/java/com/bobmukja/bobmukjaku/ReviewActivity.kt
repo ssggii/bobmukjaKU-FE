@@ -132,7 +132,7 @@ class ReviewActivity : AppCompatActivity() {
             }
         }
         else{
-            registerReviewIntoServer("")
+            registerReviewIntoServer("nodata")
         }
     }
 
