@@ -86,13 +86,17 @@ class Join2Activity : AppCompatActivity() {
                         call: Call<HashedAuthCode>,
                         response: Response<HashedAuthCode>
                     ) {
-                        Log.i("kim", response.body()!!.hashedAuthCode)
-                        hashedAuthCodeFromServer = response.body()!!.hashedAuthCode
 
-                        binding.layoutInputAuthcode.visibility = View.VISIBLE
-                        binding.join2Button.visibility = View.VISIBLE
-                        binding.sendBtn.text = "이메일 재전송"
-                        binding.emailSend.text = "6자리 인증코드를 입력해주세요.\n혹시 이메일이 오지 않았다면 이메일 재전송 버튼을 눌러주세요."
+                        if(response.isSuccessful) {
+
+                            hashedAuthCodeFromServer = response.body()!!.hashedAuthCode
+
+                            binding.layoutInputAuthcode.visibility = View.VISIBLE
+                            binding.join2Button.visibility = View.VISIBLE
+                            binding.sendBtn.text = "이메일 재전송"
+                            binding.emailSend.text =
+                                "6자리 인증코드를 입력해주세요.\n혹시 이메일이 오지 않았다면 이메일 재전송 버튼을 눌러주세요."
+                        }
                     }
 
                     override fun onFailure(call: Call<HashedAuthCode>, t: Throwable) {
