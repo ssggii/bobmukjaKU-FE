@@ -53,7 +53,11 @@ class RestaurantDetailImageAdapter(var items: List<ReviewResponse>) : RecyclerVi
 
         if (position < 3) {
             // 상위 3개 항목에 대해서만 리뷰 이미지 출력
-            setImageToImageView(holder.binding.image, reviewInfo)
+            if (reviewInfo.imageUrl != "nodata") {
+                setImageToImageView(holder.binding.image, reviewInfo)
+            } else {
+                holder.binding.image.visibility = View.GONE
+            }
         } else {
             holder.binding.image.visibility = View.GONE
         }

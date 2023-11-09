@@ -63,13 +63,14 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
 
         // 공유하기 버튼 클릭 리스너 설정
         binding.shareBtn.setOnClickListener {
-            //val intent = Intent(requireContext(), ChatActivity::class.java)
             val intent = requireActivity().intent
 
             intent.putExtra("placeName", restaurant.bizesNm)
             intent.putExtra("placeAddress", restaurant.lnoAdr)
             if (reviewList != null && reviewList.isNotEmpty()) {
                 intent.putExtra("imageUrl", reviewList[0].imageUrl)
+            } else if (reviewList[0].imageUrl == "nodata"){
+                intent.putExtra("imageUrl", "nodata")
             } else {
                 intent.putExtra("imageUrl", "nodata")
             }
@@ -126,6 +127,10 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                         reviewImageAdapter.updateItems((reviewList))
 
                         binding.totalReview.text = reviewList.size.toString()
+                    } else {
+                        reviewList.clear()
+                        reviewAdapter.updateItems(reviewList)
+                        reviewImageAdapter.updateItems((reviewList))
                     }
                     val successCode = response.code()
                     Log.i("음식점 리뷰 목록 로드", "성공 $successCode $restaurant.placeId")

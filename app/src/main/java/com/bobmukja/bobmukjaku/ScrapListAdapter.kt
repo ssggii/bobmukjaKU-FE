@@ -1,12 +1,15 @@
 package com.bobmukja.bobmukjaku
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bobmukja.bobmukjaku.Model.*
@@ -66,6 +69,10 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
                         reviewImageAdapter.updateItems((reviewList))
 
                         holder.binding.totalReview.text = reviewList.size.toString()
+                    } else {
+                        reviewList.clear()
+                        reviewAdapter.updateItems(reviewList)
+                        reviewImageAdapter.updateItems((reviewList))
                     }
                     val successCode = response.code()
                     Log.i("음식점 리뷰 목록 로드 ", "성공 $successCode")
@@ -119,6 +126,11 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
                     t.message?.let { Log.i("[스크랩 해제 실패: ]", it) }
                 }
             })
+        }
+
+        // 공유하기 버튼 클릭 리스너 설정
+        holder.binding.shareBtn.setOnClickListener {
+            Toast.makeText(holder.binding.root.context, "아직 개발 중입니다. 조금만 더 기다려주세요 :)", Toast.LENGTH_SHORT).show()
         }
     }
 

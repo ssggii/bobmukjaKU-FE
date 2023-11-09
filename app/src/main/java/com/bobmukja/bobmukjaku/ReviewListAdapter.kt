@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,18 +61,23 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
         holder.binding.content.text = "→ " + reviewInfo.contents
 
         // Firebase Storage에서 이미지 다운로드
-        val imagePath = reviewInfo.imageUrl
-        CoroutineScope(Dispatchers.IO).launch {
-            val bitmap = downloadImageFromFirebaseStorage(imagePath)
-            withContext(Dispatchers.Main) {
-                if (bitmap != null) {
-                    holder.binding.reviewImage.setImageBitmap(bitmap)
-                } else {
-                    // 이미지 다운로드 실패 처리
-                    Log.i("리뷰 이미지 로드", "실패")
+        if (reviewInfo.imageUrl != "nodata") {
+            val imagePath = reviewInfo.imageUrl
+            CoroutineScope(Dispatchers.IO).launch {
+                val bitmap = downloadImageFromFirebaseStorage(imagePath)
+                withContext(Dispatchers.Main) {
+                    if (bitmap != null) {
+                        holder.binding.reviewImage.setImageBitmap(bitmap)
+                    } else {
+                        // 이미지 다운로드 실패 처리
+                        Log.i("리뷰 이미지 로드", "실패")
+                    }
                 }
             }
+        } else {
+            holder.binding.reviewImage.visibility = View.GONE
         }
+
 
         holder.binding.deleteBtn.setOnClickListener {
             deleteReview(reviewInfo, position)
