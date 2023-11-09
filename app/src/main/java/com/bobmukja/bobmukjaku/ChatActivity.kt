@@ -441,14 +441,14 @@ class ChatActivity : AppCompatActivity() {
                                                 //Log.i("participants", it.childrenCount.toString())
                                                 rf.removeValue().addOnSuccessListener {
                                                     Log.i("exittt", "퇴장완료")
-                                                    Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(this@ChatActivity, "퇴장완료", Toast.LENGTH_SHORT).show()
                                                     val intent = Intent(this@ChatActivity, MainActivity::class.java)
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                                     startActivity(intent)
                                                 }
                                             }else{
                                                 Log.i("exittt", "퇴장완료")
-                                                Toast.makeText(this@ChatActivity, "${chatRoomInfo.roomId}퇴장완료", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(this@ChatActivity, "퇴장완료", Toast.LENGTH_SHORT).show()
                                                 val intent = Intent(this@ChatActivity, MainActivity::class.java)
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                                 startActivity(intent)
@@ -458,7 +458,7 @@ class ChatActivity : AppCompatActivity() {
                             }
                             else -> {
                                 Log.i("exittt", "퇴장에러")
-                                Toast.makeText(this@ChatActivity, "퇴장에러", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@ChatActivity, "퇴장실패", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }else {
@@ -649,10 +649,10 @@ class ChatActivity : AppCompatActivity() {
         )
         request.enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                Toast.makeText(this@ChatActivity, "메시지 전송 성공", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@ChatActivity, "메시지 전송 성공", Toast.LENGTH_SHORT).show()
             }
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Toast.makeText(this@ChatActivity, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@ChatActivity, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
             }
         })
     }
