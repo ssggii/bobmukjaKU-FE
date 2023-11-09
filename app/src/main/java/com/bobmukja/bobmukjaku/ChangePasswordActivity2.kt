@@ -27,9 +27,9 @@ class ChangePasswordActivity2 : AppCompatActivity() {
 
     private fun initLayout() {
         binding.apply {
-//            val getEmail = intent.getStringExtra("email") // ChangePasswordActivity에서 넘겨준 이메일 주소 가져오기
-//
-//            email.text = getEmail
+            val getEmail = intent.getStringExtra("email") // ChangePasswordActivity에서 넘겨준 이메일 주소 가져오기
+
+            email.text = getEmail
 
             // 비밀번호 조건
             val passwordPattern = "^(?=.*[!@^&,.?])(?=.*[A-Za-z]).{8,15}$".toRegex()
@@ -100,6 +100,7 @@ class ChangePasswordActivity2 : AppCompatActivity() {
                         RetrofitClient.memberService.updateMemberWithoutLogin(UpdatePasswordDto(passwd, email))
                             .enqueue(object : Callback<Void>{
                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                    Log.i("rrr", response.code().toString())
                                     when(response.code()){
                                         200->{
                                             Log.i("updatePassword", "success")
