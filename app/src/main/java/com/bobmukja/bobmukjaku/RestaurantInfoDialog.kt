@@ -74,17 +74,9 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
             } else {
                 intent.putExtra("imageUrl", "nodata")
             }
-            intent.putExtra("countScrap", binding.countScrap.text.toString())
-            var reviewListForward = ""
-            for((reviewCount, review) in reviewList.withIndex()){
-                reviewListForward += "${review.contents}/"
-                if(reviewCount == 2)
-                    break
-            }//리뷰 최대 3개를 가져온다.
-            intent.putExtra("reviewList", reviewListForward)
 
             val data = arguments
-            if (data != null) {
+            if (data?.getString("startTime") != null) {
                 val roomId = data.getLong("roomId")
                 val roomName = data.getString("roomName")
                 val meetingDate = data.getString("meetingDate")
@@ -102,6 +94,15 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
                 intent.putExtra("kindOfFood", kindOfFood)
                 intent.putExtra("total", total)
                 intent.putExtra("currentNum", currentNum)
+
+                intent.putExtra("countScrap", binding.countScrap.text.toString())
+                var reviewListForward = ""
+                for((reviewCount, review) in reviewList.withIndex()){
+                    reviewListForward += "${review.contents}/"
+                    if(reviewCount == 2)
+                        break
+                }//리뷰 최대 3개를 가져온다.
+                intent.putExtra("reviewList", reviewListForward)
 
                 requireActivity().setResult(Activity.RESULT_OK, intent)
                 requireActivity().finish()
