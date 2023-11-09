@@ -132,7 +132,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             unselectedColor()
             selectedColor(binding.KoreaF)
             binding.foodBtn.text = selected
-            updateMarkers(naverMap, category)
+            getFoodList(naverMap, category)
+//            updateMarkers(naverMap, category)
         }
         binding.JapanF.setOnClickListener {
             selected = "일식"
@@ -325,7 +326,6 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                         marker.position = LatLng(restaurant.lat, restaurant.lon)
                         marker.width = 45 // 마커 가로 크기
                         marker.height = 60 // 마커 세로 크기
-//                        marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.kor) // 한식
                         marker.map = naverMap
 
                         val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
