@@ -347,6 +347,9 @@ class ChatActivity : AppCompatActivity() {
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
         //val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
         val mrf = rf.child("message")
+        var beforeMessageDate = Calendar.getInstance()
+        beforeMessageDate.set(0,0,0)
+        var nowMessageDate = Calendar.getInstance()
         chatItem.clear()
         //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
         val childEventListener = object: ChildEventListener {
@@ -361,8 +364,23 @@ class ChatActivity : AppCompatActivity() {
                 val isProfanity = snapshot.child("profanity").value.toString().toBoolean()
                 //Log.i("kim", "$message&&$isShareMessage")
 
+                val beforeYear = beforeMessageDate[Calendar.YEAR]
+                val beforeMonth = beforeMessageDate[Calendar.MONTH]
+                val beforeDay = beforeMessageDate[Calendar.DAY_OF_MONTH]
+                Log.i("abc", "$beforeYear|$beforeMonth|$beforeDay")
+                nowMessageDate.timeInMillis = time
+                val nowYear = nowMessageDate[Calendar.YEAR]
+                val nowMonth = nowMessageDate[Calendar.MONTH]
+                val nowDay = nowMessageDate[Calendar.DAY_OF_MONTH]
 
-                chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
+                if((beforeYear==nowYear)&&(beforeMonth==nowMonth)&&(beforeDay==nowDay)){
+                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
+                }else{
+                    chatItem.add(ChatModel("", -100, myInfo.memberNickName, nowMessageDate.timeInMillis,false,chatRoomInfo.roomId, false))
+                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
+                }
+                beforeMessageDate.set(nowYear,nowMonth,nowDay)
+
                 adapter.notifyDataSetChanged()
                 binding.chatRecyclerView.scrollToPosition(chatItem.size - 1)
 
@@ -543,22 +561,13 @@ class ChatActivity : AppCompatActivity() {
                 //입력폼에 텍스트를 하나라도 입력하면 전송 비튼 역할, 아니면 맛지도 버튼 역할
                 //메시지 전송 버튼을 누르면 firebase의 현재 채팅방경로에 메시지 내용을 추가
 
-                calendar.timeInMillis = System.currentTimeMillis()
-                val year = calendar[Calendar.YEAR]
-                val month = calendar[Calendar.MONTH]
-                val day = calendar[Calendar.DAY_OF_MONTH]
 
-                val result = chatItem.find{
-                    val calendar = Calendar.getInstance()
-                    calendar.timeInMillis = it.time?:0
-                    val yearInArray = calendar[Calendar.YEAR]
-                    val monthInArray = calendar[Calendar.MONTH]
-                    val dayInArray = calendar[Calendar.DAY_OF_MONTH]
-                    (year==yearInArray)&&(month==monthInArray)&&(day==dayInArray)
-                }
+                val message = binding.message.text.toString()
 
-                if(result == null){//현재날짜에 보내는 최초의 메시지이므로 날짜를 표시하는 메시지를 먼저 전송
-                    // 여기서 MapFragment를 시작
+                if (message.isNotEmpty()){
+                    sendMessage(message, false)//일반 메시지 전송
+                }else{
+                    //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
                     val mapIntent = Intent(this@ChatActivity, MainActivity::class.java)
                     mapIntent.putExtra("selectedItemId", R.id.second) // R.id.second는 MapFragment를 나타내는 탭 아이템입니다.
                     mapIntent.putExtra("roomId", chatRoomInfo.roomId)
@@ -571,58 +580,9 @@ class ChatActivity : AppCompatActivity() {
                     mapIntent.putExtra("currentNum", chatRoomInfo.currentNum)
 
                     // shareMessageLauncher를 사용하여 MapFragment로 전환
-                    //shareMessageLauncher.launch(mapIntent)
-
-                    val accessToken = SharedPreferences.getString("accessToken", "")!!
-                    RetrofitClient.memberService.sendMessage("Bearer $accessToken",
-                        ChatModel("", -100, myInfo.memberNickName,
-                            System.currentTimeMillis(), false,chatRoomInfo.roomId,false)
-                    ).enqueue(object:Callback<Unit>{
-                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-
-                            val message = binding.message.text.toString()
-
-                            if (message.isNotEmpty()){
-                                sendMessage(message, false)//일반 메시지 전송
-                            }else{
-                                //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-//                                val mapListFragment = MapListFragment()
-//                                supportFragmentManager.beginTransaction()
-//                                    .replace(R.id.map_container, mapListFragment)
-//                                    .addToBackStack(null) // 필요에 따라 back stack에 추가
-//                                    .commit()
-
-                                shareMessageLauncher.launch(mapIntent)//맛지도화면으로 전환 -> 콜백함수에서 음식점 공유메시지 전송 수행
-                            }
-                        }
-
-                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                }else{
-                    val message = binding.message.text.toString()
-
-                    if (message.isNotEmpty()){
-                        sendMessage(message, false)//일반 메시지 전송
-                    }else{
-                        //입력폼에 텍스트를 입력하지 않았으므로 현재는 맛지도 버튼 역할
-                        val mapIntent = Intent(this@ChatActivity, MainActivity::class.java)
-                        mapIntent.putExtra("selectedItemId", R.id.second) // R.id.second는 MapFragment를 나타내는 탭 아이템입니다.
-                        mapIntent.putExtra("roomId", chatRoomInfo.roomId)
-                        mapIntent.putExtra("roomName", chatRoomInfo.roomName)
-                        mapIntent.putExtra("meetingDate", chatRoomInfo.meetingDate)
-                        mapIntent.putExtra("startTime", chatRoomInfo.startTime)
-                        mapIntent.putExtra("endTime", chatRoomInfo.endTime)
-                        mapIntent.putExtra("kindOfFood", chatRoomInfo.kindOfFood)
-                        mapIntent.putExtra("total", chatRoomInfo.total)
-                        mapIntent.putExtra("currentNum", chatRoomInfo.currentNum)
-
-                        // shareMessageLauncher를 사용하여 MapFragment로 전환
-                        shareMessageLauncher.launch(mapIntent)
-                    }
+                    shareMessageLauncher.launch(mapIntent)
                 }
+
             }
         }
     }
