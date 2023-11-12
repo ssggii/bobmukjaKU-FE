@@ -8,17 +8,17 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.ActivitySplashBinding
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
+import java.net.HttpURLConnection
+import java.net.URL
 
 class SplashActivity : AppCompatActivity() {
 
@@ -36,11 +36,18 @@ class SplashActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch{
 
-            //앱 최초 실행 여부 판단
-            //최초 실행시 음식점 API로부터 데이터를 받아 RoomDB에 저장, 이후 앱을 실행 시킬 경우엔 해당 작업 skip
-            if(SharedPreferences.getString("firstExecution", "no") == "no"){
+            val stdrYm = SharedPreferences.getString("stdrYm", "null")?:"null"//최근 업데이트 당시, 음식점 정보 기준 날짜
+            val newStdrYm = getStrDateFromrestaurantApi("I201","11215710")?:"null"//api로 새로 가져온 음식점 정보 기준 날짜(인자로 준 문자열은 더미)
+
+            if(stdrYm == "null"){ //최초 실행이므로 무조건 음식점 정보 다운로드
                 restaurantDb = RestaurantDatabase.getDatabase(baseContext)
                 getRestaurantListFromAPI()
+                SharedPreferences.putString("stdrYm", newStdrYm)
+            }else{//한번이라도 api로 음식점을 업데이트 한 적이 있을 때
+                if(newStdrYm != stdrYm){//api에 있는 음식점 데이터가 새로 업데이트 됐으므로, 음식점 데이터를 업데이트 한다.
+                    getRestaurantListFromAPI()
+                    SharedPreferences.putString("stdrYm", newStdrYm)
+                }
             }
 
             Handler(Looper.getMainLooper()).postDelayed({
@@ -64,6 +71,8 @@ class SplashActivity : AppCompatActivity() {
         )
     }
 
+
+
     private suspend fun getRestaurantListFromAPI() {
 
 
@@ -73,7 +82,6 @@ class SplashActivity : AppCompatActivity() {
                 listOf("I201", "I202", "I203", "I204", "I205") // "I206", "I207"
             val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
 
-            var i = 0
             var progress = 0
             var progressUnit = binding.progressbar.max / (indsMclsCdList.size * dong.size)
             binding.progressbar.visibility = View.VISIBLE
@@ -88,7 +96,6 @@ class SplashActivity : AppCompatActivity() {
                     }
                     if(progress >= 87){
                         //progress바가 거의 다채워지면 그냥 100%로 UI 변환
-                        Toast.makeText(this@SplashActivity, "다채워짐", Toast.LENGTH_SHORT).show()
                         progress = binding.progressbar.max
                     }else {
                         progress += progressUnit
@@ -99,7 +106,6 @@ class SplashActivity : AppCompatActivity() {
 
                 }
             }
-            SharedPreferences.putString("firstExecution","yes")
         }.await()
 
         binding.progresstxt.text = "다운로드 완료!"
@@ -110,4 +116,43 @@ class SplashActivity : AppCompatActivity() {
         val viewModelFactory = MapListViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[MapListViewModel::class.java]
     }
+
+
+    //
+    private suspend fun getStrDateFromrestaurantApi(categoryList: String, dongList: String): String? =
+        withContext(Dispatchers.IO) {
+
+            val serviceKey = "I%2BMzNcsHcMWL7gORiWo%2BBaZ%2FPl8w4OpluiaN88eg5zIYnjtoQ0pxS6Vpy6OaHBaIf%2BrZf9%2FgjDcrtUBv%2BcuhCw%3D%3D"
+            val pageNo = "&pageNo=1"
+            val numOfRows = "&numOfRows=1"
+            val dong = "&divId=adongCd"
+            val key = "&key=$dongList" // 동단위 key(화양동) // (화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
+            val indsLclsCd = "&indsLclsCd=I2" // 대분류
+            val indsMclsCd = "&indsMclsCd=$categoryList" // 중분류
+            val type = "&type=xml"
+            var url = "https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInDong?serviceKey=" +
+                    "$serviceKey$pageNo$numOfRows$dong$key$indsLclsCd$indsMclsCd$type"
+
+            val apiUrl = URL(url)
+            val connection = apiUrl.openConnection() as HttpURLConnection
+            val inputStream = connection.inputStream
+
+            // 음식점 데이터 파싱 및 리스트에 저장
+            val parser = XmlPullParserFactory.newInstance().newPullParser()
+            parser.setInput(inputStream, "UTF-8") // urlStream은 API 호출 결과 스트림
+
+            var eventType = parser.eventType
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                when (eventType) {
+                    XmlPullParser.START_TAG -> {
+                        if(parser.name == "stdrYm"){
+                            return@withContext parser.nextText()
+                        }
+                    }
+                }
+                eventType = parser.next()
+            }
+            return@withContext null
+        }
 }
