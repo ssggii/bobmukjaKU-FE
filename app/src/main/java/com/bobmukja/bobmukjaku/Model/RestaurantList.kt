@@ -1,13 +1,18 @@
 package com.bobmukja.bobmukjaku.Model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class RestaurantList(
-    var bizesId: String,
-    var bizesNm: String,
-    var indsMclsNm: String,
-    var indsSclsNm: String,
-    var lnoAdr: String,
-    var lat: Double,
-    var lon: Double
+    @PrimaryKey var bizesId: String,
+    @ColumnInfo var bizesNm: String,
+    @ColumnInfo var indsMclsNm: String,
+    @ColumnInfo var indsSclsNm: String,
+    @ColumnInfo var lnoAdr: String,
+    @ColumnInfo var lat: Double,
+    @ColumnInfo var lon: Double
 ){
     override fun toString(): String {
         return bizesNm

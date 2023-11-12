@@ -13,14 +13,17 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.getDisplayedMinute
 import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.bobmukja.bobmukjaku.Dto.NoticeDto
 import com.bobmukja.bobmukjaku.Model.RestaurantList
+import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.ActivityBobAppointmentBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +31,7 @@ import java.util.*
 class BobAppointmentActivity : AppCompatActivity() {
     lateinit var binding: ActivityBobAppointmentBinding
     private lateinit var viewModel: MapListViewModel
+    private lateinit var restaurantDb: RestaurantDatabase
 
     private val roomId : Long by lazy {
         intent.getLongExtra("roomId", -1)
@@ -54,15 +58,17 @@ class BobAppointmentActivity : AppCompatActivity() {
         binding = ActivityBobAppointmentBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        attachContextToViewModel(this)
-        initRestaurantList()
-        initLayout()
+        CoroutineScope(Dispatchers.Main).launch {
+            attachContextToViewModel(baseContext)
+            initRestaurantList()
+            initLayout()
+        }
     }
 
 
     //api로 모든 음식점 리스트를 불러와 restaurants배열에 저장 후, autoCompleteTextView를 초기화하는 메서드
-    private fun initRestaurantList(){
-        lifecycleScope.launch {
+    private suspend fun initRestaurantList(){
+        /*lifecycleScope.launch {
             val indsMclsCdList =
                 listOf("I201", "I202", "I203", "I204", "I205") // "I206", "I207"
             val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
@@ -79,7 +85,15 @@ class BobAppointmentActivity : AppCompatActivity() {
 
             //autoCompleteTextView를 초기화
             initAutoCompleteTextView()
-        }
+        }*/
+        CoroutineScope(Dispatchers.IO).async {
+            restaurantDb = RestaurantDatabase.getDatabase(baseContext)
+            restaurants = restaurantDb.restaurantListDao().getAllRecord()
+            Log.i("finish", restaurants.size.toString())
+            CoroutineScope(Dispatchers.Main).launch {
+                initAutoCompleteTextView()
+            }
+        }.await()
     }
 
     val test = arrayListOf<String>()
