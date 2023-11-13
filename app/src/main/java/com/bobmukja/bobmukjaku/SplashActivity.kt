@@ -68,6 +68,7 @@ class SplashActivity : AppCompatActivity() {
             if(newStdrYm != stdrYm){//api의 갱신 기준날짜가 변경됐으므로 음식점 데이터를 업데이트
                 //getRestaurantListFromAPI()
                 binding.progressbar.visibility = View.VISIBLE
+                binding.progressbar.max = 1000
                 binding.progresstxt.visibility = View.VISIBLE
 
                 val intent = Intent(this@SplashActivity, RestaurantUpdateService::class.java)
@@ -105,7 +106,7 @@ class SplashActivity : AppCompatActivity() {
                     "finish"->{
                         binding.progressbar.progress = binding.progressbar.max
                         binding.progresstxt.text = "다운로드 완료!"
-                        //SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
+                        SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
 
                         Handler(Looper.getMainLooper()).postDelayed({
 
@@ -117,7 +118,7 @@ class SplashActivity : AppCompatActivity() {
                     }
                     else->{
                         binding.progressbar.progress = progress?:0
-                        binding.progresstxt.text = "음식점 정보를 다운로드중 $progress%"
+                        binding.progresstxt.text = "음식점 정보를 다운로드중 ${progress/10}%"
                     }
                 }
             }

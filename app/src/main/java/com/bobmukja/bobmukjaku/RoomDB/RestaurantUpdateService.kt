@@ -107,7 +107,7 @@ class RestaurantUpdateService:Service() {
 
 
         var progress = 0
-        var progressUnit = 100 / (indsMclsCdList.size * dong.size)
+        var progressUnit = 1000 / (indsMclsCdList.size * dong.size)
 
 
         CoroutineScope(Dispatchers.Default).launch {
@@ -115,7 +115,7 @@ class RestaurantUpdateService:Service() {
                 for (lists in indsMclsCdList) {
                     progress += progressUnit
                     restaurantApi(lists,dongs)
-                    manager.notify(10,makeNotification("다운로드 중.. $progress%", ""))
+                    manager.notify(10,makeNotification("다운로드 중.. ${progress/10}%", ""))
                     val intent = Intent("com.bobmukja.bobmukjaku.SPLASHACTIVITY")
                     intent.putExtra("state", "downloading")
                     intent.putExtra("progress", progress)
