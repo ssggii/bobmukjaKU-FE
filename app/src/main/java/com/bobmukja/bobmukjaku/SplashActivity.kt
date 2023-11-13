@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.RoomDB.RestaurantUpdateService
@@ -45,6 +47,7 @@ class SplashActivity : AppCompatActivity() {
         }, 2000)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -69,7 +72,7 @@ class SplashActivity : AppCompatActivity() {
 
                 val intent = Intent(this@SplashActivity, RestaurantUpdateService::class.java)
                 intent.putExtra("newStdrYm", newStdrYm)
-                startService(intent)
+                startForegroundService(intent)
             }else{
                 Handler(Looper.getMainLooper()).postDelayed({
                     FirebaseMessaging.getInstance().token.addOnSuccessListener {
@@ -105,12 +108,11 @@ class SplashActivity : AppCompatActivity() {
                         //SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
 
                         Handler(Looper.getMainLooper()).postDelayed({
-                            FirebaseMessaging.getInstance().token.addOnSuccessListener {
 
-                                val intent = Intent(baseContext, LoginActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            }
+                            val intent = Intent(baseContext, LoginActivity::class.java)
+                            startActivity(intent)
+                            finish()
+
                         }, 2000)
                     }
                     else->{
@@ -162,4 +164,12 @@ class SplashActivity : AppCompatActivity() {
             }
             return@withContext null
         }
+
+    override fun onResume() {
+        super.onResume()
+        if(intent.getStringExtra("path") == "fromNotification"){
+            val intent = Intent(this, RestaurantUpdateService::class.java)
+            stopService(intent)
+        }
+    }
 }

@@ -3,12 +3,16 @@ package com.bobmukja.bobmukjaku.RoomDB
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import com.bobmukja.bobmukjaku.Model.RestaurantList
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
+import com.bobmukja.bobmukjaku.R
+import com.bobmukja.bobmukjaku.SplashActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +29,54 @@ class RestaurantUpdateService:Service() {
     private var flag = false
     //private var notificationOnOff = false
     private lateinit var newStdrYm:String
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onCreate() {
+        super.onCreate()
+        makeNotificationChannel()
+        startForeground(10,makeNotification("다운로드 중.. 0%",""))
+    }
+
+    override fun onDestroy() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        super.onDestroy()
+    }
+
+    fun makeNotification(content: String, extraString:String): Notification? {
+        val id = "BobmukjaKU"
+        val builder = NotificationCompat.Builder(this, id)
+            .setSmallIcon(R.drawable.logo_img)
+            .setContentTitle("음식점 정보 업데이트")
+            .setContentText(content)
+            .setAutoCancel(true)
+
+        val intent = Intent(this, SplashActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        intent.putExtra("path", extraString)
+
+        val pendingIntent =
+            PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        builder.setContentIntent(pendingIntent)
+
+        return builder.build()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun makeNotificationChannel() {
+        val id = "BobmukjaKU"
+        val name = "BobmukjaKUChannel"
+        val notificationChannel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
+        notificationChannel.enableLights(true)
+        notificationChannel.enableVibration(true)
+        notificationChannel.lightColor = Color.BLUE
+        notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(notificationChannel)
+        //manager.notify(10, notification)
+    }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -63,6 +115,7 @@ class RestaurantUpdateService:Service() {
                 for (lists in indsMclsCdList) {
                     progress += progressUnit
                     restaurantApi(lists,dongs)
+                    manager.notify(10,makeNotification("다운로드 중.. $progress%", ""))
                     val intent = Intent("com.bobmukja.bobmukjaku.SPLASHACTIVITY")
                     intent.putExtra("state", "downloading")
                     intent.putExtra("progress", progress)
@@ -71,7 +124,7 @@ class RestaurantUpdateService:Service() {
                 }
             }
             flag = false
-
+            manager.notify(10, makeNotification("다운로드 완료!", "fromNotification"))
             SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
             val intent = Intent("com.bobmukja.bobmukjaku.SPLASHACTIVITY")
             intent.putExtra("state", "finish")
