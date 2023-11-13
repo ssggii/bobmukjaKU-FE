@@ -17,7 +17,7 @@
 
         <EditText
             android:id="@+id/content_search"
-            android:layout_width="320dp"
+            android:layout_width="match_parent"
             android:layout_height="47dp"
             android:background="@drawable/btn_search"
             android:ems="10"
@@ -30,12 +30,12 @@
             android:textColorHint="#737373"
             android:paddingLeft="15dp" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/send_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/alarm" />
+<!--        <androidx.appcompat.widget.AppCompatButton-->
+<!--            android:id="@+id/send_btn"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_marginLeft="5dp"-->
+<!--            android:background="@drawable/alarm" />-->
     </LinearLayout>
 
     <LinearLayout
