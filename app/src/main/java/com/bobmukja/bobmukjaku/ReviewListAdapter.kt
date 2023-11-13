@@ -104,6 +104,17 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
 
     private fun deleteReview(reviewInfo: ReviewResponse, position: Int) {
         val review = ScrapInfo(uid = uid, placeId = reviewInfo.placeId)
+
+        // 이미지가 있는 경우에만 Firebase Storage에서 삭제 진행
+        if (reviewInfo.imageUrl != "nodata") {
+            val storageReference = Firebase.storage.reference.child(reviewInfo.imageUrl)
+            storageReference.delete().addOnSuccessListener {
+                Log.i("deleteReview", "리뷰 이미지 삭제 완료")
+            }.addOnFailureListener {
+                Log.e("deleteReview", "리뷰 이미지 삭제 실패: ${it.message}")
+            }
+        }
+
         val call = restaurantService.deleteReview(authorizationHeader, review)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
