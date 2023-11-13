@@ -1,20 +1,25 @@
 package com.bobmukja.bobmukjaku
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
-import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
+import com.bobmukja.bobmukjaku.RoomDB.RestaurantUpdateService
 import com.bobmukja.bobmukjaku.databinding.ActivitySplashBinding
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.net.HttpURLConnection
@@ -22,46 +27,59 @@ import java.net.URL
 
 class SplashActivity : AppCompatActivity() {
 
-    private lateinit var restaurantDb:RestaurantDatabase
-    private lateinit var viewModel: MapListViewModel
     private lateinit var binding:ActivitySplashBinding
+    lateinit var stdrYm:String
+    lateinit var newStdrYm:String
+
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if(doubleBackToExitPressedOnce){
+            super.onBackPressed()
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed({
+            doubleBackToExitPressedOnce = false
+        }, 2000)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        SharedPreferences.initSharedPreferences(this)
-        attachContextToViewModel(this)
+
+        SharedPreferences.initSharedPreferences(applicationContext)
+        registerReceiver(receiver, IntentFilter("com.bobmukja.bobmukjaku.SPLASHACTIVITY"))
 
         CoroutineScope(Dispatchers.Main).launch{
 
-            val stdrYm = SharedPreferences.getString("stdrYm", "null")?:"null"//최근 업데이트 당시, 음식점 정보 기준 날짜
-            val newStdrYm = getStrDateFromrestaurantApi("I201","11215710")?:"null"//api로 새로 가져온 음식점 정보 기준 날짜(인자로 준 문자열은 더미)
+            stdrYm = SharedPreferences.getString("stdrYm", "000000")?:"null"//최근 업데이트 당시, 음식점 정보 기준 날짜
+            newStdrYm = getStrDateFromrestaurantApi("I201","11215710")?:"null"//api로 새로 가져온 음식점 정보 기준 날짜(인자로 준 문자열은 더미)
 
-            if(stdrYm == "null"){ //최초 실행이므로 무조건 음식점 정보 다운로드
-                restaurantDb = RestaurantDatabase.getDatabase(baseContext)
-                getRestaurantListFromAPI()
-                SharedPreferences.putString("stdrYm", newStdrYm)
-            }else{//한번이라도 api로 음식점을 업데이트 한 적이 있을 때
-                if(newStdrYm != stdrYm){//api에 있는 음식점 데이터가 새로 업데이트 됐으므로, 음식점 데이터를 업데이트 한다.
-                    getRestaurantListFromAPI()
-                    SharedPreferences.putString("stdrYm", newStdrYm)
-                }
+            Log.i("stdrYm", stdrYm)
+            Log.i("newStdrYm", newStdrYm)
+
+            if(newStdrYm != stdrYm){//api의 갱신 기준날짜가 변경됐으므로 음식점 데이터를 업데이트
+                //getRestaurantListFromAPI()
+                binding.progressbar.visibility = View.VISIBLE
+                binding.progresstxt.visibility = View.VISIBLE
+
+                val intent = Intent(this@SplashActivity, RestaurantUpdateService::class.java)
+                intent.putExtra("newStdrYm", newStdrYm)
+                startService(intent)
+            }else{
+                Handler(Looper.getMainLooper()).postDelayed({
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener {
+
+                        val intent = Intent(baseContext, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }, 2000)
             }
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                FirebaseMessaging.getInstance().token.addOnSuccessListener {
-
-//                    SharedPreferences.remove("registrationKey")
-//                    SharedPreferences.putString("registrationKey", it)
-//                    Log.i("등록키", it)
-                    val intent = Intent(baseContext, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            }, 2000)
-
         }
 
 
@@ -71,51 +89,40 @@ class SplashActivity : AppCompatActivity() {
         )
     }
 
+    var currentProgress = 0
+    private val receiver = object:BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val state = intent?.getStringExtra("state")
+            val progress = intent?.getIntExtra("progress", 0)?:0
+            currentProgress = progress
+            Log.i("broadcastrcv", "call")
 
+            if(state != null){
+                when(state){
+                    "finish"->{
+                        binding.progressbar.progress = binding.progressbar.max
+                        binding.progresstxt.text = "다운로드 완료!"
+                        //SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
 
-    private suspend fun getRestaurantListFromAPI() {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            FirebaseMessaging.getInstance().token.addOnSuccessListener {
 
-
-        //api로부터 음식점 데이터를 가져온다.
-        CoroutineScope(Dispatchers.Main).async {
-            val indsMclsCdList =
-                listOf("I201", "I202", "I203", "I204", "I205") // "I206", "I207"
-            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730")
-
-            var progress = 0
-            var progressUnit = binding.progressbar.max / (indsMclsCdList.size * dong.size)
-            binding.progressbar.visibility = View.VISIBLE
-            binding.progresstxt.visibility = View.VISIBLE
-
-            for (dongs in dong) {
-                for (lists in indsMclsCdList) {
-                    viewModel.fetchRestaurantList(lists, dongs)
-                    val restaurantList = viewModel.restaurantList.value ?: emptyList()
-                    CoroutineScope(Dispatchers.IO).async {
-                        restaurantDb.restaurantListDao().insertAllRestaurant(*restaurantList.toTypedArray())
+                                val intent = Intent(baseContext, LoginActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                        }, 2000)
                     }
-                    if(progress >= 87){
-                        //progress바가 거의 다채워지면 그냥 100%로 UI 변환
-                        progress = binding.progressbar.max
-                    }else {
-                        progress += progressUnit
+                    else->{
+                        binding.progressbar.progress = progress?:0
+                        binding.progresstxt.text = "음식점 정보를 다운로드중 $progress%"
                     }
-                    binding.progressbar.progress = progress
-                    binding.progresstxt.text = "음식점 정보를 다운로드 중 $progress%"
-                    Log.i("vvv", "$progress%")
-
                 }
             }
-        }.await()
+        }
 
-        binding.progresstxt.text = "다운로드 완료!"
     }
 
-    private fun attachContextToViewModel(context: Context) {
-        val repository = RestaurantRepository()
-        val viewModelFactory = MapListViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory)[MapListViewModel::class.java]
-    }
 
 
     //
