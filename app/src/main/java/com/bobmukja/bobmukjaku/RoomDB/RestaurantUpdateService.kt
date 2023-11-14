@@ -125,6 +125,7 @@ class RestaurantUpdateService:Service() {
             }
             flag = false
             manager.notify(10, makeNotification("다운로드 완료!", "fromNotification"))
+            SharedPreferences.initSharedPreferences(applicationContext)
             SharedPreferences.putString("stdrYm", newStdrYm)//변경된 기준날짜 저장
             val intent = Intent("com.bobmukja.bobmukjaku.SPLASHACTIVITY")
             intent.putExtra("state", "finish")
