@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".RestaurantDetailActivity">
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/left_arrow_line" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +26,7 @@
             android:id="@+id/restaurantName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="3.5dp"
             android:layout_marginLeft="20dp"
             android:fontFamily="@font/notosans_bold"
             android:text="음식점 이름"
@@ -27,7 +37,7 @@
             android:id="@+id/count_scrap"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="4dp"
             android:layout_marginLeft="6dp"
             android:layout_gravity="center"
             android:text="0"
@@ -42,7 +52,7 @@
             android:id="@+id/category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="1.5dp"
             android:layout_marginLeft="10dp"
             android:fontFamily="@font/notosans_semibold"
             android:text="카테고리"
@@ -51,7 +61,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16.5dp"
             android:fontFamily="@font/notosans_semibold"
             android:text=" | "
             android:textSize="15sp" />
@@ -60,7 +69,7 @@
             android:id="@+id/categorySub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="1.5dp"
             android:fontFamily="@font/notosans_semibold"
             android:text="소분류"
             android:textSize="15sp" />

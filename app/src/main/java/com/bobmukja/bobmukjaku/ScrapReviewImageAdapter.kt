@@ -45,7 +45,7 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
         val reviewInfo = items[position]
 
         if (items.isEmpty()) {
-            holder.binding.image.visibility = View.GONE
+            holder.binding.image.setImageResource(R.drawable.basic_review_image)
         }
 
         if (position < 3) {
@@ -53,7 +53,7 @@ class ScrapReviewImageAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
             if (reviewInfo.imageUrl != "nodata") {
                 setImageToImageView(holder.binding.image, reviewInfo)
             } else {
-                holder.binding.image.visibility = View.GONE
+                holder.binding.image.setImageResource(R.drawable.basic_review_image)
             }
         } else {
             holder.binding.image.visibility = View.GONE

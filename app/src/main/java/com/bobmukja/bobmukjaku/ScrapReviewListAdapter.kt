@@ -34,7 +34,7 @@ class ScrapReviewListAdapter(var items: List<ReviewResponse>) : RecyclerView.Ada
         val reviewInfo = items[position]
 
         if (items.isEmpty()) {
-            holder.binding.content.visibility = View.GONE
+            holder.binding.content.text = "더 많은 리뷰가 추가될 예정입니다."
         }
 
         if (position < 3) {
