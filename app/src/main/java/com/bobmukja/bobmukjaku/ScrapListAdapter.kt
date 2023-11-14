@@ -21,8 +21,8 @@ import retrofit2.Response
 
 class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRemovedListener: OnScrapRemovedListener): RecyclerView.Adapter<ScrapListAdapter.ViewHolder>() {
 
-    lateinit var reviewAdapter: ScrapReviewListAdapter
-    lateinit var reviewImageAdapter: ScrapReviewImageAdapter
+//    lateinit var reviewAdapter: ScrapReviewListAdapter
+//    lateinit var reviewImageAdapter: ScrapReviewImageAdapter
     private val accessToken = SharedPreferences.getString("accessToken", "")
     private val authorizationHeader = "Bearer $accessToken"
 
@@ -56,6 +56,21 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
 
         holder.binding.name.text = scrapInfo.placeName
 
+        holder.binding.scrapBox.setOnClickListener {
+            val intent = Intent(holder.binding.root.context, RestaurantDetailActivity::class.java)
+
+            // Pass the necessary information as extras
+            intent.putExtra("bizesId", scrapInfo.placeId)
+            intent.putExtra("bizesNm", scrapInfo.placeName)
+            intent.putExtra("lnoAdr", "")
+            intent.putExtra("indsMclsNm", "")
+            intent.putExtra("indsSclsNm", "")
+            intent.putExtra("uid", uid)
+
+            // Start RestaurantDetailActivity
+            holder.binding.root.context.startActivity(intent)
+        }
+
         // 리뷰 목록 API
         val call = restaurantService.getRestaurantReview(authorizationHeader, scrapInfo.placeId)
         call.enqueue(object : Callback<List<ReviewResponse>> {
@@ -65,14 +80,14 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
                     if (reviewListResponse != null) {
                         reviewList.clear()
                         reviewList.addAll(reviewListResponse) // reviewList에 업데이트된 리뷰 목록 저장
-                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
-                        reviewImageAdapter.updateItems((reviewList))
+//                        reviewAdapter.updateItems(reviewList) // 어댑터에 업데이트된 목록 전달
+//                        reviewImageAdapter.updateItems((reviewList))
 
                         holder.binding.totalReview.text = reviewList.size.toString()
                     } else {
                         reviewList.clear()
-                        reviewAdapter.updateItems(reviewList)
-                        reviewImageAdapter.updateItems((reviewList))
+//                        reviewAdapter.updateItems(reviewList)
+//                        reviewImageAdapter.updateItems((reviewList))
                     }
                     val successCode = response.code()
                     Log.i("음식점 리뷰 목록 로드 ", "성공 $successCode")
@@ -88,21 +103,21 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
             }
         })
 
-        holder.binding.reviewList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.VERTICAL, false)
-        reviewAdapter = ScrapReviewListAdapter(reviewList)
-        reviewAdapter.onItemClickListener = object : ScrapReviewListAdapter.OnItemClickListener {
-            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
-            }
-        }
-        holder.binding.reviewList.adapter = reviewAdapter
-
-        holder.binding.reviewImageList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.HORIZONTAL, false)
-        reviewImageAdapter = ScrapReviewImageAdapter(reviewList)
-        reviewImageAdapter.onItemClickListener = object : ScrapReviewImageAdapter.OnItemClickListener {
-            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
-            }
-        }
-        holder.binding.reviewImageList.adapter = reviewImageAdapter
+//        holder.binding.reviewList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.VERTICAL, false)
+//        reviewAdapter = ScrapReviewListAdapter(reviewList)
+//        reviewAdapter.onItemClickListener = object : ScrapReviewListAdapter.OnItemClickListener {
+//            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
+//            }
+//        }
+//        holder.binding.reviewList.adapter = reviewAdapter
+//
+//        holder.binding.reviewImageList.layoutManager = LinearLayoutManager(holder.binding.root.context, LinearLayoutManager.HORIZONTAL, false)
+//        reviewImageAdapter = ScrapReviewImageAdapter(reviewList)
+//        reviewImageAdapter.onItemClickListener = object : ScrapReviewImageAdapter.OnItemClickListener {
+//            override fun onItemClick(pos: Int, reviewInfo: ReviewResponse) {
+//            }
+//        }
+//        holder.binding.reviewImageList.adapter = reviewImageAdapter
 
         // 스크랩 버튼 이벤트
         holder.binding.scrapBtn.setOnClickListener {

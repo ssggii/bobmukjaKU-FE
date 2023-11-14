@@ -54,6 +54,11 @@ class RestaurantDetailActivity : AppCompatActivity() {
         getRestaurantReview()
         countHeart()
 
+        // 이전 화면으로 돌아가기
+        binding.backBtn.setOnClickListener {
+            finish() // 현재 액티비티 종료
+        }
+
         // 스크랩 버튼 클릭 리스너 설정
         binding.scrapBtn.setOnClickListener {
             if (binding.scrapBtn.backgroundTintList == ContextCompat.getColorStateList(this, R.color.ect)) {

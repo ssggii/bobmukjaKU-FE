@@ -428,6 +428,33 @@ class ProfileFragment : Fragment() {
 //        }
 //    }
 
+//        private fun deleteMember(){
+//            val accessToken = SharedPreferences.getString("accessToken", "")
+//            val authorizationHeader = "Bearer $accessToken"
+//            binding.userDeleteBtn.setOnClickListener {
+//
+//                RetrofitClient.memberService.deleteMember(authorizationHeader)
+//                    .enqueue(object: Callback<Unit>{
+//                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+//                            if(response.isSuccessful){
+//                                //회원탈퇴 성공
+//                                //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+//                                val intent = Intent(requireContext(), LoginActivity::class.java)
+//                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//                                startActivity(intent)
+//                            }else{
+//                                Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+//                            //로그아웃 실패
+//                            Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
+//                        }
+//                    })
+//            }
+//        }
+
     companion object {
         private const val PROFILE_COLOR_REQUEST_CODE = 100
         private const val PROFILE_MODIFY_REQUEST_CODE = 101

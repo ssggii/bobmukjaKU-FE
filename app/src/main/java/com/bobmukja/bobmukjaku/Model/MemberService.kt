@@ -41,20 +41,6 @@ interface MemberService {
         @Header("Authorization") authorization: String,
         @Body rateUpdateDto: RateUpdateDto): Call<Void>
 
-    // 비밀번호 재설정
-    @PUT("/member/info/password")
-    fun updatePassword(
-        @Header("Authorization") authorization: String,
-        @Body member: UpdatePassword
-    ): Call<Void>
-
-    // 사용자 삭제
-    @DELETE("member/info")
-    fun deleteMember(
-        @Header("Authorization") authorization: String,
-        @Body requestBody: Map<String, String>
-    ): Call<Void>
-
     // 로그인
     @POST("/login")
     //fun login(@Body loginDto: LoginDto, @Header("registrationKey") registrationKey: String): Call<Void>
@@ -100,13 +86,16 @@ interface MemberService {
     @POST("/auth/logout")
     fun logout(@Header("authorization") authorization: String): Call<Unit>
 
-    // 필요한 다른 API 구현
+    //회원탈퇴
+    @DELETE("/member/account")
+    fun deleteMember(@Header("authorization") authorization: String): Call<Unit>
 
+    // 필요한 다른 API 구현
 }
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://43.202.12.102:8080" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.45.89:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
