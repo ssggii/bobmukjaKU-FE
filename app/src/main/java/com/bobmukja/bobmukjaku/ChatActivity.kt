@@ -93,6 +93,7 @@ class ChatActivity : AppCompatActivity() {
             val job =
                 CoroutineScope(Dispatchers.IO).async {
                     myInfo = getMyInfoFromServer()
+                    sendJoinMessage()
                 }.await()
 
             val job2 =
@@ -104,6 +105,34 @@ class ChatActivity : AppCompatActivity() {
             initNotice()
             initLayout()
             initRecyclerView()
+        }
+    }
+
+    private fun sendJoinMessage() {
+        //처음 모집방에 입장할 경우, 입장 메시지를 전송(sendUid를 -200으로)
+
+        val mode = intent.getStringExtra("mode")
+        if(mode != null && mode == "join"){
+            val authorization = "Bearer $accessToken"
+            val chatModel = ChatModel("",
+                -200,
+                myInfo.memberNickName,
+                System.currentTimeMillis(),
+                shareMessage = false,
+                chatRoomInfo.roomId,
+                profanity = false)
+
+            RetrofitClient.memberService.sendMessage(authorization, chatModel)
+                .enqueue(object:Callback<Unit>{
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                        //입장메시지 전송 성공
+                    }
+
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        //입장메시지 전송 실패
+                    }
+
+                })
         }
     }
 

@@ -16,10 +16,10 @@
         android:background="@drawable/dateprint"
         android:paddingHorizontal="7dp">
         <TextView
-            android:id="@+id/date_msg"
+            android:id="@+id/join_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2023년 1월 1일 금요일"
+            android:text="건붕이님이 입장하셨습니다."
             android:textColor="@color/white"
             android:layout_marginVertical="5dp" />
     </LinearLayout>

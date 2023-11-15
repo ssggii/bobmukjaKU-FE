@@ -63,6 +63,13 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 OtherShareMessageViewHolder(SharemessageOtherBinding.bind(view)
                 )
             }
+            5->{
+                val view =
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.join_msg, parent, false) //입장 메시지 레이아웃으로 초기화
+
+                JoinMsgViewHolder(JoinMsgBinding.bind(view))
+            }
             else->{
                 val view =
                     LayoutInflater.from(parent.context)
@@ -182,6 +189,9 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
     override fun getItemViewType(position: Int): Int {               //메시지의 id에 따라 내 메시지/상대 메시지 구분
         //return if (items[position].senderUid.equals(myUid)) 1 else 0
         return if(items[position].senderUid == -100L){
+            6
+        }
+        else if(items[position].senderUid == -200L){
             5
         }
         else if ((items[position].senderUid == myInfo.uid)&&(items[position].shareMessage == false)){
@@ -203,6 +213,9 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
         if(items[position].senderUid == -100L){
             (holder as DatePrintViewHolder).bind(position)
         }
+        else if(items[position].senderUid == -200L){
+            (holder as JoinMsgViewHolder).bind(position)
+        }
         else if((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == false)) { //레이아웃 항목 초기화
             (holder as MyMessageViewHolder).bind(position)
         }else if((items[position].senderUid == myInfo.uid) && (items[position].shareMessage == true)){
@@ -213,6 +226,18 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             (holder as OtherShareMessageViewHolder).bind(position)
         }
     }
+
+    inner class JoinMsgViewHolder(itemView: JoinMsgBinding) :
+        RecyclerView.ViewHolder(itemView.root){
+        val joinMsgTxt = itemView.joinMsg
+
+            fun bind(position: Int){
+                val senderNickname = items[position].senderName
+                if(senderNickname != null){
+                    joinMsgTxt.text = "${senderNickname}님이 입장하셨습니다."
+                }
+            }
+        }
 
     val calendar: Calendar = Calendar.getInstance()
     inner class DatePrintViewHolder(itemView: DateMsgBinding) :

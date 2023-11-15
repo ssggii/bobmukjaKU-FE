@@ -82,7 +82,7 @@ class SplashActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     }
-                }, 2000)
+                }, 500)
             }
         }
 
@@ -114,7 +114,7 @@ class SplashActivity : AppCompatActivity() {
                             startActivity(intent)
                             finish()
 
-                        }, 2000)
+                        }, 500)
                     }
                     else->{
                         binding.progressbar.progress = progress?:0

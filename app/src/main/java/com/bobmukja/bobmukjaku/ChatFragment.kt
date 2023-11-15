@@ -803,6 +803,7 @@ class ChatFragment : Fragment() {
                                 intent.putExtra("kindOfFood", roomInfo.kindOfFood)
                                 intent.putExtra("total", roomInfo.total)
                                 intent.putExtra("currentNum", roomInfo.currentNum?.plus(1))
+                                intent.putExtra("mode", "join")
                                 startActivity(intent)
                             }
                         } else {
