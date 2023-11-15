@@ -69,8 +69,6 @@ class RestaurantInfoDialog(private val restaurant: RestaurantList, private val u
             intent.putExtra("placeAddress", restaurant.lnoAdr)
             if (reviewList != null && reviewList.isNotEmpty()) {
                 intent.putExtra("imageUrl", reviewList[0].imageUrl)
-            } else if (reviewList[0].imageUrl == "nodata"){
-                intent.putExtra("imageUrl", "nodata")
             } else {
                 intent.putExtra("imageUrl", "nodata")
             }
