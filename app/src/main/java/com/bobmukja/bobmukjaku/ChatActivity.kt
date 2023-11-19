@@ -249,7 +249,7 @@ class ChatActivity : AppCompatActivity() {
                         response: Response<NameRateBgDto>
                     ) {
                         Log.i("ttt", "$participantUid/${response.code()}")
-                        val result = response.body()!!
+                        val result = response.body()?:NameRateBgDto("(알수없음)", 45, "bg1")
                         if(participantListForChatAdapter.find { it.uid == participantUid } == null)
                             participantListForChatAdapter.add(Member(participantUid,null, null, result.name,null, result.rate, result.bg))
                         Log.i("hhh", participantListForChatAdapter.toString())

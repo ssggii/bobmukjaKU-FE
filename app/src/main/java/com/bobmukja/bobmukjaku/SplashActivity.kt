@@ -44,7 +44,7 @@ class SplashActivity : AppCompatActivity() {
 
         Handler().postDelayed({
             doubleBackToExitPressedOnce = false
-        }, 2000)
+        }, 500)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -82,7 +82,7 @@ class SplashActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     }
-                }, 500)
+                }, 0)
             }
         }
 
@@ -114,7 +114,7 @@ class SplashActivity : AppCompatActivity() {
                             startActivity(intent)
                             finish()
 
-                        }, 500)
+                        }, 0)
                     }
                     else->{
                         binding.progressbar.progress = progress?:0
