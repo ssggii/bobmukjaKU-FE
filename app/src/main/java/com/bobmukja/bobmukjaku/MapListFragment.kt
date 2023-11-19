@@ -1,6 +1,5 @@
 import android.content.Context
 import android.graphics.PointF
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,22 +7,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bobmukja.bobmukjaku.*
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.R
 import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.FragmentMapListBinding
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.MapView
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +30,6 @@ import retrofit2.Response
 class MapListFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapView: MapView
     private val markerInfoWindowMap = mutableMapOf<Marker, DialogFragment>()
-    private lateinit var viewModel: MapListViewModel
     private lateinit var restaurantDb: RestaurantDatabase
     private var restaurants = listOf<RestaurantList>()
     private val markerList = mutableListOf<Marker>()
@@ -51,9 +44,6 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
-        val repository = RestaurantRepository()
-        val viewModelFactory = MapListViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory)[MapListViewModel::class.java]
 
         CoroutineScope(Dispatchers.Main).launch {
             initRestaurantList()
@@ -76,124 +66,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         )
         naverMap.cameraPosition = cameraPosition
 
-//        initFilter()
         initMapMarker(naverMap)
-
-        // default 설정
-        var selected = ""
-        var category = "I201"
-        var dong = "11215710"
-//        getFoodList(naverMap, category, dong)
-
         setupSearchListener(naverMap)
-
-        // 위치 필터
-//        binding.hyDong.setOnClickListener {
-//            selected = "화양동"
-//            dong = "11215710"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//        binding.jyDong.setOnClickListener {
-//            selected = "자양동"
-//            dong = "11215820"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//        binding.GE1Dong.setOnClickListener {
-//            selected = "구의1동"
-//            dong = "11215850"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//        binding.GE2Dong.setOnClickListener {
-//            selected = "구의2동"
-//            dong = "11215860"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//        binding.GE3Dong.setOnClickListener {
-//            selected = "구의3동"
-//            dong = "11215870"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//        binding.GJDong.setOnClickListener {
-//            selected = "군자동"
-//            dong = "11215730"
-//            unselectedColor()
-//            selectedColor(binding.hyDong)
-//            binding.townBtn.text = selected
-//            binding.townFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-//        }
-//
-//        // 음식 필터
-//        binding.KoreaF.setOnClickListener {
-//            selected = "한식"
-//            category = "I201"
-//            unselectedColor()
-//            selectedColor(binding.KoreaF)
-//            binding.foodBtn.text = selected
-//            binding.foodFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-////            updateMarkers(naverMap, category)
-//        }
-//        binding.JapanF.setOnClickListener {
-//            selected = "일식"
-//            category = "I203"
-//            unselectedColor()
-//            selectedColor(binding.JapanF)
-//            binding.foodBtn.text = selected
-//            binding.foodFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-////            updateMarkers(naverMap, category)
-//        }
-//        binding.ForeignF.setOnClickListener {
-//            selected = "양식"
-//            category = "I204"
-//            unselectedColor()
-//            selectedColor(binding.ForeignF)
-//            binding.foodBtn.text = selected
-//            binding.foodFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-////            updateMarkers(naverMap, category)
-//        }
-//        binding.ChinaF.setOnClickListener {
-//            selected = "중식"
-//            category = "I202"
-//            unselectedColor()
-//            selectedColor(binding.ChinaF)
-//            binding.foodBtn.text = selected
-//            binding.foodFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-////            updateMarkers(naverMap, category)
-//        }
-//        binding.ectF.setOnClickListener {
-//            selected = "기타"
-//            category = "I205"
-//            unselectedColor()
-//            selectedColor(binding.ectF)
-//            binding.foodBtn.text = selected
-//            binding.foodFilter.visibility = View.GONE
-//            getFoodList(naverMap, category, dong)
-////            updateEtcMarkers(naverMap)
-//        }
     }
 
     private suspend fun initRestaurantList(){
@@ -201,8 +75,6 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             restaurantDb = RestaurantDatabase.getDatabase(mContext)
             restaurants = restaurantDb.restaurantListDao().getAllRecord()
             Log.i("finish", restaurants.size.toString())
-//            CoroutineScope(Dispatchers.Main).launch {
-//            }
         }.await()
     }
 
@@ -222,187 +94,37 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                 if (s.toString().contains("한식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("한식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("일식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("일식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("양식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("서양식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("중식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("중식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("동남아시아")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("동남아시아")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("외국식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("기타 외국식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 베트남") || s.toString().contains("건대베트남")
@@ -411,68 +133,13 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("베트남음식점") || s.toString().contains("베트남 음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm.equals("베트남식 전문")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
-                } else if (s.toString().contains("건대 피자") || s.toString().contains("건대피자")
-                    || s.toString() == "피자" || s.toString().contains("피자맛집") || s.toString().contains("피자 맛집")
-                    || s.toString().contains("피자식당") || s.toString().contains("피자 식당")
-                    || s.toString().contains("피자음식점") || s.toString().contains("피자 음식점")) {
+                } else if (s.toString().contains("피자")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("피자")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 버거") || s.toString().contains("건대버거")
@@ -485,65 +152,13 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("햄버거음식점") || s.toString().contains("햄버거 음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("버거")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("치킨")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("치킨")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 마라탕") || s.toString().contains("건대마라탕")
@@ -552,33 +167,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("마라탕 음식점") || s.toString().contains("마라탕음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "마라탕/훠궈") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 초밥") || s.toString().contains("건대초밥")
@@ -590,33 +179,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("회 음식점") || s.toString().contains("회음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "일식 회/초밥") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 파스타") || s.toString().contains("건대파스타")
@@ -628,190 +191,37 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("스테이크 음식점") || s.toString().contains("스테이크음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "파스타/스테이크") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("화양동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("화양동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("자양동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("자양동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("구의동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("구의동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("군자동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("군자동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else {
                     for (restaurant in restaurants) {
                         if (restaurant.bizesNm.contains(s.toString())) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 }
@@ -825,187 +235,37 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                 if (s.toString().contains("한식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("한식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("일식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("일식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("양식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("서양식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("중식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("중식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("동남아시아")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("동남아시아")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("외국식")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsMclsNm.equals("기타 외국식")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 베트남") || s.toString().contains("건대베트남")
@@ -1014,68 +274,13 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("베트남음식점") || s.toString().contains("베트남 음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm.equals("베트남식 전문")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
-                } else if (s.toString().contains("건대 피자") || s.toString().contains("건대피자")
-                    || s.toString() == "피자" || s.toString().contains("피자맛집") || s.toString().contains("피자 맛집")
-                    || s.toString().contains("피자식당") || s.toString().contains("피자 식당")
-                    || s.toString().contains("피자음식점") || s.toString().contains("피자 음식점")) {
+                } else if (s.toString().contains("피자")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("피자")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 버거") || s.toString().contains("건대버거")
@@ -1088,65 +293,13 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("햄버거음식점") || s.toString().contains("햄버거 음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("버거")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("치킨")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == ("치킨")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 마라탕") || s.toString().contains("건대마라탕")
@@ -1155,33 +308,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("마라탕 음식점") || s.toString().contains("마라탕음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "마라탕/훠궈") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 초밥") || s.toString().contains("건대초밥")
@@ -1193,33 +320,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("회 음식점") || s.toString().contains("회음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "일식 회/초밥") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("건대 파스타") || s.toString().contains("건대파스타")
@@ -1231,190 +332,37 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("스테이크 음식점") || s.toString().contains("스테이크음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "파스타/스테이크") {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("화양동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("화양동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("자양동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("자양동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("구의동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("구의동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else if (s.toString().contains("군자동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("군자동")) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(
-                                            childFragmentManager,
-                                            "RestaurantInfoDialog"
-                                        )
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 } else {
                     for (restaurant in restaurants) {
                         if (restaurant.bizesNm.contains(s.toString())) {
-                            lifecycleScope.launch {
-                                val marker = Marker() // 마커 추가
-                                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                                marker.width = 45 // 마커 가로 크기
-                                marker.height = 60 // 마커 세로 크기
-                                marker.map = naverMap
-
-                                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                                val data = arguments
-                                restaurantInfoDialog.arguments = data
-
-                                marker.setOnClickListener {
-                                    if (markerInfoWindowMap.containsKey(marker)) {
-                                        markerInfoWindowMap[marker]?.dismiss()
-                                        markerInfoWindowMap.remove(marker)
-                                    } else {
-                                        markerInfoWindowMap[marker] = restaurantInfoDialog
-                                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                                    }
-                                    true
-                                }
-
-                                markerList.add(marker)
-                            }
+                            addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
                 }
@@ -1422,117 +370,88 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         })
     }
 
-    private fun initMapMarker(naverMap: NaverMap) {
-        for (restaurant in restaurants) {
-            lifecycleScope.launch {
-                val marker = Marker() // 마커 추가
-                marker.position = LatLng(restaurant.lat, restaurant.lon)
-                marker.width = 45 // 마커 가로 크기
-                marker.height = 60 // 마커 세로 크기
-                marker.map = naverMap
+    private fun addMarker(
+        restaurant: RestaurantList,
+        naverMap: NaverMap,
+        markerList: MutableList<Marker>,
+        uid: Long
+    ) {
+        lifecycleScope.launch {
+            val marker = Marker() // 마커 추가
+            marker.position = LatLng(restaurant.lat, restaurant.lon)
+            marker.width = 45 // 마커 가로 크기
+            marker.height = 60 // 마커 세로 크기
+            marker.map = naverMap
 
-                val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                val data = arguments
-                restaurantInfoDialog.arguments = data
+            val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
+            val data = arguments
+            restaurantInfoDialog.arguments = data
 
-                marker.setOnClickListener {
+            marker.setOnClickListener {
+                focusMapMarker(marker, naverMap, restaurantInfoDialog)
+                true
+            }
+
+            markerList.add(marker)
+        }
+    }
+
+    private fun focusMapMarker(
+        marker: Marker,
+        naverMap: NaverMap,
+        restaurantInfoDialog: RestaurantInfoDialog
+    ) {
+        // 다른 마커들을 지도에서 감춤
+        for (otherMarker in markerList) {
+            if (otherMarker != marker) {
+                otherMarker.map = null
+            }
+        }
+
+        naverMap.moveCamera(
+            CameraUpdate.scrollTo(marker.position)
+                .animate(CameraAnimation.Fly, 1000)
+                .finishCallback {
+                    naverMap.cameraPosition = CameraPosition(
+                        naverMap.cameraPosition.target, // 현재 중심 위치를 그대로 유지
+                        16.0 // 원하는 줌 레벨으로 설정
+                    )
+
+                    // 애니메이션이 끝난 후에 다이얼로그 표시
                     if (markerInfoWindowMap.containsKey(marker)) {
                         markerInfoWindowMap[marker]?.dismiss()
                         markerInfoWindowMap.remove(marker)
                     } else {
                         markerInfoWindowMap[marker] = restaurantInfoDialog
-                        restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                    }
-                    true
-                }
-
-                markerList.add(marker)
-            }
-        }
-    }
-
-    private fun getFoodList(naverMap: NaverMap, category: String, dong: String) {
-        lifecycleScope.launch {
-//            val dong = listOf("11215710", "11215820", "11215850", "11215860", "11215870", "11215730") // 동단위 key(화양동, 자양동, 구의1동, 구의2동, 구의3동, 군자동)
-            val indsMclsCdList = listOf("I201", "I202", "I203", "I204", "I205", "I206", "I211")
-
-            viewModel.fetchRestaurantList(category, dong)
-            val restaurantList = viewModel.restaurantList.value ?: emptyList()
-
-            val onCameraIdleListener = NaverMap.OnCameraIdleListener {
-                // 네이버 맵의 가시 영역에 해당하는 좌표 값 계산
-                val visibleRegion = naverMap.projection.toScreenLocation(naverMap.cameraPosition.target)
-                val leftTop = naverMap.projection.fromScreenLocation(
-                    PointF(visibleRegion.x - mapView.width / 2, visibleRegion.y - mapView.height / 2)
-                )
-                val rightBottom = naverMap.projection.fromScreenLocation(
-                    PointF(visibleRegion.x + mapView.width / 2, visibleRegion.y + mapView.height / 2)
-                )
-
-                // 가시 영역 좌표 값 출력
-                val minx = leftTop.longitude // 서쪽 경도
-                val miny = rightBottom.latitude // 남쪽 위도
-                val maxx = rightBottom.longitude // 동쪽 경도
-                val maxy = leftTop.latitude // 북쪽 위도
-
-                Log.d("MapListFragment", "minx: $minx, miny: $miny, maxx: $maxx, maxy: $maxy")
-
-                // 이전에 표시된 마커들 삭제
-                markerList.forEach { it.map = null }
-                markerList.clear()
-
-                for (restaurant in restaurantList) {
-                    if (restaurant.lat in miny..maxy && restaurant.lon in minx..maxx) {
-                        val marker = Marker() // 마커 추가
-                        marker.position = LatLng(restaurant.lat, restaurant.lon)
-                        marker.width = 45 // 마커 가로 크기
-                        marker.height = 60 // 마커 세로 크기
-                        marker.map = naverMap
-
-                        val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-                        val data = arguments
-                        restaurantInfoDialog.arguments = data
-
-                        marker.setOnClickListener {
-                            if (markerInfoWindowMap.containsKey(marker)) {
-                                markerInfoWindowMap[marker]?.dismiss()
-                                markerInfoWindowMap.remove(marker)
-                            } else {
-                                markerInfoWindowMap[marker] = restaurantInfoDialog
-                                restaurantInfoDialog.show(childFragmentManager, "RestaurantInfoDialog")
-                            }
-                            true
-                        }
-
-                        markerList.add(marker)
+                        restaurantInfoDialog.show(
+                            childFragmentManager,
+                            "RestaurantInfoDialog"
+                        )
                     }
                 }
-            }
-            naverMap.addOnCameraIdleListener(onCameraIdleListener)
-        }
+        )
     }
 
-//    private fun initFilter() {
-//        // 위치 필터
-//        binding.townBtn.setOnClickListener {
-//            if (binding.townFilter.visibility == View.GONE) {
-//                binding.townFilter.visibility = View.VISIBLE
-//                binding.foodFilter.visibility = View.GONE
-//            } else {
-//                binding.townFilter.visibility = View.GONE
-//            }
-//        }
-//
-//        // 음식 필터
-//        binding.foodBtn.setOnClickListener {
-//            if (binding.foodFilter.visibility == View.GONE) {
-//                binding.foodFilter.visibility = View.VISIBLE
-//                binding.townFilter.visibility = View.GONE
-//            } else {
-//                binding.foodFilter.visibility = View.GONE
-//            }
-//        }
-//    }
+    private fun initMapMarker(naverMap: NaverMap) {
+        for (restaurant in restaurants) {
+            val marker = Marker() // 마커 추가
+            marker.position = LatLng(restaurant.lat, restaurant.lon)
+            marker.width = 45 // 마커 가로 크기
+            marker.height = 60 // 마커 세로 크기
+            marker.map = naverMap
+
+            val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
+            val data = arguments
+            restaurantInfoDialog.arguments = data
+
+            marker.setOnClickListener {
+                focusMapMarker(marker, naverMap, restaurantInfoDialog)
+                true
+            }
+
+            markerList.add(marker)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -1602,47 +521,4 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             }
         })
     }
-
-    private fun selectedColor(selectedButton: AppCompatButton) {
-        val textColor = ContextCompat.getColor(requireContext(), R.color.white)
-        val color = ContextCompat.getColor(requireContext(), R.color.darkGray)
-        selectedButton.setTextColor(textColor)
-        selectedButton.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-    }
-
-//    private fun unselectedColor() {
-//        val foodList = listOf(
-//            binding.KoreaF,
-//            binding.JapanF,
-//            binding.ForeignF,
-//            binding.ChinaF,
-//            binding.ectF
-//        )
-//        val dongList = listOf(
-//            binding.hyDong,
-//            binding.jyDong,
-//            binding.GE1Dong,
-//            binding.GE2Dong,
-//            binding.GE3Dong,
-//            binding.GJDong
-//        )
-//
-//        val textColor = ContextCompat.getColor(requireContext(), R.color.white)
-//        val originalTextColor = ContextCompat.getColor(requireContext(), R.color.black)
-//        val color = ContextCompat.getColor(requireContext(), R.color.gray)
-//
-//        for (food in foodList) {
-//            if (food.currentTextColor == textColor) {
-//                food.setTextColor(originalTextColor)
-//                food.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-//            }
-//        }
-//        for (dong in dongList) {
-//            if (dong.currentTextColor == textColor) {
-//                dong.setTextColor(originalTextColor)
-//                dong.background.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-//            }
-//        }
-//
-//    }
 }
