@@ -662,8 +662,8 @@ class ChatFragment : Fragment() {
                         } else {
                             Log.i("[FilterFirstInfo]", "반환 성공")
                             for (filters in filterInfo) {
-                                val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
-                                val mainColor = ContextCompat.getColor(requireContext(), R.color.main)
+                                val whiteColor = ContextCompat.getColor(mContext, R.color.white)
+                                val mainColor = ContextCompat.getColor(mContext, R.color.main)
 
                                 if (filters.filterType == "oldest") {
                                     binding.sortBtn.text = "오래된순"
