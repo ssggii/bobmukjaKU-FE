@@ -19,10 +19,10 @@ import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.Model.TimeBlock
 import com.bobmukja.bobmukjaku.databinding.FragmentProfileBinding
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
 
 class ProfileFragment : Fragment() {
 
@@ -61,7 +61,10 @@ class ProfileFragment : Fragment() {
         modifyInfo()
 
         //로그아웃 버튼 이벤트
-//        logoutInfo()
+        logoutInfo()
+
+        //회원탈퇴 버튼 이벤트
+        deleteMember()
 
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
@@ -401,59 +404,65 @@ class ProfileFragment : Fragment() {
         }
     }
 
-//    private fun logoutInfo(){
-//        val accessToken = SharedPreferences.getString("accessToken", "")
-//        val authorizationHeader = "Bearer $accessToken"
-//        binding.logoutBtn.setOnClickListener {
-//
-//            RetrofitClient.memberService.logout(authorizationHeader)
-//                .enqueue(object: Callback<Unit>{
-//                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-//                        if(response.isSuccessful){
-//                            //로그아웃 성공
-//                            //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
-//                            val intent = Intent(requireContext(), LoginActivity::class.java)
-//                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//                            startActivity(intent)
-//                        }else{
-//                            Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//
-//                    override fun onFailure(call: Call<Unit>, t: Throwable) {
-//                        //로그아웃 실패
-//                        Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
-//                    }
-//                })
-//        }
-//    }
+    private fun logoutInfo(){
+        val accessToken = SharedPreferences.getString("accessToken", "")
+        val authorizationHeader = "Bearer $accessToken"
+        binding.logoutBtn.setOnClickListener {
 
-//        private fun deleteMember(){
-//            val accessToken = SharedPreferences.getString("accessToken", "")
-//            val authorizationHeader = "Bearer $accessToken"
-//            binding.userDeleteBtn.setOnClickListener {
-//
-//                RetrofitClient.memberService.deleteMember(authorizationHeader)
-//                    .enqueue(object: Callback<Unit>{
-//                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-//                            if(response.isSuccessful){
-//                                //회원탈퇴 성공
-//                                //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+            RetrofitClient.memberService.logout(authorizationHeader)
+                .enqueue(object: Callback<ResponseBody>{
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if(response.isSuccessful){
+                            //로그아웃 성공
+                            //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+
+                            val result = response.body()?.charStream()?.readText()
+                            Toast.makeText(requireContext(), "$result", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(requireContext(), LoginActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(intent)
+//                            Log.i("로그아웃", accessToken.toString())
+//                            Log.i("로그아웃", result.toString())
+                        }else{
+                            Toast.makeText(requireContext(), "로그아웃 실패 ${response.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        //로그아웃 실패
+                        Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
+                        Log.i("로그아웃", t.message.toString())
+                    }
+                })
+        }
+    }
+
+        private fun deleteMember(){
+            val accessToken = SharedPreferences.getString("accessToken", "")
+            val authorizationHeader = "Bearer $accessToken"
+            binding.userDeleteBtn.setOnClickListener {
+
+                RetrofitClient.memberService.deleteMember(authorizationHeader)
+                    .enqueue(object: Callback<Unit>{
+                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                            if(response.isSuccessful){
+                                //회원탈퇴 성공
+                                //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
 //                                val intent = Intent(requireContext(), LoginActivity::class.java)
 //                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 //                                startActivity(intent)
-//                            }else{
-//                                Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-//                            //로그아웃 실패
-//                            Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
-//                        }
-//                    })
-//            }
-//        }
+                            }else{
+                                Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Unit>, t: Throwable) {
+                            //로그아웃 실패
+                            Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+        }
 
     companion object {
         private const val PROFILE_COLOR_REQUEST_CODE = 100
