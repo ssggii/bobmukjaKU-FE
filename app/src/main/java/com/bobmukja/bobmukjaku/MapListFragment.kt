@@ -379,8 +379,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         lifecycleScope.launch {
             val marker = Marker() // 마커 추가
             marker.position = LatLng(restaurant.lat, restaurant.lon)
-            marker.width = 45 // 마커 가로 크기
-            marker.height = 60 // 마커 세로 크기
+            marker.width = 60 // 마커 가로 크기
+            marker.height = 80 // 마커 세로 크기
             marker.map = naverMap
 
             val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
@@ -436,8 +436,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
         for (restaurant in restaurants) {
             val marker = Marker() // 마커 추가
             marker.position = LatLng(restaurant.lat, restaurant.lon)
-            marker.width = 45 // 마커 가로 크기
-            marker.height = 60 // 마커 세로 크기
+            marker.width = 60 // 마커 가로 크기
+            marker.height = 80 // 마커 세로 크기
             marker.map = naverMap
 
             val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
