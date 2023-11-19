@@ -334,7 +334,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/join_recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="180dp" />
+                android:layout_height="220dp" />
         </ScrollView>
 
         <LinearLayout
@@ -368,16 +368,22 @@
                 android:background="@drawable/btn_circle_gray" />
         </LinearLayout>
 
-        <ScrollView
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:layout_weight="1">
+            android:layout_height="330dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/all_recyclerView"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </ScrollView>
+                android:layout_height="330dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/all_recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </ScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 
 </LinearLayout>
