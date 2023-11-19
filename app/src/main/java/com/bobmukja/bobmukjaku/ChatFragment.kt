@@ -21,6 +21,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bobmukja.bobmukjaku.Model.*
 import com.bobmukja.bobmukjaku.databinding.FragmentChatBinding
 import com.google.firebase.messaging.FirebaseMessaging
@@ -33,6 +34,7 @@ import java.util.*
 
 class ChatFragment : Fragment() {
 
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var mContext: Context
     lateinit var binding: FragmentChatBinding
     lateinit var adapter: ChatRoomAllListAdapter // 내 모집방 목록
@@ -56,6 +58,7 @@ class ChatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentChatBinding.inflate(inflater, container, false)
+        swipeRefreshLayout = binding.swipeRefreshLayout
         return binding.root
     }
 
@@ -71,6 +74,12 @@ class ChatFragment : Fragment() {
             Toast.makeText(requireContext(), "검색할 모집방 목록이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
         makeChatRoom()
+
+        // SwipeRefreshLayout 초기화 및 리스너 설정
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getFilterFirstInfo()
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
