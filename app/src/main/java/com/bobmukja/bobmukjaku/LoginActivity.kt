@@ -12,6 +12,7 @@ import com.bobmukja.bobmukjaku.Dto.LoginDto
 import com.bobmukja.bobmukjaku.Model.Member
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityLoginBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,8 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         SharedPreferences.initSharedPreferences(applicationContext)
         SharedPreferences.remove("accessToken")

@@ -12,6 +12,7 @@ import com.bobmukja.bobmukjaku.Model.Member
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.Model.UpdateScoreInfo
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityGiveScoreBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -57,6 +58,8 @@ class GiveScoreActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGiveScoreBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         try{
             roomId = intent.getLongExtra("roomId", -1)

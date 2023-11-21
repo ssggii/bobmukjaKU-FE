@@ -12,6 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import com.bobmukja.bobmukjaku.Model.Member
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SignUpRequest
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityJoinBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,6 +25,8 @@ class JoinActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityJoinBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         initLayout()
     }

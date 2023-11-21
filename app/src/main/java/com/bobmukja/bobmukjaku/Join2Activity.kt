@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.bobmukja.bobmukjaku.Hash.Sha256
 import com.bobmukja.bobmukjaku.Model.HashedAuthCode
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +51,7 @@ class Join2Activity : AppCompatActivity() {
         binding = ActivityJoin2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MyApp.setAppContext(this)
         /*auth = Firebase.auth
         initLayout()
         setupAuthStateListener()*/

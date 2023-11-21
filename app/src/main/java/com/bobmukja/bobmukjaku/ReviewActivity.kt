@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityReviewBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -64,6 +65,8 @@ class ReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
         Log.i("yyy", restaurantName.toString() + "/" + restaurantId.toString())
         Log.i("myInfo", myInfo.toString())//내정보 잘 전달받았는지 확인용
         //getRestaurantInfo()

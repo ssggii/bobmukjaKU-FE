@@ -22,6 +22,7 @@ import com.bobmukja.bobmukjaku.Dto.FriendInfoDto
 import com.bobmukja.bobmukjaku.Dto.FriendUpdateDto
 import com.bobmukja.bobmukjaku.Dto.NameRateBgDto
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityChatBinding
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -85,6 +86,7 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MyApp.setAppContext(this)
 
         Log.i("roomId", chatRoomInfo.roomId.toString())
 

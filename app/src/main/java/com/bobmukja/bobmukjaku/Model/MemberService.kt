@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import com.bobmukja.bobmukjaku.Dto.*
 import com.bobmukja.bobmukjaku.R
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -84,7 +85,7 @@ interface MemberService {
 
     //로그아웃
     @POST("/auth/logout")
-    fun logout(@Header("authorization") authorization: String): Call<Unit>
+    fun logout(@Header("authorization") authorization: String): Call<ResponseBody>
 
     //회원탈퇴
     @DELETE("/member/account")
@@ -95,7 +96,7 @@ interface MemberService {
 
 object RetrofitClient {
     //private const val BASE_URL = "https://4a76-124-58-128-62.ngrok-free.app" // 여기에 서버 URL 넣기
-    private const val BASE_URL = "http://192.168.65.251:8081" // 여기에 서버 URL 넣기
+    private const val BASE_URL = "http://192.168.219.110:8080" // 여기에 서버 URL 넣기
 
     private fun provideOkHttpClient(interceptor: ContentTypeInterceptor): OkHttpClient
             = OkHttpClient.Builder().run {
@@ -159,3 +160,7 @@ object SharedPreferences{
         return sharedPreferences.contains(key)
     }
 }
+
+
+
+

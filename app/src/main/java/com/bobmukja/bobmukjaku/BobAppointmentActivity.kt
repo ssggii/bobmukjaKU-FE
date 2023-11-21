@@ -17,6 +17,7 @@ import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.getDisplayedMinute
 import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.bobmukja.bobmukjaku.Dto.NoticeDto
 import com.bobmukja.bobmukjaku.Model.RestaurantList
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.ActivityBobAppointmentBinding
 import com.google.firebase.database.ktx.database
@@ -57,6 +58,8 @@ class BobAppointmentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityBobAppointmentBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         CoroutineScope(Dispatchers.Main).launch {
             attachContextToViewModel(baseContext)

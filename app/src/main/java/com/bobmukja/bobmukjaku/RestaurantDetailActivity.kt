@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityRestaurantDetailBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,6 +36,8 @@ class RestaurantDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRestaurantDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         // Intent로부터 데이터를 가져옵니다.
         bizesId = intent.getStringExtra("bizesId")

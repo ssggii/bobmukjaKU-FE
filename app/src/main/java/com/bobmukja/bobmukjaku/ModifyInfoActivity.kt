@@ -9,15 +9,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.Model.Member
+import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.Model.SharedPreferences
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityModifyInfoBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
 
 class ModifyInfoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityModifyInfoBinding
@@ -26,6 +25,8 @@ class ModifyInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityModifyInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        MyApp.setAppContext(this)
 
         // 닉네임 중복 검사
         binding.nickcheckbtn.setOnClickListener {

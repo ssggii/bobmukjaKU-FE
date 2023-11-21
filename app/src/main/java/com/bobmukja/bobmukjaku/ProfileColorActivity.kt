@@ -1,20 +1,19 @@
 package com.bobmukja.bobmukjaku
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityProfileColorBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
 
 class ProfileColorActivity : AppCompatActivity() {
 
@@ -26,6 +25,7 @@ class ProfileColorActivity : AppCompatActivity() {
         binding = ActivityProfileColorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MyApp.setAppContext(this)
         init()
     }
 

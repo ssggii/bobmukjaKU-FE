@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.getDisplayedMinute
 import com.bobmukja.bobmukjaku.CustomTimePicker.Companion.setTimeInterval
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityMakeRoomBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -44,6 +45,7 @@ class MakeRoomActivity : AppCompatActivity() {
         binding = ActivityMakeRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MyApp.setAppContext(this)
         initLayout()
     }
 

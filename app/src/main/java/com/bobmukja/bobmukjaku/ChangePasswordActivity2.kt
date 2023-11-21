@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bobmukja.bobmukjaku.Dto.UpdatePasswordDto
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityChangePassword2Binding
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,6 +23,7 @@ class ChangePasswordActivity2 : AppCompatActivity() {
         binding = ActivityChangePassword2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        MyApp.setAppContext(this)
         initLayout()
     }
 
