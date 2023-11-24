@@ -14,6 +14,8 @@ import com.bobmukja.bobmukjaku.Model.ReviewResponse
 import com.bobmukja.bobmukjaku.Model.ScrapInfo
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.databinding.ReviewListBinding
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
@@ -64,42 +66,35 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
         if (reviewInfo.imageUrl != "nodata") {
             val imagePath = reviewInfo.imageUrl
             CoroutineScope(Dispatchers.IO).launch {
-                val bitmap = downloadImageFromFirebaseStorage(imagePath)
-                withContext(Dispatchers.Main) {
-                    if (bitmap != null) {
-                        holder.binding.reviewImage.setImageBitmap(bitmap)
-                    } else {
-                        // 이미지 다운로드 실패 처리
-                        Log.i("리뷰 이미지 로드", "실패")
-                    }
-                }
+                downloadImageAndSetToImageView(holder, imagePath)
             }
         } else {
             holder.binding.reviewImage.visibility = View.GONE
         }
-
 
         holder.binding.deleteBtn.setOnClickListener {
             deleteReview(reviewInfo, position)
         }
     }
 
-    private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
+    private suspend fun downloadImageAndSetToImageView(holder: ViewHolder, imagePath: String) {
         val storageReference = Firebase.storage.reference.child(imagePath)
 
-        return try {
+        try {
             val maxBufferSize = 10 * 1024 * 1024 // 10MB로 설정
-            val stream = storageReference.getBytes(maxBufferSize.toLong()).await().inputStream()
+            val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
 
-            // 이미지 리사이징
-            val options = BitmapFactory.Options()
-            options.inSampleSize = 3 // 이미지 크기를 줄임 (원하는 크기에 따라 조절)
-
-            BitmapFactory.decodeStream(stream, null, options)
+            // Glide를 사용하여 이미지 로드 및 설정
+            withContext(Dispatchers.Main) {
+                Glide.with(holder.binding.root)
+                    .asBitmap()
+                    .load(bytes)
+                    .apply(RequestOptions().override(300, 300)) // 이미지 크기 조절 (원하는 크기에 따라 조절)
+                    .into(holder.binding.reviewImage)
+            }
         } catch (e: IOException) {
             e.printStackTrace()
             Log.e("ImageDownload", "Image download failed: ${e.message}")
-            null
         }
     }
 
