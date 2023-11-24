@@ -48,7 +48,7 @@ class RestaurantDetailAdapter2(var items: List<ReviewResponse>) : RecyclerView.A
             holder.binding.image.visibility = View.GONE
         }
 
-        holder.binding.content.text = "→ " + reviewInfo.contents
+        holder.binding.content.text = reviewInfo.contents
         if (reviewInfo.imageUrl != "nodata") {
             setImageToImageView(holder.binding.image, reviewInfo)
         } else {

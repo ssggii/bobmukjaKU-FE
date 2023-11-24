@@ -57,7 +57,7 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
         holder.binding.name.text = scrapInfo.placeName
 
         holder.binding.scrapBox.setOnClickListener {
-            val intent = Intent(holder.binding.root.context, RestaurantDetailActivity::class.java)
+            val intent = Intent(holder.binding.root.context, ScrapDetailActivity::class.java)
 
             // Pass the necessary information as extras
             intent.putExtra("bizesId", scrapInfo.placeId)
@@ -144,9 +144,9 @@ class ScrapListAdapter(var items: List<ScrapPost>, var uid: Long, var onScrapRem
         }
 
         // 공유하기 버튼 클릭 리스너 설정
-        holder.binding.shareBtn.setOnClickListener {
-            Toast.makeText(holder.binding.root.context, "아직 개발 중입니다. 조금만 더 기다려주세요 :)", Toast.LENGTH_SHORT).show()
-        }
+//        holder.binding.shareBtn.setOnClickListener {
+//            Toast.makeText(holder.binding.root.context, "아직 개발 중입니다. 조금만 더 기다려주세요 :)", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     override fun getItemCount(): Int {

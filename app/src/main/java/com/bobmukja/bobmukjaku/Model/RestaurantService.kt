@@ -1,5 +1,6 @@
 package com.bobmukja.bobmukjaku.Model
 
+import com.bobmukja.bobmukjaku.Dto.TopRestuarantDto
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -67,5 +68,10 @@ interface RestaurantService {
         @Path("placeId") placeId: String
     ): Call<List<ScrapPost>>
 
+    // 상위 스크랩 음식점 조회
+    @GET("/place/top/scrap")
+    fun getTopRestaurant(
+        @Header("Authorization") authorization: String
+    ): Call<List<TopRestuarantDto>>
     // 필요한 다른 API 구현
 }

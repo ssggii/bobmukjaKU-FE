@@ -23,8 +23,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.FragmentChatBinding
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,7 +46,8 @@ class ChatFragment : Fragment() {
     lateinit var adapter4: ChatRoomAllListAdapter // 전체 필터링
     var chatMyList = mutableListOf<ChatRoom>()
     var chatAllList = mutableListOf<ChatRoom>()
-    var chatFilterList = mutableListOf<ChatRoomFilter>()
+    private lateinit var restaurantDb: RestaurantDatabase
+    private var restaurants = listOf<RestaurantList>()
     var uid: Long = 0
 
     private val chatroomService = RetrofitClient.chatRoomService
@@ -51,6 +57,10 @@ class ChatFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
+
+        CoroutineScope(Dispatchers.Main).launch {
+            initRestaurantList()
+        }
     }
 
     override fun onCreateView(
@@ -79,6 +89,14 @@ class ChatFragment : Fragment() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             getFilterFirstInfo()
             binding.swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    private suspend fun initRestaurantList(){
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+            restaurantDb = RestaurantDatabase.getDatabase(mContext)
+            restaurants = restaurantDb.restaurantListDao().getAllRecord()
+            Log.i("finish", restaurants.size.toString())
         }
     }
 

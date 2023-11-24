@@ -58,7 +58,7 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val reviewInfo = items[position]
         holder.binding.name.text = reviewInfo.placeName
-        holder.binding.content.text = "→ " + reviewInfo.contents
+        holder.binding.content.text = reviewInfo.contents
 
         // Firebase Storage에서 이미지 다운로드
         if (reviewInfo.imageUrl != "nodata") {
