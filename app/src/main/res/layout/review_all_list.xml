@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="내용"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/black"
-        android:fontFamily="@font/notosans_bold"
+        android:textColor="@color/darkGray"
+        android:fontFamily="@font/notosans_medium"
         android:textSize="14dp"/>
 </LinearLayout>

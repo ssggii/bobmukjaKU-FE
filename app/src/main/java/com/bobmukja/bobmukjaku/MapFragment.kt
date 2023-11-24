@@ -1,6 +1,5 @@
 package com.bobmukja.bobmukjaku
 
-import MapListFragment
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff

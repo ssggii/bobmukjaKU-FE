@@ -1,5 +1,7 @@
+package com.bobmukja.bobmukjaku
+
 import android.content.Context
-import android.graphics.PointF
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,11 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bobmukja.bobmukjaku.*
-import com.bobmukja.bobmukjaku.Model.*
-import com.bobmukja.bobmukjaku.R
+import com.bobmukja.bobmukjaku.Dto.TopRestuarantDto
+import com.bobmukja.bobmukjaku.Model.Member
+import com.bobmukja.bobmukjaku.Model.RestaurantList
+import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.RoomDB.RestaurantDatabase
 import com.bobmukja.bobmukjaku.databinding.FragmentMapListBinding
 import com.naver.maps.geometry.LatLng
@@ -21,8 +24,8 @@ import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,6 +42,9 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
 
     private val accessToken = SharedPreferences.getString("accessToken", "")
     private val authorizationHeader = "Bearer $accessToken"
+    private val restaurantService = RetrofitClient.restaurantService
+    private var topRestaurants = mutableListOf<TopRestuarantDto>()
+
     var uid: Long = 0
 
     override fun onAttach(context: Context) {
@@ -71,11 +77,11 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     }
 
     private suspend fun initRestaurantList(){
-        CoroutineScope(Dispatchers.IO).async {
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
             restaurantDb = RestaurantDatabase.getDatabase(mContext)
             restaurants = restaurantDb.restaurantListDao().getAllRecord()
             Log.i("finish", restaurants.size.toString())
-        }.await()
+        }
     }
 
     private fun setupSearchListener(naverMap: NaverMap) {
@@ -191,6 +197,85 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     || s.toString().contains("스테이크 음식점") || s.toString().contains("스테이크음식점")) {
                     for (restaurant in restaurants) {
                         if (restaurant.indsSclsNm == "파스타/스테이크") {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("중국집")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("중국집")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("분식")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("김밥/만두/분식")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("카페")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("카페")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("족발") || s.toString().contains("보쌈")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("족발/보쌈")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("국수") || s.toString().contains("칼국수")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("국수/칼국수")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("돼지고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("돼지고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("소고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("소고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("곱창")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("곱창 전골/구이")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("오리고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("닭/오리고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("백반") || s.toString().contains("한정식")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("백반/한정식")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("샌드위치") || s.toString() == "토스트" || s.toString() == "샐러드"
+                    || s.toString().contains("토스트맛집") || s.toString().contains("토스트 맛집")
+                    || s.toString().contains("샐러드맛집") || s.toString().contains("샐러드 맛집")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("토스트/샌드위치/샐러드")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("건대 떡볶이") || s.toString().contains("건대떡볶이")
+                    || s.toString() == ("떡볶이") || s.toString().contains("떡볶이맛집") || s.toString().contains("떡볶이 맛집")
+                    || s.toString() == ("만두") || s.toString().contains("만두맛집") || s.toString().contains("만두 맛집")
+                    || s.toString().contains("건대 만두") || s.toString().contains("건대만두")
+                    || s.toString() == ("김밥") || s.toString().contains("김밥맛집") || s.toString().contains("김밥 맛집")
+                    || s.toString().contains("건대 김밥") || s.toString().contains("건대김밥")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == "김밥/만두/분식") {
                             addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
@@ -335,6 +420,85 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                             addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
+                } else if (s.toString().contains("중국집")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("중국집")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("분식")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("김밥/만두/분식")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("카페")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("카페")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("족발") || s.toString().contains("보쌈")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("족발/보쌈")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("국수") || s.toString().contains("칼국수")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("국수/칼국수")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("돼지고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("돼지고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("소고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("소고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("곱창")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("곱창 전골/구이")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("오리고기")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("닭/오리고기 구이/찜")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("백반") || s.toString().contains("한정식")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("백반/한정식")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("샌드위치") || s.toString() == "토스트" || s.toString() == "샐러드"
+                        || s.toString().contains("토스트맛집") || s.toString().contains("토스트 맛집")
+                        || s.toString().contains("샐러드맛집") || s.toString().contains("샐러드 맛집")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == ("토스트/샌드위치/샐러드")) {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
+                } else if (s.toString().contains("건대 떡볶이") || s.toString().contains("건대떡볶이")
+                    || s.toString() == ("떡볶이") || s.toString().contains("떡볶이맛집") || s.toString().contains("떡볶이 맛집")
+                    || s.toString() == ("만두") || s.toString().contains("만두맛집") || s.toString().contains("만두 맛집")
+                    || s.toString().contains("건대 만두") || s.toString().contains("건대만두")
+                    || s.toString() == ("김밥") || s.toString().contains("김밥맛집") || s.toString().contains("김밥 맛집")
+                    || s.toString().contains("건대 김밥") || s.toString().contains("건대김밥")) {
+                    for (restaurant in restaurants) {
+                        if (restaurant.indsSclsNm == "김밥/만두/분식") {
+                            addMarker(restaurant, naverMap, markerList, uid)
+                        }
+                    }
                 } else if (s.toString().contains("화양동")) {
                     for (restaurant in restaurants) {
                         if (restaurant.lnoAdr.contains("화양동")) {
@@ -359,6 +523,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                             addMarker(restaurant, naverMap, markerList, uid)
                         }
                     }
+                } else if (s.toString() == "") {
+                    initMapMarker(naverMap)
                 } else {
                     for (restaurant in restaurants) {
                         if (restaurant.bizesNm.contains(s.toString())) {
@@ -378,6 +544,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     ) {
         lifecycleScope.launch {
             val marker = Marker() // 마커 추가
+            marker.iconTintColor = Color.GREEN
             marker.position = LatLng(restaurant.lat, restaurant.lon)
             marker.width = 60 // 마커 가로 크기
             marker.height = 80 // 마커 세로 크기
@@ -397,19 +564,15 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun focusMapMarker(
-        marker: Marker,
+        selectedMarker: Marker,
         naverMap: NaverMap,
         restaurantInfoDialog: RestaurantInfoDialog
     ) {
         // 다른 마커들을 지도에서 감춤
-        for (otherMarker in markerList) {
-            if (otherMarker != marker) {
-                otherMarker.map = null
-            }
-        }
+        selectedMarker.iconTintColor = Color.BLUE
 
         naverMap.moveCamera(
-            CameraUpdate.scrollTo(marker.position)
+            CameraUpdate.scrollTo(selectedMarker.position)
                 .animate(CameraAnimation.Fly, 1000)
                 .finishCallback {
                     naverMap.cameraPosition = CameraPosition(
@@ -418,39 +581,99 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                     )
 
                     // 애니메이션이 끝난 후에 다이얼로그 표시
-                    if (markerInfoWindowMap.containsKey(marker)) {
-                        markerInfoWindowMap[marker]?.dismiss()
-                        markerInfoWindowMap.remove(marker)
+                    if (markerInfoWindowMap.containsKey(selectedMarker)) {
+                        markerInfoWindowMap[selectedMarker]?.dismiss()
+                        markerInfoWindowMap.remove(selectedMarker)
                     } else {
-                        markerInfoWindowMap[marker] = restaurantInfoDialog
+                        markerInfoWindowMap[selectedMarker] = restaurantInfoDialog
                         restaurantInfoDialog.show(
                             childFragmentManager,
                             "RestaurantInfoDialog"
                         )
+                    }
+
+                    for (marker in markerList) {
+                        if (marker != selectedMarker) {
+                            marker.iconTintColor = Color.GREEN
+                        }
                     }
                 }
         )
     }
 
     private fun initMapMarker(naverMap: NaverMap) {
-        for (restaurant in restaurants) {
-            val marker = Marker() // 마커 추가
-            marker.position = LatLng(restaurant.lat, restaurant.lon)
-            marker.width = 60 // 마커 가로 크기
-            marker.height = 80 // 마커 세로 크기
-            marker.map = naverMap
+        val call = restaurantService.getTopRestaurant(authorizationHeader)
+        call.enqueue(object : Callback<List<TopRestuarantDto>> {
+            override fun onResponse(call: Call<List<TopRestuarantDto>>, response: Response<List<TopRestuarantDto>>) {
+                if (response.isSuccessful) {
+                    val restaurantListResponse = response.body() // 서버에서 받은 스크랩 목록
+                    if (restaurantListResponse != null) {
+                        topRestaurants.clear()
+                        topRestaurants.addAll(restaurantListResponse) // topRestaurant 목록 저장
+                    } else {
+                        topRestaurants.clear()
+                    }
+                    val successCode = response.code()
+                    Log.i("TOP 음식점 목록 로드 ", "성공 $successCode")
 
-            val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
-            val data = arguments
-            restaurantInfoDialog.arguments = data
+                    if (topRestaurants.isNotEmpty()) {
+                        for (top in topRestaurants) {
+                            for (restaurant in restaurants) {
+                                if (top.placeId == restaurant.bizesId) {
+                                    val marker = Marker() // 마커 추가
+                                    marker.iconTintColor = Color.GREEN
+                                    marker.position = LatLng(restaurant.lat, restaurant.lon)
+                                    marker.width = 60 // 마커 가로 크기
+                                    marker.height = 80 // 마커 세로 크기
+                                    marker.map = naverMap
 
-            marker.setOnClickListener {
-                focusMapMarker(marker, naverMap, restaurantInfoDialog)
-                true
+                                    val restaurantInfoDialog = RestaurantInfoDialog(restaurant, uid)
+                                    val data = arguments
+                                    restaurantInfoDialog.arguments = data
+
+                                    marker.setOnClickListener {
+                                        focusMapMarker(marker, naverMap, restaurantInfoDialog)
+                                        true
+                                    }
+
+                                    markerList.add(marker)
+                                }
+                            }
+                        }
+                    } else {
+                        if (restaurants.isNotEmpty()) {
+                            for (i in 0..9) {
+                                val marker = Marker() // 마커 추가
+                                marker.iconTintColor = Color.GREEN
+                                marker.position = LatLng(restaurants[i].lat, restaurants[i].lon)
+                                marker.width = 60 // 마커 가로 크기
+                                marker.height = 80 // 마커 세로 크기
+                                marker.map = naverMap
+
+                                val restaurantInfoDialog = RestaurantInfoDialog(restaurants[i], uid)
+                                val data = arguments
+                                restaurantInfoDialog.arguments = data
+
+                                marker.setOnClickListener {
+                                    focusMapMarker(marker, naverMap, restaurantInfoDialog)
+                                    true
+                                }
+
+                                markerList.add(marker)
+                            }
+                        }
+                    }
+                } else {
+                    val errorCode = response.code()
+                    Log.i("TOP 음식점 목록 로드 ", "실패 $errorCode")
+                }
             }
 
-            markerList.add(marker)
-        }
+            override fun onFailure(call: Call<List<TopRestuarantDto>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[TOP 음식점 목록 로드 에러: ]", it1) }
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

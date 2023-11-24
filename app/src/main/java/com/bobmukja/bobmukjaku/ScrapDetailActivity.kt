@@ -1,21 +1,20 @@
 package com.bobmukja.bobmukjaku
 
-import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bobmukja.bobmukjaku.Model.*
+import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.Model.ReviewResponse
+import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.MyApp.MyApp
-import com.bobmukja.bobmukjaku.databinding.ActivityRestaurantDetailBinding
+import com.bobmukja.bobmukjaku.databinding.ActivityScrapDetailBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RestaurantDetailActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityRestaurantDetailBinding
+class ScrapDetailActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityScrapDetailBinding
     private lateinit var reviewAdapter: RestaurantDetailAdapter2
 
     private val restaurantService = RetrofitClient.restaurantService
@@ -25,16 +24,13 @@ class RestaurantDetailActivity : AppCompatActivity() {
     // Intent로부터 데이터를 받아옵니다.
     private var bizesId: String? = null
     private var bizesNm: String? = null
-    private var lnoAdr: String? = null
-    private var indsMclsNm: String? = null
-    private var indsSclsNm: String? = null
     private var uid: Long = 0L
 
     var reviewList = mutableListOf<ReviewResponse>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRestaurantDetailBinding.inflate(layoutInflater)
+        binding = ActivityScrapDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         MyApp.setAppContext(this)
@@ -42,16 +38,10 @@ class RestaurantDetailActivity : AppCompatActivity() {
         // Intent로부터 데이터를 가져옵니다.
         bizesId = intent.getStringExtra("bizesId")
         bizesNm = intent.getStringExtra("bizesNm")
-        lnoAdr = intent.getStringExtra("lnoAdr")
-        indsMclsNm = intent.getStringExtra("indsMclsNm")
-        indsSclsNm = intent.getStringExtra("indsSclsNm")
         uid = intent.getLongExtra("uid", 0L)
 
         // 데이터를 설정하여 UI 업데이트
         binding.restaurantName.text = bizesNm
-        binding.category.text = indsMclsNm
-        binding.categorySub.text = indsSclsNm
-        binding.restaurantAdd.text = lnoAdr
 
 //        getRestaurantScrap()
         getRestaurantReview()
