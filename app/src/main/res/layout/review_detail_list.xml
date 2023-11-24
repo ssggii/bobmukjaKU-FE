@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="내용"
+        android:textColor="@color/black"
         android:layout_marginBottom="5dp"
         android:fontFamily="@font/notosans_bold"
         android:textSize="14dp"/>
