@@ -97,12 +97,15 @@
             app:layout_constraintTop_toBottomOf="@+id/review_img"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@drawable/line_gray_top">
+            android:background="@drawable/line_white_top">
 
             <TextView
                 android:id="@+id/review1"
+                android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:fontFamily="@font/notosans_light"
                 android:text="리뷰1"
                 android:visibility="gone"
                 />
@@ -111,6 +114,8 @@
                 android:id="@+id/review2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:fontFamily="@font/notosans_light"
                 android:text="리뷰2"
                 android:visibility="gone"
                 />
@@ -119,6 +124,8 @@
                 android:id="@+id/review3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:fontFamily="@font/notosans_light"
                 android:text="리뷰3"
                 android:visibility="gone"
                 />
