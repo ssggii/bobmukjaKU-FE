@@ -86,17 +86,22 @@ class ReviewListAdapter(var items: List<ReviewResponse>, var uid: Long, var onRe
 
     private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
         val storageReference = Firebase.storage.reference.child(imagePath)
+
         return try {
-            val maxBufferSize = 10 * 1024 * 1024 // 최대 허용 버퍼 크기를 설정 (10MB로 설정)
-            val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            val maxBufferSize = 10 * 1024 * 1024 // 10MB로 설정
+            val stream = storageReference.getBytes(maxBufferSize.toLong()).await().inputStream()
+
+            // 이미지 리사이징
+            val options = BitmapFactory.Options()
+            options.inSampleSize = 3 // 이미지 크기를 줄임 (원하는 크기에 따라 조절)
+
+            BitmapFactory.decodeStream(stream, null, options)
         } catch (e: IOException) {
             e.printStackTrace()
             Log.e("ImageDownload", "Image download failed: ${e.message}")
             null
         }
     }
-
 
     override fun getItemCount(): Int {
         return items.size
