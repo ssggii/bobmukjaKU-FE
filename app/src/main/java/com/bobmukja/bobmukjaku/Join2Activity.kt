@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.bobmukja.bobmukjaku.Hash.Sha256
 import com.bobmukja.bobmukjaku.Model.HashedAuthCode
 import com.bobmukja.bobmukjaku.Model.RetrofitClient
+import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityJoin2Binding
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import java.time.LocalDate
 
 class Join2Activity : AppCompatActivity() {
     lateinit var binding: ActivityJoin2Binding
@@ -150,8 +152,29 @@ class Join2Activity : AppCompatActivity() {
                             startActivity(intent)
                         }
                         else if(intent.getBooleanExtra("alreadyJoin", false)) {//로그인버튼을 눌러 재학생인증 화면으로 왔다면 메인 화면으로,
-                            val intent = Intent(this@Join2Activity, MainActivity::class.java)
-                            startActivity(intent)
+                            //인증날짜 갱신
+                            val authorization = "Bearer ${SharedPreferences.getString("accessToken", "")}"
+                            val currentDate = LocalDate.now().toString()
+
+                            val requestBody = mapOf("certificatedAt" to  currentDate)
+                            RetrofitClient.memberService.updateMember(authorization,requestBody)
+                                .enqueue(object:Callback<Void>{
+                                    override fun onResponse(
+                                        call: Call<Void>,
+                                        response: Response<Void>
+                                    ) {
+                                        //서버에 인증날짜 갱신했으므로 메인화면으로
+                                        Toast.makeText(this@Join2Activity, "재학생 재인증 성공", Toast.LENGTH_SHORT).show()
+                                        val intent = Intent(this@Join2Activity, MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        startActivity(intent)
+                                    }
+
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        Toast.makeText(this@Join2Activity, "인증날짜 갱신 실패", Toast.LENGTH_SHORT).show()
+                                    }
+                                })
+
                         }else{//회원가입 버튼을 눌러 재학생 인증 화면으로 왔다면 회원가입 화면으로
                             val intent = Intent(this@Join2Activity, JoinActivity::class.java)
                             intent.putExtra("email", email)

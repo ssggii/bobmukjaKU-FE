@@ -14,14 +14,12 @@ import com.bobmukja.bobmukjaku.Model.RetrofitClient
 import com.bobmukja.bobmukjaku.Model.SharedPreferences
 import com.bobmukja.bobmukjaku.MyApp.MyApp
 import com.bobmukja.bobmukjaku.databinding.ActivityLoginBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
 class LoginActivity : AppCompatActivity() {
@@ -78,41 +76,75 @@ class LoginActivity : AppCompatActivity() {
     private fun certificatedAtCheck() {
         //서버에서 인증날짜를 비교해서 재학생인증이 만료됐는지 체크
 
+        val authorization = "Bearer ${SharedPreferences
+            .getString("accessToken", "")?:""}"
         val request = RetrofitClient
             .memberService
-            .certificatedAtCheck(
-                SharedPreferences
-                    .getString("accessToken", "")?:"")
-        CoroutineScope(Dispatchers.IO).launch {
-            request.enqueue(object: Callback<Member>{
-                @RequiresApi(Build.VERSION_CODES.O)
-                override fun onResponse(call: Call<Member>, response: Response<Member>) {
-                    //서버에서 인증날짜 값을 받아왔으므로, 인증날짜로부터 1년이 지났는지 체크하여 인증 만료 여부 결정
-                    if(response.isSuccessful) {
-                        val certificatedAtFromServerString =
-                            response.body()?.certificatedAt ?: return//인증날짜가 null -> 재학생 인증 한 적이 없다.
-                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                        val certificatedAtFromServer =
-                            LocalDate.parse(certificatedAtFromServerString, formatter)
-                        val daysUntilCertificatedAt = certificatedAtFromServer.toEpochDay()
-                        val daysUntilNow = LocalDate.now().toEpochDay()
+            .selectOne(
+                authorization)
 
-                        //날짜차이가 1년 이상이면 재학생 인증 화면으로
-                        if(daysUntilNow - daysUntilCertificatedAt >= 365){
-                            //인증한지 1년이 지났으므로 재학생 인증 화면으로
-                            val intent = Intent(this@LoginActivity, Join2Activity::class.java)
-                            intent.putExtra("alreadyJoin", true)
-                            startActivity(intent)
-                        }
+        request.enqueue(object:Callback<Member>{
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                if(response.isSuccessful){
+                    val certificatedAtFromServer =
+                        response.body()?.certificatedAt ?: return//인증날짜가 null -> 재학생 인증 한 적이 없다.
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val date = LocalDate.parse(certificatedAtFromServer, formatter)
+                    Log.i("certificateAt", date.toString())
+
+                    // 현재 날짜와의 차이 계산
+                    val today = LocalDate.now()
+                    val daysDifference = ChronoUnit.DAYS.between(date, today)
+
+                    Log.i("certificateAt", daysDifference.toString())
+
+                    if(daysDifference >= 365){
+                        //인증한지 1년이 지남
+                        val intent = Intent(this@LoginActivity, Join2Activity::class.java)
+                        intent.putExtra("alreadyJoin", true)
+                        startActivity(intent)
+
                     }
                 }
+            }
 
-                override fun onFailure(call: Call<Member>, t: Throwable) {
-                    Log.i("kim", "error: ${t.message}")
-                }
+            override fun onFailure(call: Call<Member>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
 
-            })
-        }
+        })
+
+
+//        request.enqueue(object: Callback<Member>{
+//            @RequiresApi(Build.VERSION_CODES.O)
+//            override fun onResponse(call: Call<Member>, response: Response<Member>) {
+//                //서버에서 인증날짜 값을 받아왔으므로, 인증날짜로부터 1년이 지났는지 체크하여 인증 만료 여부 결정
+//                if(response.isSuccessful) {
+//                    val certificatedAtFromServerString =
+//                        response.body()?.certificatedAt ?: return//인증날짜가 null -> 재학생 인증 한 적이 없다.
+//                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+//                    val certificatedAtFromServer =
+//                        LocalDate.parse(certificatedAtFromServerString, formatter)
+//                    val daysUntilCertificatedAt = certificatedAtFromServer.toEpochDay()
+//                    val daysUntilNow = LocalDate.now().toEpochDay()
+//
+//                    //날짜차이가 1년 이상이면 재학생 인증 화면으로
+//                    if(daysUntilNow - daysUntilCertificatedAt >= 365){
+//                        //인증한지 1년이 지났으므로 재학생 인증 화면으로
+//                        val intent = Intent(this@LoginActivity, Join2Activity::class.java)
+//                        intent.putExtra("alreadyJoin", true)
+//                        startActivity(intent)
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<Member>, t: Throwable) {
+//                Log.i("kim", "error: ${t.message}")
+//            }
+//
+//        })
+
 
     }
 

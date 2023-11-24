@@ -504,6 +504,9 @@ class ChatActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
+
+                                //여기에 퇴장메시지를 보내는 메서드 삽입
+                                sendExitMsg()
                             }
                             else -> {
                                 Log.i("exittt", "퇴장에러")
@@ -521,6 +524,30 @@ class ChatActivity : AppCompatActivity() {
 
             })
         }
+    }
+
+    private fun sendExitMsg() {
+        //퇴장 메시지 전송
+        val exitChatModel = ChatModel("",
+            -300,
+            myInfo.memberNickName,
+            System.currentTimeMillis(),
+            false,
+            chatRoomInfo.roomId,
+            false)
+        val authorization = "Bearer $accessToken"
+        RetrofitClient.memberService.sendMessage(authorization, exitChatModel)
+            .enqueue(object:Callback<Unit>{
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    Log.i("exitMsg", "퇴장메시지 전송성공")
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Log.i("exitMsg", "퇴장메시지 전송실패")
+                }
+
+            })
+
     }
 
 
