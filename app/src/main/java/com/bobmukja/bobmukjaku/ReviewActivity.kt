@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -110,6 +111,9 @@ class ReviewActivity : AppCompatActivity() {
             register.setOnClickListener {
                 //리뷰를 등록
                 if(placeName.text != "") {
+                    register.isEnabled = false//버튼 잠구기
+                    progressBar.visibility = View.VISIBLE
+
                     uploadImageToFirebaseStorage()
                 }else{
                     Toast.makeText(this@ReviewActivity,"리뷰를 입력해주세요.", Toast.LENGTH_SHORT).show()
@@ -138,6 +142,8 @@ class ReviewActivity : AppCompatActivity() {
                 }
                 else{
                     Log.i("cameraData", "업로드실패")
+                    binding.progressBar.visibility = View.GONE
+                    binding.register.isEnabled = true
                 }
             }
         }
@@ -157,12 +163,16 @@ class ReviewActivity : AppCompatActivity() {
                     val intent = Intent(this@ReviewActivity, MainActivity::class.java)
                     //intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                     //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    finishAffinity()
+                    //finishAffinity()
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(intent)
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Log.i("review", t.message.toString())
+                    binding.progressBar.visibility = View.GONE
+                    binding.register.isEnabled = true
+                    Toast.makeText(this@ReviewActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
                 }
             })
         }else{

@@ -191,6 +191,8 @@ class GiveScoreActivity : AppCompatActivity() {
     private fun initLayout() {
         binding.nextBtn.setOnClickListener {
 
+            binding.nextBtn.isEnabled = false
+            //binding.progressBar2.visibility = View.VISIBLE
             //해당 버튼을 누르면 평가점수가 업데이트 되며 리뷰화면으로 전환
             for(result in participants){
                 val originalScore = result.participant.rate
@@ -221,6 +223,7 @@ class GiveScoreActivity : AppCompatActivity() {
                 }
             }
 
+            binding.nextBtn.isEnabled = true
             //리뷰 화면으로 이동
            /* val intent = Intent(this, ReviewActivity::class.java)
             intent.putExtra("myInfo", myInfo)
