@@ -224,9 +224,11 @@ class LoginActivity : AppCompatActivity() {
                                         else->{
                                             //200 이외의 상태코드는 모두 로그인 실패
                                             Log.i("로그인", "실패")
+
                                         }
                                     }
                                 }else{
+                                    Toast.makeText(this@LoginActivity, "이메일 및 패스워드를 확인해주세요.", Toast.LENGTH_SHORT).show()
                                     Log.i("로그인", "실패")
                                 }
                             }
