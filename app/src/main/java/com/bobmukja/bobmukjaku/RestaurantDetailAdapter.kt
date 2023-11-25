@@ -41,7 +41,7 @@ class RestaurantDetailAdapter(var items: List<ReviewResponse>) : RecyclerView.Ad
 
         if (position < 3) {
             // 상위 3개 항목에 대해서만 리뷰 출력
-            holder.binding.content.text = "→ " + reviewInfo.contents
+            holder.binding.content.text = reviewInfo.contents
         } else {
             holder.binding.content.visibility = View.GONE
         }

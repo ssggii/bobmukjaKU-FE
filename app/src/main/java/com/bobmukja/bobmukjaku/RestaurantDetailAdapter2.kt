@@ -10,6 +10,8 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bobmukja.bobmukjaku.Model.ReviewResponse
 import com.bobmukja.bobmukjaku.databinding.ReviewDetailListBinding
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +50,7 @@ class RestaurantDetailAdapter2(var items: List<ReviewResponse>) : RecyclerView.A
             holder.binding.image.visibility = View.GONE
         }
 
-        holder.binding.content.text = "→ " + reviewInfo.contents
+        holder.binding.content.text = reviewInfo.contents
         if (reviewInfo.imageUrl != "nodata") {
             setImageToImageView(holder.binding.image, reviewInfo)
         } else {
@@ -59,28 +61,27 @@ class RestaurantDetailAdapter2(var items: List<ReviewResponse>) : RecyclerView.A
     private fun setImageToImageView(imageView: ImageView, reviewInfo: ReviewResponse) {
         val imagePath = reviewInfo.imageUrl
         CoroutineScope(Dispatchers.IO).launch {
-            val bitmap = downloadImageFromFirebaseStorage(imagePath)
-            withContext(Dispatchers.Main) {
-                if (bitmap != null) {
-                    imageView.setImageBitmap(bitmap)
-                } else {
-                    // 이미지 다운로드 실패 처리
-                    Log.i("리뷰 이미지 로드", "실패")
-                }
-            }
+            downloadImageAndSetToImageView(imageView, imagePath)
         }
     }
 
-    private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
+    private suspend fun downloadImageAndSetToImageView(imageView: ImageView, imagePath: String) {
         val storageReference = Firebase.storage.reference.child(imagePath)
-        return try {
-            val maxBufferSize = 10 * 1024 * 1024 // 최대 허용 버퍼 크기를 설정 (10MB로 설정)
+
+        try {
+            val maxBufferSize = 10 * 1024 * 1024 // 10MB로 설정
             val bytes = storageReference.getBytes(maxBufferSize.toLong()).await()
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+
+            // Glide를 사용하여 이미지 로드 및 설정
+            withContext(Dispatchers.Main) {
+                Glide.with(imageView.context)
+                    .load(bytes)
+                    .apply(RequestOptions().override(300, 300)) // 이미지 크기 조절 (원하는 크기에 따라 조절)
+                    .into(imageView)
+            }
         } catch (e: IOException) {
             e.printStackTrace()
             Log.e("ImageDownload", "Image download failed: ${e.message}")
-            null
         }
     }
 
