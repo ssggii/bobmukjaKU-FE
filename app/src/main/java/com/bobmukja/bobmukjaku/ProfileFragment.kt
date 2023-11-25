@@ -1,6 +1,7 @@
 package com.bobmukja.bobmukjaku
 
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -10,14 +11,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.bobmukja.bobmukjaku.Model.Member
-import com.bobmukja.bobmukjaku.Model.RetrofitClient
-import com.bobmukja.bobmukjaku.Model.SharedPreferences
-import com.bobmukja.bobmukjaku.Model.TimeBlock
+import com.bobmukja.bobmukjaku.Model.*
 import com.bobmukja.bobmukjaku.databinding.FragmentProfileBinding
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -60,11 +59,12 @@ class ProfileFragment : Fragment() {
         // 정보 수정 버튼 이벤트
         modifyInfo()
 
-        //로그아웃 버튼 이벤트
-        logoutInfo()
-
-        //회원탈퇴 버튼 이벤트
-        deleteMember()
+//        //로그아웃 버튼 이벤트
+//        logoutInfo()
+//
+//        //회원탈퇴 버튼 이벤트
+//        deleteMember()
+        initLogoutAndDeleteBtn()
 
         // profileImg 버튼 클릭 이벤트 처리
         binding.profileImg.setOnClickListener {
@@ -76,6 +76,17 @@ class ProfileFragment : Fragment() {
         binding.profileBtn.setOnClickListener {
             val intent = Intent(requireContext(), ProfileColorActivity::class.java)
             startActivityForResult(intent, PROFILE_COLOR_REQUEST_CODE)
+        }
+    }
+
+    private fun initLogoutAndDeleteBtn() {
+        binding.apply {
+            logoutBtn.setOnClickListener {
+                logoutAndDeleteDialog("logout", ::logoutInfo)
+            }
+            userDeleteBtn.setOnClickListener {
+                logoutAndDeleteDialog("delete", ::deleteMember)
+            }
         }
     }
 
@@ -407,61 +418,61 @@ class ProfileFragment : Fragment() {
     private fun logoutInfo(){
         val accessToken = SharedPreferences.getString("accessToken", "")
         val authorizationHeader = "Bearer $accessToken"
-        binding.logoutBtn.setOnClickListener {
 
-            RetrofitClient.memberService.logout(authorizationHeader)
-                .enqueue(object: Callback<ResponseBody>{
-                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                        if(response.isSuccessful){
-                            //로그아웃 성공
-                            //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
 
-                            val result = response.body()?.charStream()?.readText()
-                            Toast.makeText(requireContext(), "$result", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(requireContext(), LoginActivity::class.java)
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            startActivity(intent)
+        RetrofitClient.memberService.logout(authorizationHeader)
+            .enqueue(object: Callback<ResponseBody>{
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if(response.isSuccessful){
+                        //로그아웃 성공
+                        //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+
+                        val result = response.body()?.charStream()?.readText()
+                        Toast.makeText(requireContext(), "$result", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        startActivity(intent)
 //                            Log.i("로그아웃", accessToken.toString())
 //                            Log.i("로그아웃", result.toString())
-                        }else{
-                            Toast.makeText(requireContext(), "로그아웃 실패 ${response.code()}", Toast.LENGTH_SHORT).show()
-                        }
+                    }else{
+                        Toast.makeText(requireContext(), "로그아웃 실패 ${response.code()}", Toast.LENGTH_SHORT).show()
                     }
+                }
 
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        //로그아웃 실패
-                        Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
-                        Log.i("로그아웃", t.message.toString())
-                    }
-                })
-        }
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    //로그아웃 실패
+                    Toast.makeText(requireContext(), "로그아웃 실패", Toast.LENGTH_SHORT).show()
+                    Log.i("로그아웃", t.message.toString())
+                }
+            })
+
     }
 
         private fun deleteMember(){
             val accessToken = SharedPreferences.getString("accessToken", "")
             val authorizationHeader = "Bearer $accessToken"
-            binding.userDeleteBtn.setOnClickListener {
 
-                RetrofitClient.memberService.deleteMember(authorizationHeader)
-                    .enqueue(object: Callback<Unit>{
-                        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                            if(response.isSuccessful){
-                                //회원탈퇴 성공
-                                //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
-//                                val intent = Intent(requireContext(), LoginActivity::class.java)
-//                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//                                startActivity(intent)
-                            }else{
-                                Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
-                            }
-                        }
 
-                        override fun onFailure(call: Call<Unit>, t: Throwable) {
-                            //로그아웃 실패
+            RetrofitClient.memberService.deleteMember(authorizationHeader)
+                .enqueue(object: Callback<Unit>{
+                    override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                        if(response.isSuccessful){
+                            //회원탈퇴 성공
+                            //로그인 화면으로 전환(로그인화면에서 자동으로 SharedPreference에 있는 jwt token(accessToken, refreshToken)삭제
+                            val intent = Intent(requireContext(), LoginActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(intent)
+                        }else{
                             Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
                         }
-                    })
-            }
+                    }
+
+                    override fun onFailure(call: Call<Unit>, t: Throwable) {
+                        //로그아웃 실패
+                        Toast.makeText(requireContext(), "회원탈퇴 실패", Toast.LENGTH_SHORT).show()
+                    }
+                })
+
         }
 
     companion object {
@@ -483,6 +494,37 @@ class ProfileFragment : Fragment() {
             displayInfo()
             val selectedItemId = data?.getIntExtra("selectedItemId", R.id.forth)
             activity?.setResult(RESULT_OK, Intent().putExtra("selectedItemId", selectedItemId))
+        }
+    }
+
+
+    private fun logoutAndDeleteDialog(mode: String, action: () -> Unit) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.join_chatroom_dialog, null)
+        val yesButton = dialogView.findViewById<TextView>(R.id.time_btn_yes)
+        val noButton = dialogView.findViewById<TextView>(R.id.time_btn_no)
+        val guideTxt = dialogView.findViewById<TextView>(R.id.guide_text)
+        when(mode){
+            "logout"->guideTxt.text = "로그아웃 하시겠습니까?"
+            "delete"->guideTxt.text = "탈퇴 하시겠습니까?"
+        }
+
+
+        val builder = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        // 확인 버튼 클릭 이벤트 처리
+        yesButton.setOnClickListener {
+            action()
+            alertDialog.dismiss()
+        }
+
+        // 취소 버튼 클릭 이벤트 처리
+        noButton.setOnClickListener {
+            alertDialog.dismiss()
         }
     }
 }
