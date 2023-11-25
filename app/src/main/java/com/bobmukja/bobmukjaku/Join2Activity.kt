@@ -69,7 +69,6 @@ class Join2Activity : AppCompatActivity() {
         binding.sendBtn.setOnClickListener {
             /*서버에게 이메일인증을 요청*/
 
-
             //건국대학교 메일주소만 입력받도록 필터링
             email = binding.inputEmail.text.toString()
             val regex = """^[a-zA-Z0-9]+@konkuk\.ac\.kr$""".toRegex()
@@ -83,6 +82,7 @@ class Join2Activity : AppCompatActivity() {
 
             //1. 서버에 이메일인증 요청
             //2. 응답값에서 인증코드 해시값을 꺼내와서 hashedAuthCodeFromServer변수에 저장
+            Toast.makeText(this, "인증번호를 요청하였습니다.", Toast.LENGTH_SHORT).show()
             val request = RetrofitClient.memberService.RequestMailAuth(email)
             CoroutineScope(Dispatchers.IO).launch {
                 request.enqueue(object : Callback<HashedAuthCode> {
