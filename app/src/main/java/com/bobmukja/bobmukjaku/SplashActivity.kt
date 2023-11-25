@@ -59,7 +59,8 @@ class SplashActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch{
 
-            stdrYm = SharedPreferences.getString("stdrYm", "000000")?:"null"//최근 업데이트 당시, 음식점 정보 기준 날짜
+            //stdrYm = SharedPreferences.getString("stdrYm", "000000")?:"000000"//최근 업데이트 당시, 음식점 정보 기준 날짜
+            stdrYm = "202309"
             newStdrYm = getStrDateFromrestaurantApi("I201","11215710")?:"null"//api로 새로 가져온 음식점 정보 기준 날짜(인자로 준 문자열은 더미)
 
             Log.i("stdrYm", stdrYm)

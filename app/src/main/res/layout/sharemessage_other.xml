@@ -186,6 +186,20 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/read_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/notosans_medium"
+        android:text="1"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/txt_date"
+        app:layout_constraintLeft_toRightOf="@+id/constraintLayout"
+
+        tools:ignore="TextSizeCheck" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_date"
         setDateText="@{message.sendDate}"

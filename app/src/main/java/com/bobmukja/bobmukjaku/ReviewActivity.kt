@@ -50,11 +50,14 @@ class ReviewActivity : AppCompatActivity() {
     private var doubleBackToExitPressedOnce = false
     override fun onBackPressed() {
         if(doubleBackToExitPressedOnce){
-            super.onBackPressed()
+            //super.onBackPressed()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
         }
 
         this.doubleBackToExitPressedOnce = true
-        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 메인화면으로 갑니다.", Toast.LENGTH_SHORT).show()
 
         Handler().postDelayed({
             doubleBackToExitPressedOnce = false

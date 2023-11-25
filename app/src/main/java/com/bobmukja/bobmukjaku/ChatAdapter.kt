@@ -292,11 +292,14 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
         var txtDate = itemView.tvDate
         var imgBtnProfileBg = itemView.profileBg
         var imgBtnProfileImg = itemView.profileImage
+        var readCountTxt = itemView.readCount
 
         fun bind(position: Int) {
             Log.i("kim", "bind")//메시지 UI 항목 초기화
             var message = items[position]
             var sendDate = message.time
+
+            setReadCount(readCountTxt, items[position].readList!!)
 
             if (items[position].profanity) {
                 txtMessage.text = "욕설이 감지됐습니다."
@@ -389,6 +392,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             var review1Txt = itemView.review1
             var review2Txt = itemView.review2
             var review3Txt = itemView.review3
+            var readCountTxt = itemView.readCount
 
             private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
                 val storageReference = Firebase.storage.reference.child(imagePath)
@@ -409,6 +413,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 var imageUrl = contentList[2]
                 var scrapCount = contentList[3]
                 var reviewData = contentList[4]
+
+                setReadCount(readCountTxt, items[position].readList!!)
 
                 updateProfile(imgBtnProfileImg,imgBtnProfileBg, adapterPosition)
 
@@ -511,6 +517,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             var review1Txt = itemView.review1
             var review2Txt = itemView.review2
             var review3Txt = itemView.review3
+            var readCountTxt = itemView.readCount
 
 
             private suspend fun downloadImageFromFirebaseStorage(imagePath: String): Bitmap? {
@@ -536,7 +543,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
                 var reviewData = contentList[4]
 
 
-
+                setReadCount(readCountTxt, items[position].readList!!)
 
                 restaurantNameTxt.text = restaurantName
                 restaurantAddressTxt.text = restaurantAddress
@@ -650,6 +657,7 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
         var background = itemView.background
         var txtMessage = itemView.txtMessage
         var txtDate = itemView.txtDate
+        var readCountTxt = itemView.readCount
         //var txtIsShown = itemView.txtIsShown
 
         fun bind(position: Int) {            //메시지 UI 레이아웃 초기화
@@ -661,6 +669,8 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             }else {
                 txtMessage.text = message.message
             }
+
+            setReadCount(readCountTxt,items[position].readList!!)
 
             //txtDate.text = getDateText(sendDate.toString())
             txtDate.text = getDateText(sendDate)
@@ -694,4 +704,19 @@ class ChatAdapter(var items:ArrayList<ChatModel>, var myInfo: Member, var partic
             return dateText
         }
     }
+
+
+    private fun setReadCount(readCountTxt:TextView, map:MutableMap<String,Boolean>){
+        var count = 0
+        //Log.i("rrr", map.toString())
+        for( item in map){
+            Log.i("rrr", item.value.toString())
+            if(!item.value) count++
+        }
+        readCountTxt.text = count.toString()
+        if(count <= 0) readCountTxt.visibility = View.GONE
+        else readCountTxt.visibility = View.VISIBLE
+    }
+
+
 }

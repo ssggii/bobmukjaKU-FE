@@ -38,12 +38,10 @@ class LoginActivity : AppCompatActivity() {
         MyApp.setAppContext(this)
 
         SharedPreferences.initSharedPreferences(applicationContext)
-        SharedPreferences.remove("accessToken")
-        SharedPreferences.remove("refreshToken")
+        //SharedPreferences.remove("accessToken")
+        //SharedPreferences.remove("refreshToken")
         initLayout()
-        autoLogin()
-
-
+        //autoLogin()
     }
 
     private var doubleBackToExitPressedOnce = false

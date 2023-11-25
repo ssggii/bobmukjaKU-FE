@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class GiveScoreActivity : AppCompatActivity() {
@@ -42,11 +44,14 @@ class GiveScoreActivity : AppCompatActivity() {
     private var doubleBackToExitPressedOnce = false
     override fun onBackPressed() {
         if(doubleBackToExitPressedOnce){
-            super.onBackPressed()
+            //super.onBackPressed()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
         }
 
         this.doubleBackToExitPressedOnce = true
-        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "'뒤로가기'를 한번 더 누르면 메인화면으로 갑니다.", Toast.LENGTH_SHORT).show()
 
         Handler().postDelayed({
             doubleBackToExitPressedOnce = false
@@ -59,11 +64,13 @@ class GiveScoreActivity : AppCompatActivity() {
         binding = ActivityGiveScoreBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         MyApp.setAppContext(this)
 
         try{
             roomId = intent.getLongExtra("roomId", -1)
             //roomId = 3
+
             Log.i("roomroom", "$roomId")
 
         }catch (e: Exception){
@@ -76,7 +83,10 @@ class GiveScoreActivity : AppCompatActivity() {
             Log.i("errorMessage", accessToken)
         }catch (e: java.lang.Exception){
             Log.i("errorMessage", "SharedPreference문제 ${e.message}")
+
         }
+        //
+
 
 
 
@@ -85,7 +95,9 @@ class GiveScoreActivity : AppCompatActivity() {
         }
 
 //        Log.i("errorMessage", roomId.toString())
+
         CoroutineScope(Dispatchers.Main).launch {
+//
             myInfo = getMyInfoJob.await()
 
             val getAllParticipantsInRoomJob = CoroutineScope(Dispatchers.IO).async {
@@ -119,13 +131,27 @@ class GiveScoreActivity : AppCompatActivity() {
         }
     }
 
-    private fun getMyInfoFromServer(): Member{
-        val accessToken = SharedPreferences.getString("accessToken", "")
-        //서버에서 내정보 가져오기
-        val request = RetrofitClient.memberService.selectOne(
-            "Bearer $accessToken")
-        val response = request.execute()
-        return response.body()!!
+    private suspend fun getMyInfoFromServer(): Member{
+
+        return suspendCoroutine { continuation ->
+            val accessToken = SharedPreferences.getString("accessToken", "")
+
+            //서버에서 내정보 가져오기
+            val request = RetrofitClient.memberService.selectOne(
+                "Bearer $accessToken")
+            val response = request.enqueue(object:Callback<Member>{
+                override fun onResponse(call: Call<Member>, response: Response<Member>) {
+                    if(response.isSuccessful) {
+                        continuation.resume(response.body()!!)
+                    }
+                }
+
+                override fun onFailure(call: Call<Member>, t: Throwable) {
+
+                }
+            })
+        }
+
     }
     private fun initRecyclerView() {
         //참가자목록을 담는 recyclerView 초기화

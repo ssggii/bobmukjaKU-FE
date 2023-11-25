@@ -59,6 +59,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        val mrf = rf.child("message")
+        mrf.removeEventListener(childEventListener!!)
         super.onDestroy()
         Log.i("aaa", "destroy")
     }
@@ -67,12 +69,12 @@ class ChatActivity : AppCompatActivity() {
     var participantsMenuList = arrayListOf<WrapperInChatRoomMenu>()//참가자 목록 저장 배열
     private val rf by lazy {Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}")}
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-    }
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        val intent = Intent(this, MainActivity::class.java)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//        startActivity(intent)
+//    }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -122,7 +124,8 @@ class ChatActivity : AppCompatActivity() {
                 System.currentTimeMillis(),
                 shareMessage = false,
                 chatRoomInfo.roomId,
-                profanity = false)
+                profanity = false,
+                null)
 
             RetrofitClient.memberService.sendMessage(authorization, chatModel)
                 .enqueue(object:Callback<Unit>{
@@ -374,6 +377,7 @@ class ChatActivity : AppCompatActivity() {
         mrf.addChildEventListener(childEventListener)
     }
 
+    var childEventListener : ChildEventListener? = null
     private fun initFirebase() {
         //채팅방id를 토대로 이전까지 주고받았던 메시지를 파이어베이스로부터 가져와서 recyclerView에 반영
         //val rf = Firebase.database.getReference("chatRoom/${chatRoomInfo?.roomId}/message")
@@ -383,8 +387,15 @@ class ChatActivity : AppCompatActivity() {
         var nowMessageDate = Calendar.getInstance()
         chatItem.clear()
         //파이어베이스의 채팅방에 메시지가 업데이트되면 이를 반영
-        val childEventListener = object: ChildEventListener {
+        childEventListener = object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+
+                for(item in snapshot.child("whoRead").children){
+                    Log.i("nnn", item.key.toString())
+                }
+
+
+
                 //Log.i("chat", snapshot.toString())
                 val message = snapshot.child("message").value.toString()
                 val senderUid = snapshot.child("senderUid").value.toString().toLong()
@@ -393,7 +404,21 @@ class ChatActivity : AppCompatActivity() {
                 val isShareMessage = snapshot.child("shareMessage").value.toString().toBoolean()
                 val chatRoomIdFromMessage = snapshot.child("chatRoomId").value.toString().toLong()
                 val isProfanity = snapshot.child("profanity").value.toString().toBoolean()
+                val readList = snapshot.child("readList").children
                 //Log.i("kim", "$message&&$isShareMessage")
+
+                val map = mutableMapOf<String,Boolean>()
+                for(item in readList){
+                    val uid = item.key!!
+                    val isRead = item.value.toString().toBoolean()
+                    Log.i("rrr", "$uid/$isRead")
+                    map[uid] = isRead
+                }
+
+
+                //읽었다.
+                val mmrf = mrf.child("${snapshot.key}/readList/${myInfo.uid}")
+                mmrf.setValue(true)
 
                 val beforeYear = beforeMessageDate[Calendar.YEAR]
                 val beforeMonth = beforeMessageDate[Calendar.MONTH]
@@ -405,10 +430,10 @@ class ChatActivity : AppCompatActivity() {
                 val nowDay = nowMessageDate[Calendar.DAY_OF_MONTH]
 
                 if((beforeYear==nowYear)&&(beforeMonth==nowMonth)&&(beforeDay==nowDay)){
-                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
+                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity, map))
                 }else{
-                    chatItem.add(ChatModel("", -100, myInfo.memberNickName, nowMessageDate.timeInMillis,false,chatRoomInfo.roomId, false))
-                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity))
+                    chatItem.add(ChatModel("", -100, myInfo.memberNickName, nowMessageDate.timeInMillis,false,chatRoomInfo.roomId, false, null))
+                    chatItem.add(ChatModel(message, senderUid, senderName, time, isShareMessage, chatRoomIdFromMessage, isProfanity, map))
                 }
                 beforeMessageDate.set(nowYear,nowMonth,nowDay)
 
@@ -417,13 +442,31 @@ class ChatActivity : AppCompatActivity() {
 
 
             }
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                //메시지의 readList가 변경
+                Log.i("iii", snapshot.toString())
+                val time = snapshot.child("time").value.toString().toLong()
+                val newReadList = snapshot.child("readList").children
+
+                val chat = chatItem.find{ it.time == time }
+                val index = chatItem.indexOf(chat)
+                val readList = chat?.readList
+                readList?.clear()
+
+                for(item in newReadList){
+                    val uid = item.key!!
+                    val isRead = item.value.toString().toBoolean()
+                    readList?.set(uid, isRead)
+                }
+
+                adapter.notifyItemChanged(index)
+            }
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         }
 
-        mrf.addChildEventListener(childEventListener)
+        mrf.addChildEventListener(childEventListener!!)
     }
 
 
@@ -534,7 +577,8 @@ class ChatActivity : AppCompatActivity() {
             System.currentTimeMillis(),
             false,
             chatRoomInfo.roomId,
-            false)
+            false,
+            null)
         val authorization = "Bearer $accessToken"
         RetrofitClient.memberService.sendMessage(authorization, exitChatModel)
             .enqueue(object:Callback<Unit>{
@@ -653,6 +697,13 @@ class ChatActivity : AppCompatActivity() {
         val accessToken = SharedPreferences.getString("accessToken", "")!!
 
         Log.i("kim", isSharingMessage.toString())
+        val readList = mutableMapOf<String,Boolean>()
+        for(member in participantListForChatAdapter){
+            readList[member.uid.toString()]=false
+        }
+        readList[myInfo.uid.toString()] = true
+        Log.i("nnn", readList.toString())
+
         val request = RetrofitClient.memberService.sendMessage(
             "Bearer $accessToken",
             ChatModel(
@@ -662,7 +713,8 @@ class ChatActivity : AppCompatActivity() {
                 System.currentTimeMillis(),
                 isSharingMessage,
                 chatRoomInfo?.roomId,
-                profanity = false
+                profanity = false,
+                readList//현재시점의 참여자 수로 보낸다.(읽은 수 표시용)
             )
         )
         request.enqueue(object : Callback<Unit> {
@@ -769,13 +821,7 @@ class ChatActivity : AppCompatActivity() {
         binding.menuRecyclerview.adapter = adapter2
     }
 
-//    private fun updateFriendFirebase(friendUid: Long){
-//        rf.child("participants/$friendUid/friendOrBlock").setValue("friend")
-//    }
 
-//    private fun updateBlockFirebase(blockUid: Long){
-//        rf.child("participants/$blockUid/friendOrBlock").setValue("block")
-//    }
 }
 
 

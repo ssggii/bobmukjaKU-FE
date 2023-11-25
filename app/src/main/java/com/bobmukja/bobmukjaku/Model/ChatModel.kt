@@ -9,4 +9,6 @@ data class ChatModel(
     @JsonProperty val time:Long?,
     @JsonProperty val shareMessage:Boolean?,
     @JsonProperty val chatRoomId:Long?,
-    @JsonProperty val profanity:Boolean)
+    @JsonProperty val profanity:Boolean,
+    @JsonProperty val readList:MutableMap<String,Boolean>?)
+
