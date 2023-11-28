@@ -3,7 +3,6 @@ package com.bobmukja.bobmukjaku.RoomDB
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -51,6 +50,7 @@ class RestaurantUpdateService:Service() {
             .setContentText(content)
             .setAutoCancel(true)
 
+
         val intent = Intent(this, SplashActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("path", extraString)
@@ -66,10 +66,12 @@ class RestaurantUpdateService:Service() {
     private fun makeNotificationChannel() {
         val id = "BobmukjaKU"
         val name = "BobmukjaKUChannel"
-        val notificationChannel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
-        notificationChannel.enableLights(true)
+        val notificationChannel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_LOW)
+//        notificationChannel.enableLights(false)
+//        notificationChannel.enableVibration(false)
+//        notificationChannel.lightColor = Color.BLUE
+        notificationChannel.vibrationPattern = longArrayOf(0)
         notificationChannel.enableVibration(true)
-        notificationChannel.lightColor = Color.BLUE
         notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
