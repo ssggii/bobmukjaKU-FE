@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.bobmukja.bobmukjaku.Dto.RestaurantMarkerDto
 import com.bobmukja.bobmukjaku.Dto.TopRestuarantDto
 import com.bobmukja.bobmukjaku.Model.Member
 import com.bobmukja.bobmukjaku.Model.RestaurantList
@@ -304,11 +305,12 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                         }
                     }
                 } else {
-                    for (restaurant in restaurants) {
-                        if (restaurant.bizesNm.contains(s.toString())) {
-                            addMarker(restaurant, naverMap, markerList, uid)
-                        }
-                    }
+                    searchRestaurantName(s.toString(), naverMap)
+//                    for (restaurant in restaurants) {
+////                        if (restaurant.bizesNm.contains(s.toString())) {
+////                            addMarker(restaurant, naverMap, markerList, uid)
+////                        }
+//                    }
                 }
             }
 
@@ -526,12 +528,41 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                 } else if (s.toString() == "") {
                     initMapMarker(naverMap)
                 } else {
-                    for (restaurant in restaurants) {
-                        if (restaurant.bizesNm.contains(s.toString())) {
-                            addMarker(restaurant, naverMap, markerList, uid)
+                    searchRestaurantName(s.toString(), naverMap)
+//                    for (restaurant in restaurants) {
+////                        if (restaurant.bizesNm.contains(s.toString())) {
+////                            addMarker(restaurant, naverMap, markerList, uid)
+////                        }
+//                    }
+                }
+            }
+        })
+    }
+
+    private fun searchRestaurantName(search: String, naverMap: NaverMap) {
+        val call = restaurantService.searchRestaurantName(authorizationHeader, search)
+        call.enqueue(object : Callback<List<RestaurantMarkerDto>> {
+            override fun onResponse(call: Call<List<RestaurantMarkerDto>>, response: Response<List<RestaurantMarkerDto>>) {
+                if (response.isSuccessful) {
+                    val restaurantListResponse = response.body() // 서버에서 받은 스크랩 목록
+                    for (list in restaurantListResponse!!) {
+                        for (restaurant in restaurants) {
+                            if (list.placeName == restaurant.bizesNm) {
+                                addMarker(restaurant, naverMap, markerList, uid)
+                            }
                         }
                     }
+                    val successCode = response.code()
+                    Log.i("음식점 검색 ", "성공 $successCode")
+                } else {
+                    val errorCode = response.code()
+                    Log.i("음식점 검색 ", "실패 $errorCode")
                 }
+            }
+
+            override fun onFailure(call: Call<List<RestaurantMarkerDto>>, t: Throwable) {
+                // 네트워크 오류 또는 기타 에러가 발생했을 때의 처리
+                t.message?.let { it1 -> Log.i("[음식점 검색 에러: ]", it1) }
             }
         })
     }

@@ -327,14 +327,14 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="250dp"
             android:layout_weight="1"
             android:scrollbars="none">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/join_recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="220dp" />
+                android:layout_height="250dp" />
         </ScrollView>
 
         <LinearLayout
@@ -371,11 +371,11 @@
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="330dp">
+            android:layout_height="260dp">
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="330dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1">
 
                 <androidx.recyclerview.widget.RecyclerView

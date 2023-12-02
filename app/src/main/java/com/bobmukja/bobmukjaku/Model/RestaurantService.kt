@@ -1,5 +1,6 @@
 package com.bobmukja.bobmukjaku.Model
 
+import com.bobmukja.bobmukjaku.Dto.RestaurantMarkerDto
 import com.bobmukja.bobmukjaku.Dto.TopRestuarantDto
 import retrofit2.Call
 import retrofit2.http.*
@@ -73,5 +74,12 @@ interface RestaurantService {
     fun getTopRestaurant(
         @Header("Authorization") authorization: String
     ): Call<List<TopRestuarantDto>>
+
+    // 음식점 이름으로 검색
+    @GET("/place/name")
+    fun searchRestaurantName(
+        @Header("Authorization") authorization: String,
+        @Query("keyword") keyword:String
+    ): Call<List<RestaurantMarkerDto>>
     // 필요한 다른 API 구현
 }
