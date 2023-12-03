@@ -638,16 +638,11 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
             override fun onResponse(call: Call<List<TopRestuarantDto>>, response: Response<List<TopRestuarantDto>>) {
                 if (response.isSuccessful) {
                     val restaurantListResponse = response.body() // 서버에서 받은 스크랩 목록
+                    Log.i("top", restaurantListResponse.toString())
                     if (restaurantListResponse != null) {
                         topRestaurants.clear()
                         topRestaurants.addAll(restaurantListResponse) // topRestaurant 목록 저장
-                    } else {
-                        topRestaurants.clear()
-                    }
-                    val successCode = response.code()
-                    Log.i("TOP 음식점 목록 로드 ", "성공 $successCode")
 
-                    if (topRestaurants.isNotEmpty()) {
                         for (top in topRestaurants) {
                             for (restaurant in restaurants) {
                                 if (top.placeId == restaurant.bizesId) {
@@ -672,6 +667,7 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                             }
                         }
                     } else {
+                        topRestaurants.clear()
                         if (restaurants.isNotEmpty()) {
                             for (i in 0..9) {
                                 val marker = Marker() // 마커 추가
@@ -694,6 +690,8 @@ class MapListFragment : Fragment(), OnMapReadyCallback {
                             }
                         }
                     }
+                    val successCode = response.code()
+                    Log.i("TOP 음식점 목록 로드 ", "성공 $successCode")
                 } else {
                     val errorCode = response.code()
                     Log.i("TOP 음식점 목록 로드 ", "실패 $errorCode")
